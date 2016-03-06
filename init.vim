@@ -18,6 +18,9 @@ set history=100
 "set cpoptions+=$
 "completion in command line
 set wildmenu
+"ctrl+space - omni complition
+imap <NUL> <c-x><c-o>
+
 
 set showcmd                     " Display what command is waiting for an operator
 set noequalalways               " Don't resize when closing a window
@@ -53,6 +56,11 @@ set ssop-=options " do not store vimrc options
 
 nmap <m-s>w :mksession! <c-r>r/.vimsession<cr>
 nmap <m-s>r :source <c-r>r/.vimsession<cr>
+
+" tell it to use an undo file
+set undofile
+" set a directory to store the undo history
+set undodir=~/.config/nvim/undo
 
 "---------------------------------------------
 "                  buffers
@@ -106,21 +114,26 @@ nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
 
 "---------------------------------------------
-"               tabs/spaces
+"               intend/tab/spaces
 "---------------------------------------------
+" move curson over empty space
 "set virtualedit=all
-set autoindent
-"set smartindent
 
+" indent when moving to the next line while writing code<Paste>
+set autoindent
+
+"set smartindent
 "set smarttab
+
 set tabstop=4
+" when using the >> or << commands, shift lines by 4 spaces
 set shiftwidth=4
 set softtabstop=4
-" spaces instead of tab
+" expand tabs into spaces
 set expandtab
 
-" doc width
-set colorcolumn=80
+" show vertical line
+"set colorcolumn=80
 
 " indent text in visual mode
 vmap < <gv
@@ -132,9 +145,12 @@ vmap > >gv
 set number
 "releative line numbers
 set rnu
+" show a visual line under the cursor's current line
 set cursorline
 set nowrap
 set scrolloff=3             " Keep 3 lines below and above cursor
+" show the matching part of the pair for [] {} and ()
+set showmatch
 
 " line number/scroll/highlight
 nmap <leader>ll :set nornu<cr>:set number<CR>
@@ -154,8 +170,8 @@ nmap <m-D> yyP
 nmap zs :call ToogleScrollMode()<CR>
 
 "folding
-"au BufWinEnter *.java silent! loadview
-au BufWinLeave *.java mkview
+au BufWinEnter *.java,*.py silent! loadview
+au BufWinLeave *.java,*.py mkview
 
 nmap zh mmggzf%`m
 nmap ze zf%
@@ -180,6 +196,7 @@ nmap ,cp :lprevious<cr>
 "---------------------------------------------
 set wildignore+=*/bin/*
 set wildignore+=*.class
+set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
 
 "ft = filetype
@@ -191,11 +208,12 @@ autocmd BufRead,BufNewFile *.gradle set ft=java
 call plug#begin('~/.config/nvim/plugged')
 Plug 'https://github.com/altercation/vim-colors-solarized.git'
 Plug 'https://github.com/bling/vim-airline.git'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'https://github.com/SirVer/ultisnips.git'
 Plug 'https://github.com/scrooloose/nerdtree.git'
 Plug 'https://github.com/rking/ag.vim.git'
 Plug 'https://github.com/majutsushi/tagbar.git'
-Plug 'https://github.com/simnalamburt/vim-mundo.git'
+Plug 'https://github.com/klen/python-mode.git'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
@@ -218,12 +236,23 @@ nmap <Leader>mq :VimuxCloseRunner<CR>
 nmap <Leader>mz :call VimuxZoomRunner()<CR>
 
 "---------------------------------------------
+"                python 
+"---------------------------------------------
+" enable all Python syntax highlighting features
+let python_highlight_all = 1
+
+autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+autocmd BufRead *.py set nocindent
+autocmd BufWritePre *.py normal m`:%s/\s\+$//e ``
+
+let g:pymode_folding = 0
+
+"---------------------------------------------
 "                eclim & java
 "---------------------------------------------
 au BufEnter *.java silent let @c=GetCanonicalClassName()
 au BufEnter *.java silent let @s=GetSimpleClassName()
 
-imap <NUL> <c-x><c-u>
 nmap <leader>jP :ProjectProblems<cr>
 nmap <leader>jc :JavaCorrect<cr>
 nmap <leader>jf :%JavaFormat<cr>
@@ -245,9 +274,9 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_use_caching = 1
 
-nmap <m-p> :CtrlP <cr><c-\>w
+nmap <m-p> :CtrlPBuffer<CR>
+nmap <m-P> :CtrlP <cr><c-\>w
 nmap <c-m-p> :CtrlPMRUFiles<cr>
-nmap \ :CtrlPBuffer<CR>
 nmap <m-c> :CtrlPChange<CR>
 nmap <m-t> :CtrlPBufTag<CR>
 nmap <m-T> :CtrlPBufTag<CR><c-\>w
@@ -283,7 +312,7 @@ nmap <leader>n1 :let NERDTreeQuitOnOpen=1<CR>
 "---------------------------------------------
 "                Gundo
 "---------------------------------------------
-nmap <F4> :GundoToggle<cr>
+nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
 
 "---------------------------------------------
