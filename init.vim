@@ -22,25 +22,15 @@ imap <NUL> <c-x><c-o>
 
 " Display what command is waiting for an operator
 set showcmd
-" Don't resize when closing a window
-set noequalalways
-
-" auto reload .vimrc
-"autocmd! bufwritepost .vimrc source %
-
 
 " redraw only when we need to.
-set lazyredraw          
+set lazyredraw
 
 "---------------------------------------------
 "                misc maps
 "---------------------------------------------
-nmap <leader><leader> :
-
 "disable ex mode
 :map Q <Nop>
-"redraws screen
-nmap <F5> <C-L>
 
 "insert mode
 imap <c-h> <left>
@@ -56,7 +46,8 @@ nnoremap <F2> :w<CR>
 inoremap <F2> <Esc>:w<CR>
 nnoremap <F10> :q<CR>
 
-set ssop-=options " do not store vimrc options
+" do not store vimrc options in session
+set ssop-=options
 
 nmap <m-s>w :mksession! <c-r>r/.vimsession<cr>
 nmap <m-s>r :source <c-r>r/.vimsession<cr>
@@ -69,8 +60,6 @@ set undodir=~/.config/nvim/undo
 "---------------------------------------------
 "                  buffers
 "---------------------------------------------
-"nmap <leader>b :ls<cr>:b
-"nmap <leader>bd :ls<cr>:bd
 nmap <leader>b% :%bd<cr>:e #<cr>
 
 "---------------------------------------------
@@ -110,9 +99,10 @@ set splitright
 set splitbelow
 
 " windows
-"nmap <c-j> <C-w><Down>
-"nmap <c-h> <C-w><Left>
-"nmap <c-l> <C-w><Right>
+nmap <c-j> <C-w><Down>
+nmap <c-h> <C-w><Left>
+nmap <c-l> <C-w><Right>
+nmap <c-k> <C-w><Up>
 
 " tabs
 nmap <m-j> :tabprev<CR>
@@ -122,7 +112,7 @@ nmap <m-k> :tabnext<CR>
 "               intend/tab/spaces
 "---------------------------------------------
 " move curson over empty space
-"set virtualedit=all
+set virtualedit=all
 
 " indent when moving to the next line while writing code<Paste>
 set autoindent
@@ -181,7 +171,7 @@ nmap <m-D> yyP
 nmap zs :call ToogleScrollMode()<CR>
 
 "folding
-set foldmethod=indent
+set foldmethod=manual
 
 au BufWinEnter *.java,*.py silent! loadview
 au BufWinLeave *.java,*.py mkview
@@ -234,9 +224,8 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
-Plug '~/projects/vim-plugins/scroll_mode.vim'
-Plug '~/projects/vim-plugins/replace_all_files.vim'
-Plug '~/projects/vim-plugins/java_class_name.vim'
+Plug 'https://github.com/Yggdroot/indentLine.git'
+Plug 'https://github.com/tpope/vim-fugitive.git'
 call plug#end()
 
 "---------------------------------------------
@@ -248,13 +237,19 @@ let @r=getcwd()
 nmap <Leader>ml :VimuxRunLastCommand<CR>
 nmap <Leader>mq :VimuxCloseRunner<CR>
 nmap <Leader>mi :VimuxInspectRunner<CR>
-nmap <Leader>mq :VimuxCloseRunner<CR>
 nmap <Leader>mz :call VimuxZoomRunner()<CR>
 
 "---------------------------------------------
 "                 markdown
 "---------------------------------------------
 autocmd BufRead *.md set wrap lbr
+
+"---------------------------------------------
+"                 deoplete
+"---------------------------------------------
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+let g:deoplete#auto_completion_start_length = 1
 
 "---------------------------------------------
 "                python
@@ -269,6 +264,7 @@ autocmd BufRead *.py set nocindent
 " flake8
 "let g:flake8_show_in_gutter=1
 let g:flake8_show_in_file=1
+
 autocmd BufWritePost *.py call Flake8()
 
 " jedi
@@ -276,11 +272,6 @@ let g:jedi#show_call_signatures = "1"
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
-
-" deoplete
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#enable_smart_case = 1
-let g:deoplete#auto_completion_start_length = 1
 
 autocmd BufRead *.py inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : deoplete#mappings#manual_complete()
 
@@ -306,12 +297,11 @@ map <F8> :TagbarToggle<CR><c-l>
 "---------------------------------------------
 "                ctrlp
 "---------------------------------------------
-"let g:ctrlp_map = '\'
 let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_use_caching = 1
 
-nmap <m-p> :CtrlPBuffer<CR>
+nmap <\> :CtrlPBuffer<CR>
 nmap <m-P> :CtrlP <cr><c-\>w
 nmap <c-m-p> :CtrlPMRUFiles<cr>
 nmap <m-c> :CtrlPChange<CR>
@@ -333,6 +323,11 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#fnamemod = ':t'
+
+" wget
+" https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim
+" -P ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
+let g:airline_theme='oceanicnext'
 
 "---------------------------------------------
 "                nerd tree
@@ -363,8 +358,61 @@ set background=dark
 "---------------------------------------------
 
 "---------------------------------------------
-"             QuickFixOpenAll
+"             functions
 "---------------------------------------------
+" ReplaceInFiles
+function! ReplaceInFiles(o, n)
+    exec "Ack '" . a:o . "'"
+    if empty(getqflist())
+        return
+    endif
+
+    let l:c = "%s/" . escape(a:o, '\') . "/" . escape(a:n, '\') . "/g"
+    let l:p = input('additinal params? (q=quit) :' . l:c)
+    if l:p == "q"
+        exec "bd %"
+        return
+    endif
+
+    exec "call QuickFixDoAll(\"" . l:c . l:p . "\")"
+endfunction
+
+function! ReplaceInFilesExact(o, n)
+    exec "Ack '\\b" . a:o . "\\b'"
+    if empty(getqflist())
+        return
+    endif
+
+    let l:c = "%s/\\\\<" . escape(a:o, '\') . "\\\\>/" . escape(a:n, '\') . "/g"
+    let l:p = input('additinal params? (q=quit) :' . l:c)
+    if l:p == "q"
+        exec "bd %"
+        return
+    endif
+
+    exec "call QuickFixDoAll(\"" . l:c . l:p . "\")"
+endfunction
+
+" QuickFixDoAll
+function! QuickFixDoAll(command)
+    if empty(getqflist())
+        return
+    endif
+    exec "only"
+    let s:prev_val = ""
+    for d in getqflist()
+        let s:curr_val = bufname(d.bufnr)
+        if (s:curr_val != s:prev_val)
+            exec "edit " . s:curr_val
+            exec a:command
+            exec "write"
+        endif
+        let s:prev_val = s:curr_val
+    endfor
+    "exec "quit"
+endfunction
+command! -nargs=+ QuickFixDoAll call QuickFixDoAll(<f-args>)
+
 function! QuickFixOpenAll()
     if empty(getqflist())
         return
