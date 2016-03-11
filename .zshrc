@@ -90,3 +90,4 @@ alias vi=nvim
 alias vim=nvim
 alias virc='vi -u .vimrc'
 
+alias ack-grep=ack

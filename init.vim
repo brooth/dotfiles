@@ -14,19 +14,23 @@ let mapleader=","
 
 set pastetoggle=<m-p>
 set history=100
-"$ sing in the change mode
-"set cpoptions+=$
 "completion in command line
 set wildmenu
+
 "ctrl+space - omni complition
 imap <NUL> <c-x><c-o>
 
-
-set showcmd                     " Display what command is waiting for an operator
-set noequalalways               " Don't resize when closing a window
+" Display what command is waiting for an operator
+set showcmd
+" Don't resize when closing a window
+set noequalalways
 
 " auto reload .vimrc
 "autocmd! bufwritepost .vimrc source %
+
+
+" redraw only when we need to.
+set lazyredraw          
 
 "---------------------------------------------
 "                misc maps
@@ -94,15 +98,16 @@ nmap <leader>rW :call ReplaceInFilesExact("<C-R><C-w>", "")<Left><Left>
 nmap <leader>re :call ReplaceInFilesExact("")<Left><Left>
 
 "Ag
-let g:ag_working_path_mode="r"
-nmap <leader>ff :Ag ""<Left>
-nmap <leader>fw :Ag "<C-R><C-W>"
-nmap <leader>fW :Ag "\b<C-R><C-W>\b"
+"#let g:ag_working_path_mode="r"
+nmap <leader>ff :Ack ""<Left>
+nmap <leader>fw :Ack "<C-R><C-W>"
+nmap <leader>fW :Ack "\b<C-R><C-W>\b"
 
 "---------------------------------------------
 "             windows/tabs
 "---------------------------------------------
 set splitright
+set splitbelow
 
 " windows
 "nmap <c-j> <C-w><Down>
@@ -142,6 +147,12 @@ vmap > >gv
 "---------------------------------------------
 "            lines/numbers/wrap
 "---------------------------------------------
+" go between wrapped lines
+map j gj
+map k gk
+map <Down> gj
+map <Up> gk
+
 set number
 "releative line numbers
 set rnu
@@ -170,6 +181,8 @@ nmap <m-D> yyP
 nmap zs :call ToogleScrollMode()<CR>
 
 "folding
+set foldmethod=indent
+
 au BufWinEnter *.java,*.py silent! loadview
 au BufWinLeave *.java,*.py mkview
 
@@ -178,9 +191,9 @@ nmap ze zf%
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
-     \ if line("'\"") > 0 && line("'\"") <= line("$") |
-     \   exe "normal! g`\"" |
-     \ endif
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \   exe "normal! g`\"" |
+            \ endif
 
 "---------------------------------------------
 "               correct
@@ -211,9 +224,12 @@ Plug 'https://github.com/bling/vim-airline.git'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'https://github.com/SirVer/ultisnips.git'
 Plug 'https://github.com/scrooloose/nerdtree.git'
-Plug 'https://github.com/rking/ag.vim.git'
+Plug 'https://github.com/mileszs/ack.vim.git'
 Plug 'https://github.com/majutsushi/tagbar.git'
-Plug 'https://github.com/klen/python-mode.git'
+Plug 'https://github.com/simnalamburt/vim-mundo.git'
+Plug 'https://github.com/Shougo/deoplete.nvim.git'
+Plug 'https://github.com/nvie/vim-flake8.git'
+Plug 'https://github.com/davidhalter/jedi-vim.git'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
@@ -236,16 +252,37 @@ nmap <Leader>mq :VimuxCloseRunner<CR>
 nmap <Leader>mz :call VimuxZoomRunner()<CR>
 
 "---------------------------------------------
-"                python 
+"                 markdown
+"---------------------------------------------
+autocmd BufRead *.md set wrap lbr
+
+"---------------------------------------------
+"                python
 "---------------------------------------------
 " enable all Python syntax highlighting features
 let python_highlight_all = 1
 
+autocmd FileType python setlocal completeopt-=preview
 autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 autocmd BufRead *.py set nocindent
-autocmd BufWritePre *.py normal m`:%s/\s\+$//e ``
 
-let g:pymode_folding = 0
+" flake8
+"let g:flake8_show_in_gutter=1
+let g:flake8_show_in_file=1
+autocmd BufWritePost *.py call Flake8()
+
+" jedi
+let g:jedi#show_call_signatures = "1"
+let g:jedi#popup_select_first = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#completions_enabled = 0
+
+" deoplete
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+let g:deoplete#auto_completion_start_length = 1
+
+autocmd BufRead *.py inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : deoplete#mappings#manual_complete()
 
 "---------------------------------------------
 "                eclim & java
@@ -322,13 +359,8 @@ colorscheme solarized
 set background=dark
 
 "---------------------------------------------
-"                  Ag
+"                  Ack
 "---------------------------------------------
-if executable('ag')
-    " Note we extract the column as well as the file and line number
-    set grepprg=ag\ --nogroup\ --nocolor\ --column
-    set grepformat=%f:%l:%c%m
-endif
 
 "---------------------------------------------
 "             QuickFixOpenAll
@@ -340,10 +372,9 @@ function! QuickFixOpenAll()
     let s:prev_val = ""
     for d in getqflist()
         let s:curr_val = bufname(d.bufnr)
-		if s:curr_val != s:prev_val
+        if s:curr_val != s:prev_val
             exec "tabnew " . s:curr_val
         endif
         let s:prev_val = s:curr_val
     endfor
 endfunction
-command! QuickFixOpenAll call QuickFixOpenAll()
