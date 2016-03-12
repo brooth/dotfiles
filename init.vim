@@ -19,12 +19,13 @@ set wildmenu
 
 "ctrl+space - omni complition
 imap <NUL> <c-x><c-o>
+set complete=.,w,b,u,t,k
 
 " Display what command is waiting for an operator
 set showcmd
 
 " redraw only when we need to.
-set lazyredraw
+"set lazyredraw
 
 "---------------------------------------------
 "                misc maps
@@ -226,6 +227,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
 Plug 'https://github.com/Yggdroot/indentLine.git'
 Plug 'https://github.com/tpope/vim-fugitive.git'
+Plug 'airblade/vim-gitgutter'
 call plug#end()
 
 "---------------------------------------------
@@ -301,9 +303,9 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_use_caching = 1
 
-nmap <\> :CtrlPBuffer<CR>
+nmap <m-\> :CtrlPBuffer<CR>
 nmap <m-P> :CtrlP <cr><c-\>w
-nmap <c-m-p> :CtrlPMRUFiles<cr>
+nmap \ :CtrlPMRUFiles<cr>
 nmap <m-c> :CtrlPChange<CR>
 nmap <m-t> :CtrlPBufTag<CR>
 nmap <m-T> :CtrlPBufTag<CR><c-\>w
@@ -327,6 +329,10 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " wget
 " https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim
 " -P ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
+" let s:cterm0B = "166"
+" let s:cterm09 = "37"
+" let s:cterm09 = "37"
+" let s:cterm0D = "67"
 let g:airline_theme='oceanicnext'
 
 "---------------------------------------------
