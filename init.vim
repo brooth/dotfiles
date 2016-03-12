@@ -12,10 +12,14 @@ filetype plugin indent on
 
 let mapleader=","
 
-set pastetoggle=<m-p>
+set <m-P>=P
+set pastetoggle=<m-P>
 set history=100
 "completion in command line
 set wildmenu
+
+" no mouse support
+set mouse = ""
 
 "ctrl+space - omni complition
 imap <NUL> <c-x><c-o>
@@ -50,13 +54,16 @@ nnoremap <F10> :q<CR>
 " do not store vimrc options in session
 set ssop-=options
 
-nmap <m-s>w :mksession! <c-r>r/.vimsession<cr>
-nmap <m-s>r :source <c-r>r/.vimsession<cr>
+nmap <leader>S :mksession! <c-r>r/.vimsession<cr>
+nmap <leader>R :source <c-r>r/.vimsession<cr>
 
 " tell it to use an undo file
 set undofile
 " set a directory to store the undo history
 set undodir=~/.config/nvim/undo
+
+" store swp files in die
+set directory=~/.config/nvim/tmp
 
 "---------------------------------------------
 "                  buffers
@@ -106,6 +113,8 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 " tabs
+set <m-j>=j
+set <m-k>=k
 nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
 
@@ -162,12 +171,14 @@ nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
 " new/move lines
 let @e=''
+set <m-n>=n
+set <m-N>=N
+set <m-m>=m
+set <m-M>=M
 nmap <m-n> :pu e<cr>k
 nmap <m-N> :pu! e<cr>j
 nmap <m-m> :m +1<CR>
 nmap <m-M> :m -2<CR>
-nmap <m-d> yyp
-nmap <m-D> yyP
 
 nmap zs :call ToogleScrollMode()<CR>
 
@@ -218,7 +229,6 @@ Plug 'https://github.com/scrooloose/nerdtree.git'
 Plug 'https://github.com/mileszs/ack.vim.git'
 Plug 'https://github.com/majutsushi/tagbar.git'
 Plug 'https://github.com/simnalamburt/vim-mundo.git'
-Plug 'https://github.com/Shougo/deoplete.nvim.git'
 Plug 'https://github.com/nvie/vim-flake8.git'
 Plug 'https://github.com/davidhalter/jedi-vim.git'
 Plug 'ctrlpvim/ctrlp.vim'
@@ -228,6 +238,13 @@ Plug 'benmills/vimux'
 Plug 'https://github.com/Yggdroot/indentLine.git'
 Plug 'https://github.com/tpope/vim-fugitive.git'
 Plug 'airblade/vim-gitgutter'
+
+if has('nvim') 
+    Plug 'https://github.com/Shougo/deoplete.nvim.git'
+else
+    Plug 'https://github.com/Shougo/neocomplete.vim.git'
+endif
+
 call plug#end()
 
 "---------------------------------------------
@@ -249,9 +266,40 @@ autocmd BufRead *.md set wrap lbr
 "---------------------------------------------
 "                 deoplete
 "---------------------------------------------
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#enable_smart_case = 1
-let g:deoplete#auto_completion_start_length = 1
+if has('nvim') 
+    let g:deoplete#enable_at_startup = 1
+    let g:deoplete#enable_smart_case = 1
+    let g:deoplete#auto_completion_start_length = 2
+
+    autocmd BufRead *.py inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : deoplete#mappings#manual_complete()
+else
+    let g:neocomplete#enable_at_startup = 1
+    let g:neocomplete#enable_smart_case = 1
+    let g:neocomplete#sources#syntax#min_keyword_length = 2
+endif
+
+inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
+
+"---------------------------------------------
+"                ultisnips
+"---------------------------------------------
+let g:UltiSnipsExpandTrigger="<Nop>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:UltiSnipsListSnippets="<F6>"
+
+" respect neosnippet
+let g:ulti_expand_or_jump_res = 0
+function! <SID>ExpandSnippetOrReturn()
+    let snippet = UltiSnips#ExpandSnippetOrJump()
+    if g:ulti_expand_or_jump_res > 0
+        return snippet
+    else
+        return "\<C-Y>"
+    endif
+endfunction
+imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 "---------------------------------------------
 "                python
@@ -274,8 +322,6 @@ let g:jedi#show_call_signatures = "1"
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
-
-autocmd BufRead *.py inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : deoplete#mappings#manual_complete()
 
 "---------------------------------------------
 "                eclim & java
@@ -303,20 +349,11 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_use_caching = 1
 
-nmap <m-\> :CtrlPBuffer<CR>
-nmap <m-P> :CtrlP <cr><c-\>w
-nmap \ :CtrlPMRUFiles<cr>
+set <m-p>=p
+set <m-c>=c
+nmap <m-p> :CtrlPMRUFiles<cr>
 nmap <m-c> :CtrlPChange<CR>
-nmap <m-t> :CtrlPBufTag<CR>
-nmap <m-T> :CtrlPBufTag<CR><c-\>w
-
-"---------------------------------------------
-"                ultisnips
-"---------------------------------------------
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsListSnippets="<F6>"
+nmap \ :CtrlPBufTag<CR>
 
 "---------------------------------------------
 "                airline
@@ -330,7 +367,6 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim
 " -P ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
 " let s:cterm0B = "166"
-" let s:cterm09 = "37"
 " let s:cterm09 = "37"
 " let s:cterm0D = "67"
 let g:airline_theme='oceanicnext'
@@ -431,4 +467,12 @@ function! QuickFixOpenAll()
         endif
         let s:prev_val = s:curr_val
     endfor
+endfunction
+
+function! GetCanonicalClassName()
+    return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
+endfunction
+
+function! GetSimpleClassName()
+    return system("ctags -f - -u --java-kinds=c " . expand('%:p') . " | grep -m 1 -o '^[^	]*'")
 endfunction
