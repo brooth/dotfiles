@@ -4,6 +4,7 @@
 " Ctrl+R %    - copy current file name into command line
 " * (<s-8>)   - serch/highlight word
 " q:          - command history
+" gv          - re-select last visual selection
 
 "---------------------------------------------
 "                misc settings
@@ -11,6 +12,12 @@
 filetype plugin indent on
 
 let mapleader=","
+
+if has('nvim')
+    let $VIMHOME = "~/.config/nvim"
+else
+    let $VIMHOME = "~/.vim"
+endif
 
 set <m-P>=P
 set pastetoggle=<m-P>
@@ -20,6 +27,11 @@ set wildmenu
 
 " no mouse support
 set mouse = ""
+
+" F1 - Esc
+imap <F1> <Esc>
+nmap <F1> <Esc>
+vmap <F1> <Esc>
 
 "ctrl+space - omni complition
 imap <NUL> <c-x><c-o>
@@ -60,10 +72,10 @@ nmap <leader>R :source <c-r>r/.vimsession<cr>
 " tell it to use an undo file
 set undofile
 " set a directory to store the undo history
-set undodir=~/.config/nvim/undo
+exec 'set undodir='.$VIMHOME.'/undo'
 
 " store swp files in die
-set directory=~/.config/nvim/tmp
+exec 'set dir='.$VIMHOME.'/tmp'
 
 "---------------------------------------------
 "                  buffers
@@ -214,38 +226,37 @@ set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
 
-"ft = filetype
-autocmd BufRead,BufNewFile *.gradle set ft=java
-
 "---------------------------------------------
 "                plugins
 "---------------------------------------------
-call plug#begin('~/.config/nvim/plugged')
-Plug 'https://github.com/altercation/vim-colors-solarized.git'
-Plug 'https://github.com/bling/vim-airline.git'
+call plug#begin('$VIMHOME/plugged')
+Plug 'altercation/vim-colors-solarized'
+Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'https://github.com/SirVer/ultisnips.git'
-Plug 'https://github.com/scrooloose/nerdtree.git'
-Plug 'https://github.com/mileszs/ack.vim.git'
-Plug 'https://github.com/majutsushi/tagbar.git'
-Plug 'https://github.com/simnalamburt/vim-mundo.git'
-Plug 'https://github.com/nvie/vim-flake8.git'
-Plug 'https://github.com/davidhalter/jedi-vim.git'
+Plug 'SirVer/ultisnips'
+Plug 'scrooloose/nerdtree'
+Plug 'mileszs/ack.vim'
+Plug 'majutsushi/tagbar'
+Plug 'simnalamburt/vim-mundo'
+Plug 'nvie/vim-flake8'
+Plug 'davidhalter/jedi-vim'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
-Plug 'https://github.com/Yggdroot/indentLine.git'
-Plug 'https://github.com/tpope/vim-fugitive.git'
+Plug 'Yggdroot/indentLine'
+Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
-if has('nvim') 
-    Plug 'https://github.com/Shougo/deoplete.nvim.git'
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim'
 else
-    Plug 'https://github.com/Shougo/neocomplete.vim.git'
+    Plug 'Shougo/neocomplete.vim'
 endif
 
 call plug#end()
+
+let g:indentLine_faster = 1
 
 "---------------------------------------------
 "                vimux
@@ -264,9 +275,9 @@ nmap <Leader>mz :call VimuxZoomRunner()<CR>
 autocmd BufRead *.md set wrap lbr
 
 "---------------------------------------------
-"                 deoplete
+"         neocomplete/deoplete
 "---------------------------------------------
-if has('nvim') 
+if has('nvim')
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#enable_smart_case = 1
     let g:deoplete#auto_completion_start_length = 2
@@ -326,6 +337,8 @@ let g:jedi#completions_enabled = 0
 "---------------------------------------------
 "                eclim & java
 "---------------------------------------------
+autocmd BufRead,BufNewFile *.gradle set ft=java
+
 au BufEnter *.java silent let @c=GetCanonicalClassName()
 au BufEnter *.java silent let @s=GetSimpleClassName()
 
@@ -358,6 +371,7 @@ nmap \ :CtrlPBufTag<CR>
 "---------------------------------------------
 "                airline
 "---------------------------------------------
+set laststatus=2
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
