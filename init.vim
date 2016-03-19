@@ -19,7 +19,7 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
-set <m-P>=P
+"set <m-P>=P
 set pastetoggle=<m-P>
 set history=100
 "completion in command line
@@ -125,8 +125,8 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 " tabs
-set <m-j>=j
-set <m-k>=k
+"set <m-j>=j
+"set <m-k>=k
 nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
 
@@ -183,10 +183,10 @@ nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
 " new/move lines
 let @e=''
-set <m-n>=n
-set <m-N>=N
-set <m-m>=m
-set <m-M>=M
+"set <m-n>=n
+"set <m-N>=N
+"set <m-m>=m
+"set <m-M>=M
 nmap <m-n> :pu e<cr>k
 nmap <m-N> :pu! e<cr>j
 nmap <m-m> :m +1<CR>
@@ -362,8 +362,8 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_use_caching = 1
 
-set <m-p>=p
-set <m-c>=c
+"set <m-p>=p
+"set <m-c>=c
 nmap <m-p> :CtrlPMRUFiles<cr>
 nmap <m-c> :CtrlPChange<CR>
 nmap \ :CtrlPBufTag<CR>
@@ -377,9 +377,8 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#fnamemod = ':t'
 
-" wget
-" https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim
-" -P ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
+"wget https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim \
+"    ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
 " let s:cterm0B = "166"
 " let s:cterm09 = "37"
 " let s:cterm0D = "67"

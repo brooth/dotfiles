@@ -5,7 +5,7 @@ export ZSH=~/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="agnoster"
+ZSH_THEME="gentoo"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -53,8 +53,11 @@ plugins=(git)
 
 # User configuration
 
-  export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
 # export MANPATH="/usr/local/man:$MANPATH"
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -85,6 +88,11 @@ source $ZSH/oh-my-zsh.sh
 
 export TERM="xterm-256color"
 setopt no_share_history
+
+# caps as ctrl
+setxkbmap -layout us -option ctrl:nocaps
+
+alias g=~/.gradle-2.6/bin/gradle
 
 alias vi=nvim
 alias vim=nvim
