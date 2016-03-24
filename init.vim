@@ -230,7 +230,8 @@ set wildignore+=*/build/^[^g]*
 "                plugins
 "---------------------------------------------
 call plug#begin('$VIMHOME/plugged')
-Plug 'altercation/vim-colors-solarized'
+"Plug 'altercation/vim-colors-solarized'
+Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'SirVer/ultisnips'
@@ -405,8 +406,9 @@ imap <F4> <esc><f4>
 "---------------------------------------------
 "                solarized
 "---------------------------------------------
-colorscheme solarized
+"colorscheme solarized
 set background=dark
+colorscheme gruvbox
 
 "---------------------------------------------
 "                  Ack

@@ -6,9 +6,18 @@
    dotspacemacs-configuration-layer-path '()
 
    dotspacemacs-configuration-layers '(
-     auto-completion
      ;; better-defaults
      emacs-lisp
+     ;; completion
+     (auto-completion :variables
+                      auto-completion-return-key-behavior 'complete
+                      auto-completion-tab-key-behavior 'complete
+                      ;; auto-completion-complete-with-key-sequence jk
+                      auto-completion-complete-with-key-sequence-delay 0.0
+                      auto-completion-private-snippets-directory nil
+                      auto-completion-enable-snippets-in-popup t
+                      )
+
      git
      markdown
      org
@@ -18,12 +27,12 @@
      spell-checking
      syntax-checking
      version-control
-     unimpaired
-     ranger
+     java
      )
 
    dotspacemacs-additional-packages '(
-     solarized-theme
+     ;; solarized-theme
+     gruvbox-theme
    )
 
    dotspacemacs-excluded-packages '()))
@@ -31,16 +40,18 @@
 (defun dotspacemacs/init ()
   (setq-default
    ;; known
-   dotspacemacs-mode-line-unicode-symbols t
+   dotspacemacs-mode-line-unicode-symbols nil
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-loading-progress-bar nil
-   dotspacemacs-themes '(monokai spacemacs-dark zenburn solarized-dark)
+   dotspacemacs-themes '(gruvbox monokai spacemacs-dark zenburn solarized-dark)
    dotspacemacs-default-font '("Ubuntu Mono" :size 16 :weight normal
                                :width normal :powerline-scale 1.1)
+   dotspacemacs-active-transparency nil
+   dotspacemacs-inactive-transparency nil
 
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
-   dotspacemacs-smartparens-strict-mode t
+   dotspacemacs-smartparens-strict-mode nil
 
    dotspacemacs-editing-style 'vim
    dotspacemacs-line-numbers 'relative
@@ -51,7 +62,7 @@
    dotspacemacs-startup-recent-list-size 5
    dotspacemacs-check-for-update t
    dotspacemacs-maximized-at-startup t
-   dotspacemacs-smooth-scrolling t
+   dotspacemacs-smooth-scrolling nil
    dotspacemacs-auto-resume-layouts t
 
    dotspacemacs-leader-key "SPC"
@@ -65,16 +76,6 @@
 
    dotspacemacs-elpa-https t
    dotspacemacs-elpa-timeout 5
-
-   ;; A value from the range (0..100), in increasing opacity, which describes
-   ;; the transparency level of a frame when it's active or selected.
-   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-active-transparency nil
-   ;; A value from the range (0..100), in increasing opacity, which describes
-   ;; the transparency level of a frame when it's inactive or deselected.
-   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-inactive-transparency nil
-
 
    ;; unknown
 
@@ -145,7 +146,7 @@
 
    ;; show helm's prompt at the bottom
    helm-echo-input-in-header-line nil
-   powerline-default-separator 'arrow-fade)
+   powerline-default-separator (quote utf-8))
 
   (evil-leader/set-key
     "os" 'just-one-space)
@@ -154,6 +155,9 @@
   ;; move visual lines
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+
+  ;; undo all in insert mode
+  (setq evil-want-fine-undo t)
 
   ;; save undo history
   (setq undo-tree-auto-save-history t)
@@ -165,3 +169,7 @@
      (evilified-state-evilify-map proced-mode-map
        :mode proced-mode))
 )
+
+(custom-set-faces
+ '(font-lock-type-face ((t (:foreground "#ffaf20"))))
+ '(warning ((t (:foreground "DarkOrange")))))

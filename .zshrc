@@ -52,41 +52,12 @@ ZSH_THEME="gentoo"
 plugins=(git)
 
 # User configuration
-
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
+export TERM="xterm-256color"
 
 source $ZSH/oh-my-zsh.sh
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-export TERM="xterm-256color"
 setopt no_share_history
 
 # caps as ctrl
@@ -97,5 +68,8 @@ alias g=~/.gradle-2.6/bin/gradle
 alias vi=nvim
 alias vim=nvim
 alias virc='vi -u .vimrc'
+
+alias em='emacs -nw'
+alias emc='emacsclient -nw'
 
 alias ack-grep=ack
