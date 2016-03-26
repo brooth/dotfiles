@@ -11,15 +11,16 @@
 "---------------------------------------------
 filetype plugin indent on
 
-let mapleader=","
+let mapleader=" "
 
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
+    " normal mode in terminal by Esc
+    tnoremap <Esc> <C-\><C-n>
 else
     let $VIMHOME = "~/.vim"
 endif
 
-"set <m-P>=P
 set pastetoggle=<m-P>
 set history=100
 "completion in command line
@@ -49,6 +50,9 @@ set showcmd
 "disable ex mode
 :map Q <Nop>
 
+"yeah
+map Y y$
+
 "insert mode
 imap <c-h> <left>
 imap <c-k> <up>
@@ -62,6 +66,7 @@ imap <c-l> <right>
 nnoremap <F2> :w<CR>
 inoremap <F2> <Esc>:w<CR>
 nnoremap <F10> :q<CR>
+nmap <leader>E :e!<cr>
 
 " do not store vimrc options in session
 set ssop-=options
@@ -80,7 +85,7 @@ exec 'set dir='.$VIMHOME.'/tmp'
 "---------------------------------------------
 "                  buffers
 "---------------------------------------------
-nmap <leader>b% :%bd<cr>:e #<cr>
+nmap <leader>bD :%bd<cr>:e #<cr>
 
 "---------------------------------------------
 "          search/replace/subtitude
@@ -118,6 +123,11 @@ nmap <leader>fW :Ack "\b<C-R><C-W>\b"
 set splitright
 set splitbelow
 
+nmap <leader>1 1<c-w><c-w>
+nmap <leader>2 2<c-w><c-w>
+nmap <leader>3 3<c-w><c-w>
+nmap <leader>4 4<c-w><c-w>
+
 " windows
 nmap <c-j> <C-w><Down>
 nmap <c-h> <C-w><Left>
@@ -125,10 +135,8 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 " tabs
-"set <m-j>=j
-"set <m-k>=k
-nmap <m-j> :tabprev<CR>
-nmap <m-k> :tabnext<CR>
+nmap <leader>J :tabprev<CR>
+nmap <leader>K :tabnext<CR>
 
 "---------------------------------------------
 "               intend/tab/spaces
@@ -183,14 +191,6 @@ nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
 " new/move lines
 let @e=''
-"set <m-n>=n
-"set <m-N>=N
-"set <m-m>=m
-"set <m-M>=M
-nmap <m-n> :pu e<cr>k
-nmap <m-N> :pu! e<cr>j
-nmap <m-m> :m +1<CR>
-nmap <m-M> :m -2<CR>
 
 nmap zs :call ToogleScrollMode()<CR>
 
@@ -212,11 +212,11 @@ autocmd BufReadPost *
 "---------------------------------------------
 "               correct
 "---------------------------------------------
-nmap ,ct :%s/\s\+$//e<cr>
+nmap <leader>ct :%s/\s\+$//e<cr>
 
-nmap ,co :lopen<cr>
-nmap ,cn :lnext<cr>
-nmap ,cp :lprevious<cr>
+nmap <leader>co :lopen<cr>
+nmap <leader>cn :lnext<cr>
+nmap <leader>cp :lprevious<cr>
 
 "---------------------------------------------
 "                files/types
@@ -230,7 +230,6 @@ set wildignore+=*/build/^[^g]*
 "                plugins
 "---------------------------------------------
 call plug#begin('$VIMHOME/plugged')
-"Plug 'altercation/vim-colors-solarized'
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -248,6 +247,7 @@ Plug 'benmills/vimux'
 Plug 'Yggdroot/indentLine'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
+Plug 'artur-shaik/vim-javacomplete2'
 
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
@@ -336,23 +336,12 @@ let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
 
 "---------------------------------------------
-"                eclim & java
+"               java
 "---------------------------------------------
 autocmd BufRead,BufNewFile *.gradle set ft=java
 
-au BufEnter *.java silent let @c=GetCanonicalClassName()
-au BufEnter *.java silent let @s=GetSimpleClassName()
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
-nmap <leader>jP :ProjectProblems<cr>
-nmap <leader>jc :JavaCorrect<cr>
-nmap <leader>jf :%JavaFormat<cr>
-nmap <leader>ji :JavaImport<cr>
-nmap <leader>jI :JavaImportOrganize<cr>
-nmap <leader>jl :JavaImpl<cr>
-nmap <leader>jd :JavaDocPreview<cr><c-k>
-nmap <leader>jD :JavaDocSearch<cr><c-k>
-nmap <leader>js :JavaSearchContext -a<cr><c-k>
-nnoremap <silent> <buffer> <cr> :JavaSearchContext<cr>
 
 map <F8> :TagbarToggle<CR><c-l>
 
@@ -361,13 +350,30 @@ map <F8> :TagbarToggle<CR><c-l>
 "---------------------------------------------
 let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = '0'
+let g:ctrlp_show_hidden = 1
 let g:ctrlp_use_caching = 1
 
-"set <m-p>=p
-"set <m-c>=c
-nmap <m-p> :CtrlPMRUFiles<cr>
-nmap <m-c> :CtrlPChange<CR>
-nmap \ :CtrlPBufTag<CR>
+nmap <leader>p :CtrlP<cr>
+nmap <leader>P :CtrlPMRUFiles<cr>
+nmap <leader><c-p> :CtrlP<cr><c-\>w<cr>
+nmap <leader>C :CtrlPChange<CR>
+nmap <leader>T :CtrlPTag<CR>
+nmap \ :CtrlPLine<cr>
+
+if executable('ag')
+    let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden
+                \ --ignore .git
+                \ --ignore .svn
+                \ --ignore .DS_Store
+                \ --ignore "**/*.pyc"
+                \ -g ""'
+endif
+
+"---------------------------------------------
+"                theme
+"---------------------------------------------
+set background=dark
+colorscheme gruvbox
 
 "---------------------------------------------
 "                airline
@@ -391,24 +397,13 @@ let g:airline_theme='oceanicnext'
 let NERDTreeWinSize=46
 
 nmap <leader>n :NERDTreeToggle<CR>
-nmap <leader>nn :NERDTreeToggle<CR>
-nmap <leader>nf :NERDTreeFind<CR>
-nmap <leader>nq :NERDTreeClose<CR>
-nmap <leader>n0 :let NERDTreeQuitOnOpen=0<CR>
-nmap <leader>n1 :let NERDTreeQuitOnOpen=1<CR>
+nmap <leader>N :NERDTreeFind<CR>
 
 "---------------------------------------------
 "                Gundo
 "---------------------------------------------
 nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
-
-"---------------------------------------------
-"                solarized
-"---------------------------------------------
-"colorscheme solarized
-set background=dark
-colorscheme gruvbox
 
 "---------------------------------------------
 "                  Ack

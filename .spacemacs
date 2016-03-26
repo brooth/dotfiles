@@ -35,7 +35,9 @@
      gruvbox-theme
    )
 
-   dotspacemacs-excluded-packages '()))
+   dotspacemacs-excluded-packages '(
+    ;; neotree
+   )))
 
 (defun dotspacemacs/init ()
   (setq-default
