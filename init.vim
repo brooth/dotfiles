@@ -9,8 +9,6 @@
 "---------------------------------------------
 "                misc settings
 "---------------------------------------------
-filetype plugin indent on
-
 let mapleader=" "
 
 if has('nvim')
@@ -42,7 +40,7 @@ set complete=.,w,b,u,t,k
 set showcmd
 
 " redraw only when we need to.
-"set lazyredraw
+set lazyredraw
 
 "---------------------------------------------
 "                misc maps
@@ -232,7 +230,6 @@ set wildignore+=*/build/^[^g]*
 call plug#begin('$VIMHOME/plugged')
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'SirVer/ultisnips'
 Plug 'scrooloose/nerdtree'
 Plug 'mileszs/ack.vim'
@@ -247,7 +244,10 @@ Plug 'benmills/vimux'
 Plug 'Yggdroot/indentLine'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
+Plug 'jiangmiao/auto-pairs'
 Plug 'artur-shaik/vim-javacomplete2'
+Plug 'scrooloose/syntastic'
+Plug 'hsanson/vim-android'
 
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
@@ -256,6 +256,7 @@ else
 endif
 
 call plug#end()
+filetype plugin indent on
 
 let g:indentLine_faster = 1
 
@@ -281,17 +282,21 @@ autocmd BufRead *.md set wrap lbr
 if has('nvim')
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#enable_smart_case = 1
-    let g:deoplete#auto_completion_start_length = 2
+    let g:deoplete#auto_completion_start_length = 1
 
-    autocmd BufRead *.py inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : deoplete#mappings#manual_complete()
 else
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#sources#syntax#min_keyword_length = 2
+    let g:neocomplete#sources#syntax#min_keyword_length = 1
 endif
 
 inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
+
+"set completeopt=longest,menu,menuone
+"todo: until the lag is
+let g:deoplete#ignore_sources = {}
+let g:deoplete#ignore_sources.java = ['javacomplete2']
 
 "---------------------------------------------
 "                ultisnips
@@ -338,12 +343,18 @@ let g:jedi#completions_enabled = 0
 "---------------------------------------------
 "               java
 "---------------------------------------------
-autocmd BufRead,BufNewFile *.gradle set ft=java
+au BufEnter *.java silent let @c=GetCanonicalClassName()
+au BufEnter *.java silent let @s=GetSimpleClassName()
 
+autocmd BufRead,BufNewFile *.gradle set ft=java
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
+"let g:android_sdk_path="~/Android/Sdk"
+"let g:gradle_path="~/.gradle-2.6"
+let g:gradle_daemon=1
 
-map <F8> :TagbarToggle<CR><c-l>
+let g:tagbar_autofocus = 1
+map <F8> :TagbarToggle<CR>
 
 "---------------------------------------------
 "                ctrlp
@@ -384,17 +395,15 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#fnamemod = ':t'
 
-"wget https://raw.githubusercontent.com/mhartington/oceanic-next/master/autoload/airline/themes/oceanicnext.vim \
-"    ~/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/
-" let s:cterm0B = "166"
-" let s:cterm09 = "37"
-" let s:cterm0D = "67"
 let g:airline_theme='oceanicnext'
 
 "---------------------------------------------
 "                nerd tree
 "---------------------------------------------
 let NERDTreeWinSize=46
+let NERDTreeHighlightCursorline = 1
+
+let NERDTreeIgnore=['\.pyc$', '\.pyo$', '\.py\$class$', '^\.git$' ]
 
 nmap <leader>n :NERDTreeToggle<CR>
 nmap <leader>N :NERDTreeFind<CR>
