@@ -63,9 +63,6 @@ source $ZSH/oh-my-zsh.sh
 
 setopt no_share_history
 
-# caps as ctrl
-setxkbmap -layout us -option ctrl:nocaps
-
 alias g=~/.gradle-2.6/bin/gradle
 
 alias vi=nvim

@@ -19,7 +19,7 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
-set pastetoggle=<m-P>
+set pastetoggle=<F12>
 set history=100
 "completion in command line
 set wildmenu
@@ -248,6 +248,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'artur-shaik/vim-javacomplete2'
 Plug 'scrooloose/syntastic'
 Plug 'hsanson/vim-android'
+Plug 'tpope/vim-repeat'
 
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
@@ -259,6 +260,18 @@ call plug#end()
 filetype plugin indent on
 
 let g:indentLine_faster = 1
+
+"---------------------------------------------
+"                git
+"---------------------------------------------
+" hunks
+nmap <leader>hv <Plug>GitGutterPreviewHunk
+nmap <leader>h[ <Plug>GitGutterPrevHunk
+nmap <leader>h] <Plug>GitGutterNextHunk
+nmap <Leader>hu <Plug>GitGutterRevertHunk
+nmap <Leader>ha <Plug>GitGutterStageHunk
+" no mappings by gitgutter
+let g:gitgutter_map_keys = 0
 
 "---------------------------------------------
 "                vimux
@@ -321,6 +334,12 @@ imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR
 "---------------------------------------------
 "                python
 "---------------------------------------------
+" <leader>g - goto assingment
+" <leader>d - goto definitions
+" K - pydoc
+" <leader>r - renaming
+" <leader>n - usages
+"
 " enable all Python syntax highlighting features
 let python_highlight_all = 1
 
@@ -364,9 +383,8 @@ let g:ctrlp_working_path_mode = '0'
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_use_caching = 1
 
-nmap <leader>p :CtrlP<cr>
-nmap <leader>P :CtrlPMRUFiles<cr>
-nmap <leader><c-p> :CtrlP<cr><c-\>w<cr>
+nmap <leader>p :CtrlPMRUFiles<cr>
+nmap <leader>P :CtrlP<cr><c-\>w<cr>
 nmap <leader>C :CtrlPChange<CR>
 nmap <leader>T :CtrlPTag<CR>
 nmap \ :CtrlPLine<cr>
