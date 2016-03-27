@@ -7,8 +7,47 @@
 " gv          - re-select last visual selection
 
 "---------------------------------------------
+"                plugins
+"---------------------------------------------
+call plug#begin('$VIMHOME/plugged')
+Plug 'morhetz/gruvbox'
+Plug 'bling/vim-airline'
+Plug 'SirVer/ultisnips'
+Plug 'scrooloose/nerdtree'
+Plug 'mileszs/ack.vim'
+Plug 'majutsushi/tagbar'
+Plug 'simnalamburt/vim-mundo'
+Plug 'nvie/vim-flake8'
+Plug 'davidhalter/jedi-vim'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'tpope/vim-surround'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'benmills/vimux'
+Plug 'Yggdroot/indentLine'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+Plug 'jiangmiao/auto-pairs'
+Plug 'artur-shaik/vim-javacomplete2'
+Plug 'scrooloose/syntastic'
+Plug 'hsanson/vim-android'
+Plug 'tpope/vim-repeat'
+Plug 'haya14busa/incsearch.vim'
+
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim'
+else
+    Plug 'Shougo/neocomplete.vim'
+endif
+
+call plug#end()
+
+let g:indentLine_faster = 1
+
+"---------------------------------------------
 "                misc settings
 "---------------------------------------------
+filetype plugin indent on
+
 let mapleader=" "
 
 if has('nvim')
@@ -90,6 +129,8 @@ nmap <leader>bD :%bd<cr>:e #<cr>
 "---------------------------------------------
 "case sensetive search in CtrlP if enter capitals
 set smartcase
+" with smartcase ignores case when all in lowercase
+set ignorecase
 "highlight search
 set hlsearch
 "highlight search while typing
@@ -98,6 +139,11 @@ set incsearch
 "no hightlight
 nmap <F3> :noh<CR>
 imap <F3> <esc>:noh<CR>
+
+"incsearch plugin
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
 
 "replace (subsitute)
 nmap <leader>ss :%s//gc<Left><Left><Left>
@@ -108,12 +154,6 @@ nmap <leader>rr :call ReplaceInFiles("")<Left><Left>
 nmap <leader>rw :call ReplaceInFiles("<C-R><C-w>", "")<Left><Left>
 nmap <leader>rW :call ReplaceInFilesExact("<C-R><C-w>", "")<Left><Left>
 nmap <leader>re :call ReplaceInFilesExact("")<Left><Left>
-
-"Ag
-"#let g:ag_working_path_mode="r"
-nmap <leader>ff :Ack ""<Left>
-nmap <leader>fw :Ack "<C-R><C-W>"
-nmap <leader>fW :Ack "\b<C-R><C-W>\b"
 
 "---------------------------------------------
 "             windows/tabs
@@ -133,8 +173,9 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 " tabs
-nmap <leader>J :tabprev<CR>
-nmap <leader>K :tabnext<CR>
+nmap <leader>j :tabprev<CR>
+nmap <leader>k :tabnext<CR>
+nmap <leader>te :tabe %<cr>
 
 "---------------------------------------------
 "               intend/tab/spaces
@@ -156,7 +197,7 @@ set softtabstop=4
 set expandtab
 
 " show vertical line
-"set colorcolumn=80
+set colorcolumn=80
 
 " indent text in visual mode
 vmap < <gv
@@ -190,15 +231,15 @@ nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 " new/move lines
 let @e=''
 
-nmap zs :call ToogleScrollMode()<CR>
-
 "folding
 set foldmethod=manual
 
 au BufWinEnter *.java,*.py silent! loadview
 au BufWinLeave *.java,*.py mkview
 
+"fold file header (e.g. license javadoc)
 nmap zh mmggzf%`m
+"fold current brackets
 nmap ze zf%
 
 " Return to last edit position when opening files (You want this!)
@@ -210,8 +251,10 @@ autocmd BufReadPost *
 "---------------------------------------------
 "               correct
 "---------------------------------------------
+"trailing
 nmap <leader>ct :%s/\s\+$//e<cr>
 
+"goto next, prev. open error
 nmap <leader>co :lopen<cr>
 nmap <leader>cn :lnext<cr>
 nmap <leader>cp :lprevious<cr>
@@ -223,113 +266,6 @@ set wildignore+=*/bin/*
 set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
-
-"---------------------------------------------
-"                plugins
-"---------------------------------------------
-call plug#begin('$VIMHOME/plugged')
-Plug 'morhetz/gruvbox'
-Plug 'bling/vim-airline'
-Plug 'SirVer/ultisnips'
-Plug 'scrooloose/nerdtree'
-Plug 'mileszs/ack.vim'
-Plug 'majutsushi/tagbar'
-Plug 'simnalamburt/vim-mundo'
-Plug 'nvie/vim-flake8'
-Plug 'davidhalter/jedi-vim'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'tpope/vim-surround'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'benmills/vimux'
-Plug 'Yggdroot/indentLine'
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-Plug 'jiangmiao/auto-pairs'
-Plug 'artur-shaik/vim-javacomplete2'
-Plug 'scrooloose/syntastic'
-Plug 'hsanson/vim-android'
-Plug 'tpope/vim-repeat'
-
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim'
-else
-    Plug 'Shougo/neocomplete.vim'
-endif
-
-call plug#end()
-filetype plugin indent on
-
-let g:indentLine_faster = 1
-
-"---------------------------------------------
-"                git
-"---------------------------------------------
-" hunks
-nmap <leader>hv <Plug>GitGutterPreviewHunk
-nmap <leader>h[ <Plug>GitGutterPrevHunk
-nmap <leader>h] <Plug>GitGutterNextHunk
-nmap <Leader>hu <Plug>GitGutterRevertHunk
-nmap <Leader>ha <Plug>GitGutterStageHunk
-" no mappings by gitgutter
-let g:gitgutter_map_keys = 0
-
-"---------------------------------------------
-"                vimux
-"---------------------------------------------
-let g:VimuxHeight = "40"
-let @r=getcwd()
-
-nmap <Leader>ml :VimuxRunLastCommand<CR>
-nmap <Leader>mq :VimuxCloseRunner<CR>
-nmap <Leader>mi :VimuxInspectRunner<CR>
-nmap <Leader>mz :call VimuxZoomRunner()<CR>
-
-"---------------------------------------------
-"                 markdown
-"---------------------------------------------
-autocmd BufRead *.md set wrap lbr
-
-"---------------------------------------------
-"         neocomplete/deoplete
-"---------------------------------------------
-if has('nvim')
-    let g:deoplete#enable_at_startup = 1
-    let g:deoplete#enable_smart_case = 1
-    let g:deoplete#auto_completion_start_length = 1
-
-else
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#sources#syntax#min_keyword_length = 1
-endif
-
-inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
-
-"set completeopt=longest,menu,menuone
-"todo: until the lag is
-let g:deoplete#ignore_sources = {}
-let g:deoplete#ignore_sources.java = ['javacomplete2']
-
-"---------------------------------------------
-"                ultisnips
-"---------------------------------------------
-let g:UltiSnipsExpandTrigger="<Nop>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsListSnippets="<F6>"
-
-" respect neosnippet
-let g:ulti_expand_or_jump_res = 0
-function! <SID>ExpandSnippetOrReturn()
-    let snippet = UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res > 0
-        return snippet
-    else
-        return "\<C-Y>"
-    endif
-endfunction
-imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 "---------------------------------------------
 "                python
@@ -376,6 +312,40 @@ let g:tagbar_autofocus = 1
 map <F8> :TagbarToggle<CR>
 
 "---------------------------------------------
+"                git
+"---------------------------------------------
+" hunks
+nmap <leader>hv <Plug>GitGutterPreviewHunk
+nmap <leader>h[ <Plug>GitGutterPrevHunk
+nmap <leader>h] <Plug>GitGutterNextHunk
+nmap <Leader>hu <Plug>GitGutterRevertHunk
+nmap <Leader>ha <Plug>GitGutterStageHunk
+" no mappings by gitgutter
+let g:gitgutter_map_keys = 0
+
+"---------------------------------------------
+"         neocomplete/deoplete
+"---------------------------------------------
+if has('nvim')
+    let g:deoplete#enable_at_startup = 1
+    let g:deoplete#enable_smart_case = 1
+    let g:deoplete#auto_completion_start_length = 1
+
+else
+    let g:neocomplete#enable_at_startup = 1
+    let g:neocomplete#enable_smart_case = 1
+    let g:neocomplete#sources#syntax#min_keyword_length = 1
+endif
+
+inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
+
+"set completeopt=longest,menu,menuone
+"todo: until the lag is
+let g:deoplete#ignore_sources = {}
+let g:deoplete#ignore_sources.java = ['javacomplete2']
+
+"---------------------------------------------
 "                ctrlp
 "---------------------------------------------
 let g:ctrlp_by_filename = 1
@@ -385,18 +355,57 @@ let g:ctrlp_use_caching = 1
 
 nmap <leader>p :CtrlPMRUFiles<cr>
 nmap <leader>P :CtrlP<cr><c-\>w<cr>
-nmap <leader>C :CtrlPChange<CR>
-nmap <leader>T :CtrlPTag<CR>
-nmap \ :CtrlPLine<cr>
+nmap <leader>c :CtrlPChange<CR>
+nmap \ :CtrlPTag<CR>
+nmap <leader>f :CtrlPLine<cr>
 
 if executable('ag')
     let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden
+                \ --ignore .pyc
+                \ --ignore .class
                 \ --ignore .git
                 \ --ignore .svn
                 \ --ignore .DS_Store
                 \ --ignore "**/*.pyc"
                 \ -g ""'
 endif
+
+"---------------------------------------------
+"                 markdown
+"---------------------------------------------
+autocmd BufRead *.md set wrap lbr
+autocmd BufEnter *.md set syntax=markdown
+
+"---------------------------------------------
+"                ultisnips
+"---------------------------------------------
+let g:UltiSnipsExpandTrigger="<Nop>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:UltiSnipsListSnippets="<F6>"
+
+" respect neosnippet
+let g:ulti_expand_or_jump_res = 0
+function! <SID>ExpandSnippetOrReturn()
+    let snippet = UltiSnips#ExpandSnippetOrJump()
+    if g:ulti_expand_or_jump_res > 0
+        return snippet
+    else
+        return "\<C-Y>"
+    endif
+endfunction
+imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+
+"---------------------------------------------
+"                vimux
+"---------------------------------------------
+let g:VimuxHeight = "40"
+let @r=getcwd()
+
+nmap <Leader>ml :VimuxRunLastCommand<CR>
+nmap <Leader>mq :VimuxCloseRunner<CR>
+nmap <Leader>mi :VimuxInspectRunner<CR>
+nmap <Leader>mz :call VimuxZoomRunner()<CR>
 
 "---------------------------------------------
 "                theme
@@ -431,10 +440,6 @@ nmap <leader>N :NERDTreeFind<CR>
 "---------------------------------------------
 nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
-
-"---------------------------------------------
-"                  Ack
-"---------------------------------------------
 
 "---------------------------------------------
 "             functions
