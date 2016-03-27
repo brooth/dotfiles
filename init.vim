@@ -9,6 +9,14 @@
 "---------------------------------------------
 "                plugins
 "---------------------------------------------
+if has('nvim')
+    let $VIMHOME = "~/.config/nvim"
+    "normal mode in terminal by Esc
+    tnoremap <Esc> <C-\><C-n>
+else
+    let $VIMHOME = "~/.vim"
+endif
+
 call plug#begin('$VIMHOME/plugged')
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
@@ -50,23 +58,15 @@ filetype plugin indent on
 
 let mapleader=" "
 
-if has('nvim')
-    let $VIMHOME = "~/.config/nvim"
-    " normal mode in terminal by Esc
-    tnoremap <Esc> <C-\><C-n>
-else
-    let $VIMHOME = "~/.vim"
-endif
-
 set pastetoggle=<F12>
 set history=100
 "completion in command line
 set wildmenu
 
-" no mouse support
+"no mouse support
 set mouse = ""
 
-" F1 - Esc
+"F1 - Esc
 imap <F1> <Esc>
 nmap <F1> <Esc>
 vmap <F1> <Esc>
@@ -75,10 +75,10 @@ vmap <F1> <Esc>
 imap <NUL> <c-x><c-o>
 set complete=.,w,b,u,t,k
 
-" Display what command is waiting for an operator
+"Display what command is waiting for an operator
 set showcmd
 
-" redraw only when we need to.
+"redraw only when we need to.
 set lazyredraw
 
 "---------------------------------------------
@@ -105,18 +105,18 @@ inoremap <F2> <Esc>:w<CR>
 nnoremap <F10> :q<CR>
 nmap <leader>E :e!<cr>
 
-" do not store vimrc options in session
+"do not store vimrc options in session
 set ssop-=options
 
 nmap <leader>S :mksession! <c-r>r/.vimsession<cr>
 nmap <leader>R :source <c-r>r/.vimsession<cr>
 
-" tell it to use an undo file
+"tell it to use an undo file
 set undofile
-" set a directory to store the undo history
+"set a directory to store the undo history
 exec 'set undodir='.$VIMHOME.'/undo'
 
-" store swp files in die
+"store swp files in die
 exec 'set dir='.$VIMHOME.'/tmp'
 
 "---------------------------------------------
@@ -129,7 +129,7 @@ nmap <leader>bD :%bd<cr>:e #<cr>
 "---------------------------------------------
 "case sensetive search in CtrlP if enter capitals
 set smartcase
-" with smartcase ignores case when all in lowercase
+"with smartcase ignores case when all in lowercase
 set ignorecase
 "highlight search
 set hlsearch
@@ -166,13 +166,13 @@ nmap <leader>2 2<c-w><c-w>
 nmap <leader>3 3<c-w><c-w>
 nmap <leader>4 4<c-w><c-w>
 
-" windows
+"windows
 nmap <c-j> <C-w><Down>
 nmap <c-h> <C-w><Left>
 nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
-" tabs
+"tabs
 nmap <leader>j :tabprev<CR>
 nmap <leader>k :tabnext<CR>
 nmap <leader>te :tabe %<cr>
@@ -180,33 +180,33 @@ nmap <leader>te :tabe %<cr>
 "---------------------------------------------
 "               intend/tab/spaces
 "---------------------------------------------
-" move curson over empty space
+"move curson over empty space
 set virtualedit=all
 
-" indent when moving to the next line while writing code<Paste>
+"indent when moving to the next line while writing code<Paste>
 set autoindent
 
 "set smartindent
 "set smarttab
 
 set tabstop=4
-" when using the >> or << commands, shift lines by 4 spaces
+"when using the >> or << commands, shift lines by 4 spaces
 set shiftwidth=4
 set softtabstop=4
-" expand tabs into spaces
+"expand tabs into spaces
 set expandtab
 
-" show vertical line
-set colorcolumn=80
+"show vertical line
+"set colorcolumn=80
 
-" indent text in visual mode
+"indent text in visual mode
 vmap < <gv
 vmap > >gv
 
 "---------------------------------------------
 "            lines/numbers/wrap
 "---------------------------------------------
-" go between wrapped lines
+"go between wrapped lines
 map j gj
 map k gk
 map <Down> gj
@@ -215,21 +215,24 @@ map <Up> gk
 set number
 "releative line numbers
 set rnu
-" show a visual line under the cursor's current line
+"show a visual line under the cursor's current line
 set cursorline
 set nowrap
-set scrolloff=3             " Keep 3 lines below and above cursor
-" show the matching part of the pair for [] {} and ()
-set showmatch
+"keep 3 lines below and above cursor
+set scrolloff=3             
+"show bracket pair
+"set showmatch
 
-" line number/scroll/highlight
+"line number/scroll/highlight
 nmap <leader>ll :set nornu<cr>:set number<CR>
 nmap <leader>lr :set number<cr>:set rnu<cr>
 nmap <leader>lw :set wrap!<cr>
 nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
-" new/move lines
+"new/move lines
 let @e=''
+nmap <leader>M :m-2<cr>
+nmap <leader>m :m+1<cr>
 
 "folding
 set foldmethod=manual
@@ -242,7 +245,7 @@ nmap zh mmggzf%`m
 "fold current brackets
 nmap ze zf%
 
-" Return to last edit position when opening files (You want this!)
+"Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
             \ if line("'\"") > 0 && line("'\"") <= line("$") |
             \   exe "normal! g`\"" |
@@ -274,22 +277,22 @@ set wildignore+=*/build/^[^g]*
 " <leader>d - goto definitions
 " K - pydoc
 " <leader>r - renaming
-" <leader>n - usages
+" <leader2n - usages
 "
-" enable all Python syntax highlighting features
+"enable all Python syntax highlighting features
 let python_highlight_all = 1
 
 autocmd FileType python setlocal completeopt-=preview
 autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 autocmd BufRead *.py set nocindent
 
-" flake8
+"flake8
 "let g:flake8_show_in_gutter=1
 let g:flake8_show_in_file=1
 
 autocmd BufWritePost *.py call Flake8()
 
-" jedi
+"jedi
 let g:jedi#show_call_signatures = "1"
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
@@ -314,13 +317,13 @@ map <F8> :TagbarToggle<CR>
 "---------------------------------------------
 "                git
 "---------------------------------------------
-" hunks
+"hunks
 nmap <leader>hv <Plug>GitGutterPreviewHunk
 nmap <leader>h[ <Plug>GitGutterPrevHunk
 nmap <leader>h] <Plug>GitGutterNextHunk
 nmap <Leader>hu <Plug>GitGutterRevertHunk
 nmap <Leader>ha <Plug>GitGutterStageHunk
-" no mappings by gitgutter
+"no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
 "---------------------------------------------
@@ -384,7 +387,7 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 let g:UltiSnipsListSnippets="<F6>"
 
-" respect neosnippet
+"respect neosnippet
 let g:ulti_expand_or_jump_res = 0
 function! <SID>ExpandSnippetOrReturn()
     let snippet = UltiSnips#ExpandSnippetOrJump()
@@ -402,10 +405,10 @@ imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR
 let g:VimuxHeight = "40"
 let @r=getcwd()
 
-nmap <Leader>ml :VimuxRunLastCommand<CR>
-nmap <Leader>mq :VimuxCloseRunner<CR>
-nmap <Leader>mi :VimuxInspectRunner<CR>
-nmap <Leader>mz :call VimuxZoomRunner()<CR>
+nmap <Leader>vl :VimuxRunLastCommand<CR>
+nmap <Leader>vq :VimuxCloseRunner<CR>
+nmap <Leader>vi :VimuxInspectRunner<CR>
+nmap <Leader>vz :call VimuxZoomRunner()<CR>
 
 "---------------------------------------------
 "                theme
@@ -444,7 +447,7 @@ imap <F4> <esc><f4>
 "---------------------------------------------
 "             functions
 "---------------------------------------------
-" ReplaceInFiles
+"ReplaceInFiles
 function! ReplaceInFiles(o, n)
     exec "Ack '" . a:o . "'"
     if empty(getqflist())
@@ -477,7 +480,7 @@ function! ReplaceInFilesExact(o, n)
     exec "call QuickFixDoAll(\"" . l:c . l:p . "\")"
 endfunction
 
-" QuickFixDoAll
+"QuickFixDoAll
 function! QuickFixDoAll(command)
     if empty(getqflist())
         return
