@@ -5,6 +5,10 @@
 " * (<s-8>)   - serch/highlight word
 " q:          - command history
 " gv          - re-select last visual selection
+"
+" search & replace
+" :args `ag -l <search> **/*.java`
+" :argdo %s/<search>/<replace>/gc
 
 "---------------------------------------------
 "                plugins
@@ -21,13 +25,10 @@ call plug#begin('$VIMHOME/plugged')
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'SirVer/ultisnips'
-Plug 'scrooloose/nerdtree'
-Plug 'mileszs/ack.vim'
 Plug 'majutsushi/tagbar'
 Plug 'simnalamburt/vim-mundo'
 Plug 'nvie/vim-flake8'
 Plug 'davidhalter/jedi-vim'
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-surround'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
@@ -42,6 +43,9 @@ Plug 'tpope/vim-repeat'
 Plug 'haya14busa/incsearch.vim'
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neomru.vim'
+Plug 'Shougo/vimproc.vim', { 'do': 'make' }
+Plug 'Shougo/unite-outline'
+Plug 'Shougo/vimfiler.vim'
 
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
@@ -147,15 +151,13 @@ map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
 
-"replace (subsitute)
-nmap <leader>ss :%s//gc<Left><Left><Left>
-nmap <leader>sw ,ss<C-R><C-W>/
-nmap <leader>sW ,ss\<<C-R><C-W>\>/
+nmap [q :cprev<cr>
+nmap ]q :cnext<cr>
 
-nmap <leader>rr :call ReplaceInFiles("")<Left><Left>
-nmap <leader>rw :call ReplaceInFiles("<C-R><C-w>", "")<Left><Left>
-nmap <leader>rW :call ReplaceInFilesExact("<C-R><C-w>", "")<Left><Left>
-nmap <leader>re :call ReplaceInFilesExact("")<Left><Left>
+if executable('ag')
+    set grepprg=ag\ --nogroup\ --column\ --nocolor
+    set grepformat=%f:%l:%C:%m
+endif
 
 "---------------------------------------------
 "             windows/tabs
@@ -231,11 +233,6 @@ nmap <leader>lr :set number<cr>:set rnu<cr>
 nmap <leader>lw :set wrap!<cr>
 nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
-"new/move lines
-let @e=''
-nmap <leader>M :m-2<cr>
-nmap <leader>m :m+1<cr>
-
 "folding
 set foldmethod=manual
 
@@ -261,8 +258,8 @@ nmap <leader>ct :%s/\s\+$//e<cr>
 
 "goto next, prev. open error
 nmap <leader>co :lopen<cr>
-nmap <leader>cn :lnext<cr>
-nmap <leader>cp :lprevious<cr>
+nmap ]c :lnext<cr>
+nmap [c :lprevious<cr>
 
 "---------------------------------------------
 "                files/types
@@ -316,6 +313,14 @@ let g:gradle_daemon=1
 let g:tagbar_autofocus = 1
 map <F8> :TagbarToggle<CR>
 
+function! GetCanonicalClassName()
+    return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
+endfunction
+
+function! GetSimpleClassName()
+    return system("ctags -f - -u --java-kinds=c " . expand('%:p') . " | grep -m 1 -o '^[^	]*'")
+endfunction
+
 "---------------------------------------------
 "                git
 "---------------------------------------------
@@ -359,6 +364,10 @@ let g:unite_source_rec_max_cache_files = 1000
 let g:unite_prompt = '» '
 let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
 
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --hidden --smart-case'
+let g:unite_source_grep_recursive_opts = ''
+
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
@@ -368,33 +377,31 @@ function! <SID>UniteSetup()
 endfunction
 autocmd FileType unite call <SID>UniteSetup()
 
-nmap <leader>u :Unite -buffer-name=files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
-nmap <leader>U :UniteWithBufferDir -buffer-name=./files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
+nmap <leader>u :Unite -buffer-name=files
+                \ -buffer-name=files
+                \ -start-insert
+                \ -no-split
+                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+nmap <leader>U :UniteWithBufferDir
+                \ -buffer-name=./files
+                \ -start-insert
+                \ -no-split
+                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+nmap <leader>g :Unite -buffer-name=grep
+                \ -no-split 
+                \ grep:.<cr>
+nmap <leader>o :Unite -buffer-name=outline
+                \ -no-split
+                \ -start-insert
+                \ outline<cr>
 
 "---------------------------------------------
-"                ctrlp
+"                 vimfiler
 "---------------------------------------------
-let g:ctrlp_by_filename = 1
-let g:ctrlp_working_path_mode = '0'
-let g:ctrlp_show_hidden = 1
-let g:ctrlp_use_caching = 1
+"let g:vimfiler_ignore_pattern = '^\%(.git\|.idea)$'
 
-nmap <leader>p :CtrlPMRUFiles<cr>
-nmap <leader>P :CtrlP<cr><c-\>w<cr>
-nmap <leader>C :CtrlPChange<CR>
-nmap \ :CtrlPTag<CR>
-nmap <leader>F :CtrlPLine<cr>
-
-if executable('ag')
-    let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden
-                \ --ignore .pyc
-                \ --ignore .class
-                \ --ignore .git
-                \ --ignore .svn
-                \ --ignore .DS_Store
-                \ --ignore "**/*.pyc"
-                \ -g ""'
-endif
+nmap <leader>f :VimFilerCurrentDir<cr>
+nmap <leader>F :VimFilerBufferDir<cr>
 
 "---------------------------------------------
 "                 markdown
@@ -451,96 +458,7 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_theme='oceanicnext'
 
 "---------------------------------------------
-"                nerd tree
-"---------------------------------------------
-let NERDTreeWinSize=46
-let NERDTreeHighlightCursorline = 1
-
-let NERDTreeIgnore=['\.pyc$', '\.pyo$', '\.py\$class$', '^\.git$' ]
-
-nmap <leader>n :NERDTreeToggle<CR>
-nmap <leader>N :NERDTreeFind<CR>
-
-"---------------------------------------------
 "                Gundo
 "---------------------------------------------
 nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
-
-"---------------------------------------------
-"             functions
-"---------------------------------------------
-"ReplaceInFiles
-function! ReplaceInFiles(o, n)
-    exec "Ack '" . a:o . "'"
-    if empty(getqflist())
-        return
-    endif
-
-    let l:c = "%s/" . escape(a:o, '\') . "/" . escape(a:n, '\') . "/g"
-    let l:p = input('additinal params? (q=quit) :' . l:c)
-    if l:p == "q"
-        exec "bd %"
-        return
-    endif
-
-    exec "call QuickFixDoAll(\"" . l:c . l:p . "\")"
-endfunction
-
-function! ReplaceInFilesExact(o, n)
-    exec "Ack '\\b" . a:o . "\\b'"
-    if empty(getqflist())
-        return
-    endif
-
-    let l:c = "%s/\\\\<" . escape(a:o, '\') . "\\\\>/" . escape(a:n, '\') . "/g"
-    let l:p = input('additinal params? (q=quit) :' . l:c)
-    if l:p == "q"
-        exec "bd %"
-        return
-    endif
-
-    exec "call QuickFixDoAll(\"" . l:c . l:p . "\")"
-endfunction
-
-"QuickFixDoAll
-function! QuickFixDoAll(command)
-    if empty(getqflist())
-        return
-    endif
-    exec "only"
-    let s:prev_val = ""
-    for d in getqflist()
-        let s:curr_val = bufname(d.bufnr)
-        if (s:curr_val != s:prev_val)
-            exec "edit " . s:curr_val
-            exec a:command
-            exec "write"
-        endif
-        let s:prev_val = s:curr_val
-    endfor
-    "exec "quit"
-endfunction
-command! -nargs=+ QuickFixDoAll call QuickFixDoAll(<f-args>)
-
-function! QuickFixOpenAll()
-    if empty(getqflist())
-        return
-    endif
-    let s:prev_val = ""
-    for d in getqflist()
-        let s:curr_val = bufname(d.bufnr)
-        if s:curr_val != s:prev_val
-            exec "tabnew " . s:curr_val
-        endif
-        let s:prev_val = s:curr_val
-    endfor
-endfunction
-
-function! GetCanonicalClassName()
-    return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
-endfunction
-
-function! GetSimpleClassName()
-    return system("ctags -f - -u --java-kinds=c " . expand('%:p') . " | grep -m 1 -o '^[^	]*'")
-endfunction
