@@ -362,7 +362,12 @@ let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogrou
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
-nmap <buffer> <Esc> <plug>(unite_exit)
+function! <SID>UniteSetup()
+    nmap <buffer> <Esc> <plug>(unite_exit)
+    imap <buffer> <Esc> <plug>(unite_exit)
+endfunction
+autocmd FileType unite call <SID>UniteSetup()
+
 nmap <leader>u :Unite -buffer-name=files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
 nmap <leader>U :UniteWithBufferDir -buffer-name=./files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
 
