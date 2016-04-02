@@ -10,9 +10,6 @@
 " :args `ag -l <search> **/*.java`
 " :argdo %s/<search>/<replace>/gc
 
-"---------------------------------------------
-"                plugins
-"---------------------------------------------
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
     "normal mode in terminal by Esc
@@ -21,6 +18,9 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
+"---------------------------------------------
+"                plugins
+"---------------------------------------------
 call plug#begin('$VIMHOME/plugged')
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
@@ -77,19 +77,6 @@ imap <F1> <Esc>
 nmap <F1> <Esc>
 vmap <F1> <Esc>
 
-"ctrl+space - omni complition
-imap <NUL> <c-x><c-o>
-set complete=.,w,b,u,t,k
-
-"Display what command is waiting for an operator
-set showcmd
-
-"redraw only when we need to.
-set lazyredraw
-
-"---------------------------------------------
-"                misc maps
-"---------------------------------------------
 "disable ex mode
 :map Q <Nop>
 
@@ -101,6 +88,19 @@ imap <c-h> <left>
 imap <c-k> <up>
 imap <c-j> <down>
 imap <c-l> <right>
+
+"Display what command is waiting for an operator
+set showcmd
+
+"redraw only when we need to.
+set lazyredraw
+
+"---------------------------------------------
+"              complition
+"---------------------------------------------
+"ctrl+space - omni complition
+imap <NUL> <c-x><c-o>
+set complete=.,w,b,u,t,k
 
 "---------------------------------------------
 "          save/restore/quit
@@ -129,6 +129,7 @@ exec 'set dir='.$VIMHOME.'/tmp'
 "                  buffers
 "---------------------------------------------
 nmap <leader>bD :%bd<cr>:e #<cr>
+nmap <leader>bb :ls<cr>:b 
 
 "---------------------------------------------
 "          search/replace/subtitude
@@ -151,6 +152,7 @@ map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
 
+"go to next/prev of vimgrep result
 nmap [q :cprev<cr>
 nmap ]q :cnext<cr>
 
@@ -162,8 +164,8 @@ endif
 "---------------------------------------------
 "             windows/tabs
 "---------------------------------------------
-set splitright
-set splitbelow
+"set splitright
+"set splitbelow
 
 nmap <leader>1 1<c-w><c-w>
 nmap <leader>2 2<c-w><c-w>
@@ -326,9 +328,9 @@ endfunction
 "---------------------------------------------
 "hunks
 nmap <leader>hv <Plug>GitGutterPreviewHunk
-nmap <leader>h[ <Plug>GitGutterPrevHunk
-nmap <leader>h] <Plug>GitGutterNextHunk
-nmap <Leader>hu <Plug>GitGutterRevertHunk
+nmap <leader>[h <Plug>GitGutterPrevHunk
+nmap <leader>]h <Plug>GitGutterNextHunk
+nmap <Leader>hr <Plug>GitGutterRevertHunk
 nmap <Leader>ha <Plug>GitGutterStageHunk
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
