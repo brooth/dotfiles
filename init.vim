@@ -40,6 +40,8 @@ Plug 'scrooloose/syntastic'
 Plug 'hsanson/vim-android'
 Plug 'tpope/vim-repeat'
 Plug 'haya14busa/incsearch.vim'
+Plug 'Shougo/unite.vim'
+Plug 'Shougo/neomru.vim'
 
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
@@ -219,7 +221,7 @@ set rnu
 set cursorline
 set nowrap
 "keep 3 lines below and above cursor
-set scrolloff=3             
+set scrolloff=3
 "show bracket pair
 "set showmatch
 
@@ -349,6 +351,22 @@ let g:deoplete#ignore_sources = {}
 let g:deoplete#ignore_sources.java = ['javacomplete2']
 
 "---------------------------------------------
+"                  Unite
+"---------------------------------------------
+let g:unite_winheight = 13
+let g:unite_source_history_yank_enable = 1
+let g:unite_source_rec_max_cache_files = 1000
+let g:unite_prompt = '» '
+let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
+
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#filters#sorter_default#use(['sorter_rank'])
+
+nmap <buffer> <Esc> <plug>(unite_exit)
+nmap <leader>u :Unite -buffer-name=files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
+nmap <leader>U :UniteWithBufferDir -buffer-name=./files -buffer-name=files -start-insert buffer neomru/file file_rec/neovim file/new directory/new<CR>
+
+"---------------------------------------------
 "                ctrlp
 "---------------------------------------------
 let g:ctrlp_by_filename = 1
@@ -358,9 +376,9 @@ let g:ctrlp_use_caching = 1
 
 nmap <leader>p :CtrlPMRUFiles<cr>
 nmap <leader>P :CtrlP<cr><c-\>w<cr>
-nmap <leader>c :CtrlPChange<CR>
+nmap <leader>C :CtrlPChange<CR>
 nmap \ :CtrlPTag<CR>
-nmap <leader>f :CtrlPLine<cr>
+nmap <leader>F :CtrlPLine<cr>
 
 if executable('ag')
     let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden
