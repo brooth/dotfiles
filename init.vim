@@ -22,31 +22,47 @@ endif
 "                plugins
 "---------------------------------------------
 call plug#begin('$VIMHOME/plugged')
+
+"appirance
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
-Plug 'SirVer/ultisnips'
-Plug 'majutsushi/tagbar'
+Plug 'Yggdroot/indentLine'
+
+"utils
+Plug 'tpope/vim-repeat'
 Plug 'simnalamburt/vim-mundo'
-Plug 'nvie/vim-flake8'
-Plug 'davidhalter/jedi-vim'
 Plug 'tpope/vim-surround'
+Plug 'jiangmiao/auto-pairs'
+
+"search
+Plug 'haya14busa/incsearch.vim'
+
+"tmux
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
-Plug 'Yggdroot/indentLine'
+
+"git
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-Plug 'jiangmiao/auto-pairs'
+
+"java 
+Plug 'SirVer/ultisnips'
 Plug 'artur-shaik/vim-javacomplete2'
 Plug 'scrooloose/syntastic'
 Plug 'hsanson/vim-android'
-Plug 'tpope/vim-repeat'
-Plug 'haya14busa/incsearch.vim'
+
+"python
+Plug 'nvie/vim-flake8'
+Plug 'davidhalter/jedi-vim'
+
+"unite
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neomru.vim'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'Shougo/unite-outline'
 Plug 'Shougo/vimfiler.vim'
 
+"completion
 if has('nvim')
     Plug 'Shougo/deoplete.nvim'
 else
@@ -93,7 +109,7 @@ imap <c-l> <right>
 set showcmd
 
 "redraw only when we need to.
-set lazyredraw
+"set lazyredraw
 
 "---------------------------------------------
 "              complition
@@ -121,7 +137,6 @@ nmap <leader>R :source <c-r>r/.vimsession<cr>
 set undofile
 "set a directory to store the undo history
 exec 'set undodir='.$VIMHOME.'/undo'
-
 "store swp files in die
 exec 'set dir='.$VIMHOME.'/tmp'
 
@@ -129,7 +144,6 @@ exec 'set dir='.$VIMHOME.'/tmp'
 "                  buffers
 "---------------------------------------------
 nmap <leader>bD :%bd<cr>:e #<cr>
-nmap <leader>bb :ls<cr>:b 
 
 "---------------------------------------------
 "          search/replace/subtitude
@@ -179,12 +193,11 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 "tabs
-nmap <leader>j :tabprev<CR>
-nmap <leader>k :tabnext<CR>
-nmap <leader>te :tabe %<cr>
+nmap <m-j> :tabprev<CR>
+nmap <m-k> :tabnext<CR>
 
 "---------------------------------------------
-"               intend/tab/spaces
+"               indent/tab/spaces
 "---------------------------------------------
 "move curson over empty space
 set virtualedit=all
@@ -308,12 +321,15 @@ au BufEnter *.java silent let @s=GetSimpleClassName()
 autocmd BufRead,BufNewFile *.gradle set ft=java
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
-"let g:android_sdk_path="~/Android/Sdk"
-"let g:gradle_path="~/.gradle-2.6"
-let g:gradle_daemon=1
+let g:android_sdk_path='~/Android/Sdk'
+let g:gradle_path='/home/brooth/.gradle-2.6'
+"let g:gradle_daemon=1
 
-let g:tagbar_autofocus = 1
-map <F8> :TagbarToggle<CR>
+"javacomplete2 mappings
+nmap <leader>ji <Plug>(JavaComplete-Imports-Add)
+nmap <leader>jI <Plug>(JavaComplete-Imports-AddSmart)
+nmap <leader>jm <Plug>(JavaComplete-Imports-AddMissing)
+imap <leader>jo <Plug>(JavaComplete-Imports-RemoveUnused)
 
 function! GetCanonicalClassName()
     return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
@@ -326,14 +342,15 @@ endfunction
 "---------------------------------------------
 "                git
 "---------------------------------------------
-"hunks
-nmap <leader>hv <Plug>GitGutterPreviewHunk
-nmap <leader>[h <Plug>GitGutterPrevHunk
-nmap <leader>]h <Plug>GitGutterNextHunk
-nmap <Leader>hr <Plug>GitGutterRevertHunk
-nmap <Leader>ha <Plug>GitGutterStageHunk
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
+
+"hunks
+nmap <leader>hv <Plug>GitGutterPreviewHunk
+nmap [h <Plug>GitGutterPrevHunk
+nmap ]h <Plug>GitGutterNextHunk
+nmap <Leader>hr <Plug>GitGutterRevertHunk
+nmap <Leader>ha <Plug>GitGutterStageHunk
 
 "---------------------------------------------
 "         neocomplete/deoplete
@@ -342,7 +359,6 @@ if has('nvim')
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#enable_smart_case = 1
     let g:deoplete#auto_completion_start_length = 1
-
 else
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
@@ -359,19 +375,27 @@ let g:deoplete#ignore_sources.java = ['javacomplete2']
 
 "---------------------------------------------
 "                  Unite
-"---------------------------------------------
+"-------------------------------------------
 let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
-let g:unite_source_rec_max_cache_files = 1000
+let g:unite_source_rec_max_cache_files = 0
 let g:unite_prompt = '» '
-let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
 
-let g:unite_source_grep_command = 'ag'
-let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --hidden --smart-case'
-let g:unite_source_grep_recursive_opts = ''
+if executable('ag')
+  let g:unite_source_grep_command = 'ag'
+  let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --column --hidden --smart-case'
+  let g:unite_source_grep_recursive_opt = ''
+endif
 
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
+
+call unite#custom#source('buffer', 'converters', 'converter_tail')
+call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
+      \ '\.git/',
+      \ '\.idea/',
+      \ '\.gradle/',
+      \ ], '\|'))
 
 function! <SID>UniteSetup()
     nmap <buffer> <Esc> <plug>(unite_exit)
@@ -390,12 +414,16 @@ nmap <leader>U :UniteWithBufferDir
                 \ -no-split
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
-                \ -no-split 
+                \ -no-split
                 \ grep:.<cr>
 nmap <leader>o :Unite -buffer-name=outline
                 \ -no-split
                 \ -start-insert
                 \ outline<cr>
+nmap <leader>j :Unite -buffer-name=buffers 
+                \ -no-split
+                \ -quick-match
+                \ buffer<cr>
 
 "---------------------------------------------
 "                 vimfiler
