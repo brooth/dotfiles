@@ -315,6 +315,8 @@ let g:jedi#completions_enabled = 0
 "---------------------------------------------
 "               java
 "---------------------------------------------
+exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
+
 au BufEnter *.java silent let @c=GetCanonicalClassName()
 au BufEnter *.java silent let @s=GetSimpleClassName()
 
@@ -330,6 +332,13 @@ nmap <leader>ji <Plug>(JavaComplete-Imports-Add)
 nmap <leader>jI <Plug>(JavaComplete-Imports-AddSmart)
 nmap <leader>jm <Plug>(JavaComplete-Imports-AddMissing)
 nmap <leader>jo <Plug>(JavaComplete-Imports-RemoveUnused)
+
+function! UpdateJavaCtags()
+    let l:cmd = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".
+        \ getcwd()." && ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --languages=java ".getcwd()
+    call system(l:cmd)
+    echo 'ctags updated!'
+endfunction
 
 function! GetCanonicalClassName()
     return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
@@ -400,7 +409,6 @@ call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
 
 function! <SID>UniteSetup()
     nmap <buffer> <Esc> <plug>(unite_exit)
-    imap <buffer> <Esc> <plug>(unite_exit)
 endfunction
 autocmd FileType unite call <SID>UniteSetup()
 
@@ -409,7 +417,11 @@ nmap <leader>u :Unite -buffer-name=files
                 \ -start-insert
                 \ -no-split
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
-nmap <leader>U :UniteWithBufferDir
+nmap <leader>U :UniteWithCursorWord -buffer-name=cursorword
+                \ -buffer-name=files
+                \ -no-split
+                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+nmap <leader>y :UniteWithBufferDir
                 \ -buffer-name=./files
                 \ -start-insert
                 \ -no-split
@@ -483,7 +495,7 @@ function! s:vimfiler_settings()
     map <silent><buffer> <c-j> <NOP>
     nmap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
     nmap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
-    nmap <buffer> <Esc> <Plug>(vimfiler_exit)
+    nmap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
 endfunction
 
 nmap <leader>f :VimFilerCurrentDir<cr>
