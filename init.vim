@@ -45,7 +45,7 @@ Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
-"java 
+"java
 Plug 'SirVer/ultisnips'
 Plug 'artur-shaik/vim-javacomplete2'
 Plug 'scrooloose/syntastic'
@@ -329,7 +329,7 @@ let g:gradle_path='/home/brooth/.gradle-2.6'
 nmap <leader>ji <Plug>(JavaComplete-Imports-Add)
 nmap <leader>jI <Plug>(JavaComplete-Imports-AddSmart)
 nmap <leader>jm <Plug>(JavaComplete-Imports-AddMissing)
-imap <leader>jo <Plug>(JavaComplete-Imports-RemoveUnused)
+nmap <leader>jo <Plug>(JavaComplete-Imports-RemoveUnused)
 
 function! GetCanonicalClassName()
     return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
@@ -395,6 +395,7 @@ call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
       \ '\.git/',
       \ '\.idea/',
       \ '\.gradle/',
+	  \ 'build/[^gen]',
       \ ], '\|'))
 
 function! <SID>UniteSetup()
@@ -420,7 +421,7 @@ nmap <leader>o :Unite -buffer-name=outline
                 \ -no-split
                 \ -start-insert
                 \ outline<cr>
-nmap <leader>j :Unite -buffer-name=buffers 
+nmap <leader>j :Unite -buffer-name=buffers
                 \ -no-split
                 \ -quick-match
                 \ buffer<cr>
@@ -428,7 +429,75 @@ nmap <leader>j :Unite -buffer-name=buffers
 "---------------------------------------------
 "                 vimfiler
 "---------------------------------------------
+"<C-l>			<Plug>(vimfiler_redraw_screen)
+"*			<Plug>(vimfiler_toggle_mark_all_lines)
+"#			<Plug>(vimfiler_mark_similar_lines)
+"U			<Plug>(vimfiler_clear_mark_all_lines)
+"c			<Plug>(vimfiler_copy_file)
+"m			<Plug>(vimfiler_move_file)
+"d			<Plug>(vimfiler_delete_file)
+"Cc			<Plug>(vimfiler_clipboard_copy_file)
+"Cm			<Plug>(vimfiler_clipboard_move_file)
+"Cp			<Plug>(vimfiler_clipboard_paste)
+"r			<Plug>(vimfiler_rename_file)
+"K			<Plug>(vimfiler_make_directory)
+"N			<Plug>(vimfiler_new_file)
+"x			<Plug>(vimfiler_execute_system_associated)
+"X			<Plug>(vimfiler_execute_vimfiler_associated)
+"~			<Plug>(vimfiler_switch_to_home_directory)
+"\			<Plug>(vimfiler_switch_to_root_directory)
+"&			<Plug>(vimfiler_switch_to_project_directory)
+".			<Plug>(vimfiler_toggle_visible_ignore_files)
+"e			<Plug>(vimfiler_edit_file)
+"E			<Plug>(vimfiler_split_edit_file)
+"ge			<Plug>(vimfiler_execute_external_filer)
+"q			<Plug>(vimfiler_hide)
+"Q			<Plug>(vimfiler_exit)
+"g?			<Plug>(vimfiler_help)
+"v			<Plug>(vimfiler_preview_file)
+"yy			<Plug>(vimfiler_yank_full_path)
+"M			<Plug>(vimfiler_set_current_mask)
+"gr			<Plug>(vimfiler_grep)
+"gf			<Plug>(vimfiler_find)
+"S			<Plug>(vimfiler_select_sort_type)
+"gc			<Plug>(vimfiler_cd_vim_current_dir)
+"gs			<Plug>(vimfiler_toggle_safe_mode)
+"gS			<Plug>(vimfiler_toggle_simple_mode)
+"a			<Plug>(vimfiler_choose_action)
+"Y			<Plug>(vimfiler_pushd)
+"P			<Plug>(vimfiler_popd)
+"t			<Plug>(vimfiler_expand_tree)
+"T			<Plug>(vimfiler_expand_tree_recursive)
+"I			<Plug>(vimfiler_cd_input_directory)
+"gj			<Plug>(vimfiler_jump_last_child)
+"gk			<Plug>(vimfiler_jump_first_child)
+
+
 "let g:vimfiler_ignore_pattern = '^\%(.git\|.idea)$'
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_safe_mode_by_default = 1
+
+let g:vimfiler_tree_leaf_icon = ''
+let g:vimfiler_tree_opened_icon = '▾'
+let g:vimfiler_tree_closed_icon = '▸'
+"let g:vimfiler_default_columns = ''
+"let g:vimfiler_explorer_columns = ''
+let g:vimfiler_tree_indentation = 3
+let g:vimfiler_file_icon = ''
+let g:vimfiler_marked_file_icon = '*'
+let g:vimfiler_readonly_file_icon = '~'
+
+augroup vimfiler
+  autocmd!
+  autocmd FileType vimfiler call s:vimfiler_settings()
+augroup END
+function! s:vimfiler_settings()
+    map <silent><buffer> <Space> <NOP>
+    map <silent><buffer> <c-j> <NOP>
+	nmap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
+    nmap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
+	nmap <buffer> <Esc> <Plug>(vimfiler_exit)
+endfunction
 
 nmap <leader>f :VimFilerCurrentDir<cr>
 nmap <leader>F :VimFilerBufferDir<cr>
