@@ -7,7 +7,7 @@
 " gv          - re-select last visual selection
 "
 " search & replace
-" :args `ag -l <search> **/*.java`
+" :args **/*.java OR :args `ag -l <search> **/*.java`
 " :argdo %s/<search>/<replace>/gc
 
 if has('nvim')
@@ -34,9 +34,6 @@ Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 
-"search
-Plug 'haya14busa/incsearch.vim'
-
 "tmux
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'benmills/vimux'
@@ -61,6 +58,7 @@ Plug 'Shougo/neomru.vim'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'Shougo/unite-outline'
 Plug 'Shougo/vimfiler.vim'
+Plug 'tsukkee/unite-tag'
 
 "completion
 if has('nvim')
@@ -161,11 +159,6 @@ set incsearch
 nmap <F3> :noh<CR>
 imap <F3> <esc>:noh<CR>
 
-"incsearch plugin
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-
 "go to next/prev of vimgrep result
 nmap [q :cprev<cr>
 nmap ]q :cnext<cr>
@@ -181,6 +174,7 @@ endif
 "set splitright
 "set splitbelow
 
+nmap <leader><tab> <c-w>p
 nmap <leader>1 1<c-w><c-w>
 nmap <leader>2 2<c-w><c-w>
 nmap <leader>3 3<c-w><c-w>
@@ -323,15 +317,17 @@ au BufEnter *.java silent let @s=GetSimpleClassName()
 autocmd BufRead,BufNewFile *.gradle set ft=java
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
+let g:syntastic_check_on_wq=0
 let g:android_sdk_path='~/Android/Sdk'
 let g:gradle_path='/home/brooth/.gradle-2.6'
 "let g:gradle_daemon=1
 
 "javacomplete2 mappings
-nmap <leader>ji <Plug>(JavaComplete-Imports-Add)
-nmap <leader>jI <Plug>(JavaComplete-Imports-AddSmart)
-nmap <leader>jm <Plug>(JavaComplete-Imports-AddMissing)
-nmap <leader>jo <Plug>(JavaComplete-Imports-RemoveUnused)
+nmap <leader>ji <Plug>(JavaComplete-Imports-AddSmart)
+nmap <leader>jI <Plug>(JavaComplete-Imports-AddMissing)
+nmap <leader>jO <Plug>(JavaComplete-Imports-RemoveUnused)
+
+nmap <leader>jU :call UpdateJavaCtags()<cr>
 
 function! UpdateJavaCtags()
     let l:cmd = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".
@@ -392,20 +388,50 @@ let g:unite_prompt = '» '
 
 if executable('ag')
   let g:unite_source_grep_command = 'ag'
-  let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --column --hidden --smart-case'
+  let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
   let g:unite_source_grep_recursive_opt = ''
 endif
 
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
-call unite#custom#source('buffer', 'converters', 'converter_tail')
 call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
                 \ '\.git/',
                 \ '\.idea/',
                 \ '\.gradle/',
                 \ 'build/[^gen]',
                 \ ], '\|'))
+
+let s:filters = {"name" : "custom_buffer_converter"}
+
+function! s:filters.filter(candidates, context)
+    for candidate in a:candidates
+        let bufname = bufname(candidate.action__buffer_nr)
+        let filename = fnamemodify(bufname, ':p:t')
+        let path = fnamemodify(bufname, ':p:h')
+        let candidate.abbr = printf("%s %s", filename, path)
+    endfor
+    return a:candidates
+endfunction
+
+call unite#define_filter(s:filters)
+unlet s:filters
+call unite#custom#source('buffer', 'converters', 'custom_buffer_converter')
+
+let s:filters = {"name" : "custom_grep_converter"}
+
+function! s:filters.filter(candidates, context)
+    for candidate in a:candidates
+        let info = get(candidate, 'source__info')
+        let filename = fnamemodify(get(candidate, 'action__path', candidate.word), ':t')
+        let candidate.abbr = printf("%s %s", filename, info[2])
+    endfor
+    return a:candidates
+endfunction
+
+call unite#define_filter(s:filters)
+unlet s:filters
+call unite#custom#source('grep', 'converters', 'custom_grep_converter')
 
 function! <SID>UniteSetup()
     nmap <buffer> <Esc> <plug>(unite_exit)
@@ -417,7 +443,7 @@ nmap <leader>u :Unite -buffer-name=files
                 \ -start-insert
                 \ -no-split
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
-nmap <leader>U :UniteWithCursorWord -buffer-name=cursorword
+nmap <leader>U :UniteWithCursorWord -buffer-name=files
                 \ -buffer-name=files
                 \ -no-split
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
@@ -428,12 +454,21 @@ nmap <leader>y :UniteWithBufferDir
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
                 \ -no-split
+                \ -wrap
                 \ grep:.<cr>
-nmap <leader>o :Unite -buffer-name=outline
+nmap <leader>G :UniteWithCursorWord -buffer-name=grep
+                \ -no-split
+                \ -wrap
+                \ grep:.<cr>
+nmap <leader>o :Unite -buffer-name=tags
+                \ -no-split
+                \ -start-insert
+                \ tag<cr>
+nmap <leader>O :Unite -buffer-name=outline
                 \ -no-split
                 \ -start-insert
                 \ outline<cr>
-nmap <leader>j :Unite -buffer-name=buffers
+nmap <leader><leader> :Unite -buffer-name=buffers
                 \ -no-split
                 \ -quick-match
                 \ buffer<cr>
@@ -543,6 +578,11 @@ nmap <Leader>vz :call VimuxZoomRunner()<CR>
 "---------------------------------------------
 set background=dark
 colorscheme gruvbox
+
+
+"no hl line in insert mode
+autocmd InsertEnter * set nocul
+autocmd InsertLeave * set cul
 
 "---------------------------------------------
 "                airline
