@@ -389,7 +389,7 @@ let g:unite_prompt = '» '
 
 if executable('ag')
   let g:unite_source_grep_command = 'ag'
-  let g:unite_source_grep_default_opts = '--nocolor --nogroup'
+  let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
   let g:unite_source_grep_recursive_opt = ''
 endif
 
