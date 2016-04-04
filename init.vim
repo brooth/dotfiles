@@ -23,7 +23,7 @@ endif
 "---------------------------------------------
 call plug#begin('$VIMHOME/plugged')
 
-"appirance
+"appearance
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'Yggdroot/indentLine'
@@ -33,6 +33,7 @@ Plug 'tpope/vim-repeat'
 Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-commentary'
 
 "tmux
 Plug 'christoomey/vim-tmux-navigator'
@@ -383,16 +384,16 @@ let g:deoplete#ignore_sources.java = ['javacomplete2']
 "-------------------------------------------
 let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
-let g:unite_source_rec_max_cache_files = 0
+let g:unite_source_rec_max_cache_files = 1000
 let g:unite_prompt = '» '
 
 if executable('ag')
   let g:unite_source_grep_command = 'ag'
-  let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
+  let g:unite_source_grep_default_opts = '--nocolor --nogroup'
   let g:unite_source_grep_recursive_opt = ''
 endif
 
-call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
@@ -406,25 +407,27 @@ let s:filters = {"name" : "custom_buffer_converter"}
 
 function! s:filters.filter(candidates, context)
     for candidate in a:candidates
-        let bufname = bufname(candidate.action__buffer_nr)
-        let filename = fnamemodify(bufname, ':p:t')
-        let path = fnamemodify(bufname, ':p:h')
-        let candidate.abbr = printf("%s %s", filename, path)
+        "echo candidate
+        let word = get(candidate, 'word')
+        "let path = get(candidate, 'action__path', '')
+        "let candidate.abbr = printf("%s   %s", word, path)
+        let candidate.abbr = word
     endfor
     return a:candidates
 endfunction
 
 call unite#define_filter(s:filters)
 unlet s:filters
-call unite#custom#source('buffer', 'converters', 'custom_buffer_converter')
+call unite#custom#source('buffer,neomru/file,file_rec/neovim',
+    \ 'converters', 'custom_buffer_converter')
 
 let s:filters = {"name" : "custom_grep_converter"}
 
 function! s:filters.filter(candidates, context)
     for candidate in a:candidates
-        let info = get(candidate, 'source__info')
         let filename = fnamemodify(get(candidate, 'action__path', candidate.word), ':t')
-        let candidate.abbr = printf("%s %s", filename, info[2])
+        let trimmed = substitute(get(candidate, 'source__info')[2], '^\s\+\|\s\+$', '', 'g')
+        let candidate.abbr = printf("%s   %s", filename, trimmed)
     endfor
     return a:candidates
 endfunction
@@ -454,11 +457,9 @@ nmap <leader>y :UniteWithBufferDir
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
                 \ -no-split
-                \ -wrap
                 \ grep:.<cr>
 nmap <leader>G :UniteWithCursorWord -buffer-name=grep
                 \ -no-split
-                \ -wrap
                 \ grep:.<cr>
 nmap <leader>o :Unite -buffer-name=tags
                 \ -no-split
