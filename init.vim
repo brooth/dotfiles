@@ -12,6 +12,8 @@
 
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
+    "normal mode in terminal by Esc
+    tnoremap <Esc> <C-\><C-n>
 else
     let $VIMHOME = "~/.vim"
 endif
@@ -91,10 +93,7 @@ nmap <F1> <Esc>
 vmap <F1> <Esc>
 
 "disable ex mode
-nmap Q <Nop>
-"remap macros, don't use it that often
-nmap q <Nop>
-nnoremap <leader>q q
+:map Q <Nop>
 
 "yeah
 map Y y$
@@ -104,11 +103,6 @@ imap <c-h> <left>
 imap <c-k> <up>
 imap <c-j> <down>
 imap <c-l> <right>
-
-if has('nvim')
-    "normal mode in terminal by Esc
-    tnoremap <Esc> <C-\><C-n>
-endif
 
 "Display what command is waiting for an operator
 set showcmd
@@ -154,6 +148,12 @@ nmap <leader>bD :%bd<cr>:e #<cr>
 "          search/replace/subtitude
 "---------------------------------------------
 "case sensetive search in CtrlP if enter capitals
+set smartcase
+"with smartcase ignores case when all in lowercase
+set ignorecase
+"highlight search
+set hlsearch
+"highlight search while typing
 set smartcase
 "with smartcase ignores case when all in lowercase
 set ignorecase
@@ -415,9 +415,9 @@ function! s:filters.filter(candidates, context)
     for candidate in a:candidates
         "echo candidate
         let word = get(candidate, 'word')
-        "let path = get(candidate, 'action__path', '')
-        "let candidate.abbr = printf("%s   %s", word, path)
-        let candidate.abbr = word
+        let path = get(candidate, 'action__path', '')
+        let candidate.abbr = printf("%s   %s", word, path)
+        " let candidate.abbr = word
     endfor
     return a:candidates
 endfunction
@@ -467,77 +467,70 @@ nmap <leader>g :Unite -buffer-name=grep
 nmap <leader>G :UniteWithCursorWord -buffer-name=grep
                     \ -no-split
                     \ grep:.<cr>
-    nmap <leader>o :Unite -buffer-name=tags
-                    \ -no-split
-                    \ -start-insert
-                    \ tag<cr>
-    nmap <leader>O :Unite -buffer-name=outline
-                    \ -no-split
-                    \ -start-insert
-                    \ outline<cr>
-    nmap <leader><leader> :Unite -buffer-name=buffers
-                    \ -no-split
-                    \ -quick-match
-                    \ buffer<cr>
+nmap <leader>o :Unite -buffer-name=tags
+                \ -no-split
+                \ -start-insert
+                \ tag<cr>
+nmap <leader>O :Unite -buffer-name=outline
+                \ -no-split
+                \ -start-insert
+                \ outline<cr>
+nmap <leader><leader> :Unite -buffer-name=buffers
+                \ -no-split
+                \ -quick-match
+                \ buffer<cr>
 
-    "---------------------------------------------
-    "                 vimfiler
-    "---------------------------------------------
-    "<C-l>			<Plug>(vimfiler_redraw_screen)
-    "*			<Plug>(vimfiler_toggle_mark_all_lines)
-    "U			<Plug>(vimfiler_clear_mark_all_lines)
-    "cc			<Plug>(vimfiler_copy_file)
-    "mm			<Plug>(vimfiler_move_file)
-    "dd			<Plug>(vimfiler_delete_file)
-    "Cc			<Plug>(vimfiler_clipboard_copy_file)
-    "Cm			<Plug>(vimfiler_clipboard_move_file)
-    "Cp			<Plug>(vimfiler_clipboard_paste)
-    "r			<Plug>(vimfiler_rename_file)
-    "K			<Plug>(vimfiler_make_directory)
-    "N			<Plug>(vimfiler_new_file)
-    "x			<Plug>(vimfiler_execute_system_associated)
-    "X			<Plug>(vimfiler_execute_vimfiler_associated)
-    "~			<Plug>(vimfiler_switch_to_home_directory)
-    "\			<Plug>(vimfiler_switch_to_root_directory)
-    "&			<Plug>(vimfiler_switch_to_project_directory)
-    ".			<Plug>(vimfiler_toggle_visible_ignore_files)
-    "g?			<Plug>(vimfiler_help)
-    "v			<Plug>(vimfiler_preview_file)
-    "yy			<Plug>(vimfiler_yank_full_path)
-    "M			<Plug>(vimfiler_set_current_mask)
-    "S			<Plug>(vimfiler_select_sort_type)
-    "gs			<Plug>(vimfiler_toggle_safe_mode)
-    "a			<Plug>(vimfiler_choose_action)
-    "Y			<Plug>(vimfiler_pushd)
-    "P			<Plug>(vimfiler_popd)
-    "T			<Plug>(vimfiler_expand_tree_recursive)
-    "I			<Plug>(vimfiler_cd_input_directory)
+"---------------------------------------------
+"                 vimfiler
+"---------------------------------------------
+"<C-l> <Plug>(vimfiler_redraw_screen)
+"*	   <Plug>(vimfiler_toggle_mark_all_lines)
+"U	   <Plug>(vimfiler_clear_mark_all_lines)
+"cc	   <Plug>(vimfiler_copy_file)
+"mm	   <Plug>(vimfiler_move_file)
+"dd	   <Plug>(vimfiler_delete_file)
+"Cc	   <Plug>(vimfiler_clipboard_copy_file)
+"Cm	   <Plug>(vimfiler_clipboard_move_file)
+"Cp	   <Plug>(vimfiler_clipboard_paste)
+"r	   <Plug>(vimfiler_rename_file)
+"K	   <Plug>(vimfiler_make_directory)
+"N	   <Plug>(vimfiler_new_file)
+"x	   <Plug>(vimfiler_execute_system_associated)
+"X	   <Plug>(vimfiler_execute_vimfiler_associated)
+"~	   <Plug>(vimfiler_switch_to_home_directory)
+"\	   <Plug>(vimfiler_switch_to_root_directory)
+"&	   <Plug>(vimfiler_switch_to_project_directory)
+".	   <Plug>(vimfiler_toggle_visible_ignore_files)
+"g?	   <Plug>(vimfiler_help)
+"v	   <Plug>(vimfiler_preview_file)
+"yy	   <Plug>(vimfiler_yank_full_path)
+"M	   <Plug>(vimfiler_set_current_mask)
+"S	   <Plug>(vimfiler_select_sort_type)
+"gs	   <Plug>(vimfiler_toggle_safe_mode)
+"a	   <Plug>(vimfiler_choose_action)
+"Y	   <Plug>(vimfiler_pushd)
+"P	   <Plug>(vimfiler_popd)
+"T	   <Plug>(vimfiler_expand_tree_recursive)
+"I	   <Plug>(vimfiler_cd_input_directory)
 
+let g:vimfiler_tree_closed_icon = '▸'
+"let g:vimfiler_default_columns = ''
+"let g:vimfiler_explorer_columns = ''
+let g:vimfiler_tree_indentation = 3
+let g:vimfiler_file_icon = ''
+let g:vimfiler_marked_file_icon = '*'
+let g:vimfiler_readonly_file_icon = '~'
 
-    "let g:vimfiler_ignore_pattern = '^\%(.git\|.idea)$'
-    let g:vimfiler_as_default_explorer = 1
-    let g:vimfiler_safe_mode_by_default = 0
-
-    let g:vimfiler_tree_leaf_icon = ''
-    let g:vimfiler_tree_opened_icon = '▾'
-    let g:vimfiler_tree_closed_icon = '▸'
-    "let g:vimfiler_default_columns = ''
-    "let g:vimfiler_explorer_columns = ''
-    let g:vimfiler_tree_indentation = 3
-    let g:vimfiler_file_icon = ''
-    let g:vimfiler_marked_file_icon = '*'
-    let g:vimfiler_readonly_file_icon = '~'
-
-    augroup vimfiler
-      autocmd!
-      autocmd FileType vimfiler call s:vimfiler_settings()
-    augroup END
-    function! s:vimfiler_settings()
-        map <silent><buffer> <Space> <NOP>
-        map <silent><buffer> <c-j> <NOP>
-        nmap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
-        nmap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
-        nmap <buffer> <Esc> <Plug>(vimfiler_exit)
+augroup vimfiler
+  autocmd!
+  autocmd FileType vimfiler call s:vimfiler_settings()
+augroup END
+function! s:vimfiler_settings()
+    map <silent><buffer> <Space> <NOP>
+    map <silent><buffer> <c-j> <NOP>
+    nmap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
+    nmap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
+    nmap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
 endfunction
 
 nmap <leader>f :VimFilerCurrentDir<cr>
@@ -607,20 +600,3 @@ let g:airline_theme='oceanicnext'
 "---------------------------------------------
 nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
-
-"---------------------------------------------
-"                Gists
-"---------------------------------------------
-" Zoom / Restore window.
-function! ZoomToggle() abort
-    if exists('t:zoomed') && t:zoomed
-        execute t:zoom_winrestcmd
-        let t:zoomed = 0
-    else
-        let t:zoom_winrestcmd = winrestcmd()
-        resize
-        vertical resize
-        let t:zoomed = 1
-    endif
-endfunction
-nnoremap <silent> <leader>Z :call ZoomToggle()<CR>
