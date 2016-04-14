@@ -97,6 +97,8 @@ vmap <F1> <Esc>
 
 "yeah
 map Y y$
+"stay same position on insert mode exit
+inoremap <silent> <Esc> <Esc>`^
 
 "insert mode
 imap <c-h> <left>
@@ -271,6 +273,7 @@ autocmd BufReadPost *
 "---------------------------------------------
 "trailing
 nmap <leader>ct :%s/\s\+$//e<cr>
+nmap <leader>cm :retab<cr>
 
 "goto next, prev. open error
 nmap <leader>co :lopen<cr>
@@ -288,12 +291,14 @@ set wildignore+=*/build/^[^g]*
 "---------------------------------------------
 "                python
 "---------------------------------------------
-" <leader>g - goto assingment
-" <leader>d - goto definitions
-" K - pydoc
-" <leader>r - renaming
-" <leader2n - usages
-"
+let g:jedi#goto_command = "<leader>pg"
+let g:jedi#goto_assignments_command = "<leader>pa"
+let g:jedi#goto_definitions_command = ""
+let g:jedi#documentation_command = "<leader>pd"
+let g:jedi#usages_command = "<leader>pn"
+let g:jedi#completions_command = "<C-Space>"
+let g:jedi#rename_command = "<leader>pr"
+
 "enable all Python syntax highlighting features
 let python_highlight_all = 1
 
@@ -444,6 +449,10 @@ call unite#custom#source('grep', 'converters', 'custom_grep_converter')
 
 function! <SID>UniteSetup()
     nmap <buffer> <Esc> <plug>(unite_exit)
+    imap <buffer> <Esc> <plug>(unite_exit)
+
+    nnoremap <silent><buffer><expr> <C-s>     unite#do_action('split')
+    nnoremap <silent><buffer><expr> <C-v>     unite#do_action('vsplit')
 endfunction
 autocmd FileType unite call <SID>UniteSetup()
 
@@ -462,11 +471,11 @@ nmap <leader>y :UniteWithBufferDir
                 \ -no-split
                 \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
-                \ -no-split
+                \ -no-quit
                 \ grep:.<cr>
 nmap <leader>G :UniteWithCursorWord -buffer-name=grep
-                    \ -no-split
-                    \ grep:.<cr>
+                \ -no-quit
+                \ grep:.<cr>
 nmap <leader>o :Unite -buffer-name=tags
                 \ -no-split
                 \ -start-insert
