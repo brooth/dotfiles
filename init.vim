@@ -587,11 +587,18 @@ nmap <Leader>vz :call VimuxZoomRunner()<CR>
 "---------------------------------------------
 set background=dark
 colorscheme gruvbox
+syntax manual
 
+"syntax in active window only
+autocmd WinEnter * set syntax=on
+autocmd WinLeave * set syntax=off
 
 "no hl line in insert mode
 autocmd InsertEnter * set nocul
 autocmd InsertLeave * set cul
+"hl line in active window only
+autocmd WinEnter * set cul
+autocmd WinLeave * set nocul
 
 "---------------------------------------------
 "                airline
