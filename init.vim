@@ -88,7 +88,7 @@ set wildmenu
 set mouse = ""
 
 "allow switching away from a changed buffer without saving.
-set hidden	
+set hidden
 
 "F1 - Esc
 imap <F1> <Esc>
@@ -303,6 +303,7 @@ let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>pr"
 
 "enable all Python syntax highlighting features
+let g:jedi#force_py_version = 3
 let python_highlight_all = 1
 
 autocmd FileType python setlocal completeopt-=preview
@@ -590,15 +591,23 @@ nmap <Leader>vz :call VimuxZoomRunner()<CR>
 "---------------------------------------------
 set background=dark
 colorscheme gruvbox
-syntax manual
 
-"syntax in active window only
-autocmd BufEnter * set syntax=on
-autocmd WinEnter * set syntax=on
-autocmd BufLeave * set syntax=off
+"dim inactive  windows
+hi def Dim cterm=none ctermbg=none ctermfg=242
+
+function! s:DimInactiveWindow()
+    syntax region Dim start='' end='$$$end$$$'
+endfunction
+
+function! s:UndimActiveWindow()
+    ownsyntax
+endfunction
+
+autocmd BufEnter * call s:UndimActiveWindow()
+autocmd WinEnter * call s:UndimActiveWindow()
+autocmd WinLeave * call s:DimInactiveWindow()
 
 "hl line orange in insert mode
-
 function! s:SetNormalCursorLine()
     hi cursorline cterm=none ctermbg=236 ctermfg=none
 endfunction
