@@ -8,7 +8,7 @@
 "
 " search & replace
 " :args **/*.java OR :args `ag -l <search> **/*.java`
-" :argdo %s/<search>/<replace>/gc
+" :argdo %s/<search>/<replace>/ge | update
 
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
@@ -86,6 +86,9 @@ set wildmenu
 
 "no mouse support
 set mouse = ""
+
+"allow switching away from a changed buffer without saving.
+set hidden	
 
 "F1 - Esc
 imap <F1> <Esc>
@@ -590,12 +593,23 @@ colorscheme gruvbox
 syntax manual
 
 "syntax in active window only
+autocmd BufEnter * set syntax=on
 autocmd WinEnter * set syntax=on
-autocmd WinLeave * set syntax=off
+autocmd BufLeave * set syntax=off
 
-"no hl line in insert mode
-autocmd InsertEnter * set nocul
-autocmd InsertLeave * set cul
+"hl line orange in insert mode
+
+function! s:SetNormalCursorLine()
+    hi cursorline cterm=none ctermbg=236 ctermfg=none
+endfunction
+
+function! s:SetInsertCursorLine()
+    hi cursorline cterm=none ctermbg=52 ctermfg=none
+endfunction
+
+autocmd InsertEnter * call s:SetInsertCursorLine()
+autocmd InsertLeave * call s:SetNormalCursorLine()
+
 "hl line in active window only
 autocmd WinEnter * set cul
 autocmd WinLeave * set nocul
