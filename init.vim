@@ -50,8 +50,8 @@ Plug 'scrooloose/syntastic'
 Plug 'hsanson/vim-android'
 
 "python
-Plug 'nvie/vim-flake8'
 Plug 'davidhalter/jedi-vim'
+Plug 'zchee/deoplete-jedi'
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -114,13 +114,6 @@ set showcmd
 
 "redraw only when we need to.
 "set lazyredraw
-
-"---------------------------------------------
-"              complition
-"---------------------------------------------
-"ctrl+space - omni complition
-imap <NUL> <c-x><c-o>
-set complete=.,w,b,u,t,k
 
 "---------------------------------------------
 "          save/restore/quit
@@ -296,31 +289,38 @@ set wildignore+=*/build/^[^g]*
 "---------------------------------------------
 let g:jedi#goto_command = "<leader>pg"
 let g:jedi#goto_assignments_command = "<leader>pa"
-let g:jedi#goto_definitions_command = ""
+let g:jedi#goto_definitions_command = "<leader>pp"
 let g:jedi#documentation_command = "<leader>pd"
 let g:jedi#usages_command = "<leader>pn"
-let g:jedi#completions_command = "<C-Space>"
+let g:jedi#completions_command = "<c-Space>"
 let g:jedi#rename_command = "<leader>pr"
-
-"enable all Python syntax highlighting features
-let g:jedi#force_py_version = 3
-let python_highlight_all = 1
-
-autocmd FileType python setlocal completeopt-=preview
-autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-autocmd BufRead *.py set nocindent
-
-"flake8
-"let g:flake8_show_in_gutter=1
-let g:flake8_show_in_file=1
-
-autocmd BufWritePost *.py call Flake8()
 
 "jedi
 let g:jedi#show_call_signatures = "1"
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
+
+"syntastic
+let g:syntastic_python_checkers=['flake8']
+let g:syntastic_python_flake8_args='--ignore=E501'
+
+"enable all Python syntax highlighting features
+if has('python3')
+    let g:jedi#force_py_version = 3
+endif
+let python_highlight_all = 1
+
+function! s:SetPythonSetting()
+    set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+    set nocindent
+    if has('python3')
+        set omnifunc=python3complete#Complete
+    endif 
+endfunction
+
+autocmd FileType python setlocal completeopt-=preview
+autocmd BufRead *.py call s:SetPythonSetting()
 
 "---------------------------------------------
 "               java
@@ -374,25 +374,33 @@ nmap <Leader>hr <Plug>GitGutterRevertHunk
 nmap <Leader>ha <Plug>GitGutterStageHunk
 
 "---------------------------------------------
-"         neocomplete/deoplete
+"       completion/neocomplete/deoplete
 "---------------------------------------------
+"ctrl+space - omni complition
+imap <NUL> <c-x><c-o>
+set complete=.,w,b,u,k
+"set completeopt=longest,menu,menuone
+
+"up/down with tab
+inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
+
 if has('nvim')
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#enable_smart_case = 1
     let g:deoplete#auto_completion_start_length = 1
+
+    "close popup on esc
+    "imap <expr> <Esc> pumvisible() ? deoplete#mappings#cancel_popup() : "\<Esc>"
+
+    "todo: until the lag is
+    let g:deoplete#ignore_sources = {}
+    let g:deoplete#ignore_sources.java = ['javacomplete2']
 else
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#sources#syntax#min_keyword_length = 1
 endif
-
-inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
-
-"set completeopt=longest,menu,menuone
-"todo: until the lag is
-let g:deoplete#ignore_sources = {}
-let g:deoplete#ignore_sources.java = ['javacomplete2']
 
 "---------------------------------------------
 "                  Unite
@@ -490,7 +498,6 @@ nmap <leader>O :Unite -buffer-name=outline
                 \ outline<cr>
 nmap <leader><leader> :Unite -buffer-name=buffers
                 \ -no-split
-                \ -quick-match
                 \ buffer<cr>
 
 "---------------------------------------------
@@ -526,6 +533,7 @@ nmap <leader><leader> :Unite -buffer-name=buffers
 "T	   <Plug>(vimfiler_expand_tree_recursive)
 "I	   <Plug>(vimfiler_cd_input_directory)
 
+let g:vimfiler_safe_mode_by_default=0
 let g:vimfiler_tree_closed_icon = '▸'
 "let g:vimfiler_default_columns = ''
 "let g:vimfiler_explorer_columns = ''
