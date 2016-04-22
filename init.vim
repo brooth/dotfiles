@@ -303,7 +303,7 @@ let g:jedi#completions_enabled = 0
 
 "syntastic
 let g:syntastic_python_checkers=['flake8']
-let g:syntastic_python_flake8_args='--ignore=E501'
+let g:syntastic_python_flake8_args='--ignore=E501,E126,E128'
 
 "enable all Python syntax highlighting features
 if has('python3')
@@ -316,7 +316,7 @@ function! s:SetPythonSetting()
     set nocindent
     if has('python3')
         set omnifunc=python3complete#Complete
-    endif 
+    endif
 endfunction
 
 autocmd FileType python setlocal completeopt-=preview
