@@ -55,13 +55,12 @@ plugins=(git)
 
 # User configuration
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export ANDROID_HOME=~/Android/Sdk
 
 export PYTHONSTARTUP=~/.pystartup
 
 export TERM="xterm-256color"
-export bintrayApiKey=9f8004aaa2a9480f7a148a845828feb076f502bd
 
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -g ""'
