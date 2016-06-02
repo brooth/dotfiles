@@ -43,15 +43,8 @@ Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
-"java
+"dev
 Plug 'SirVer/ultisnips'
-Plug 'artur-shaik/vim-javacomplete2'
-Plug 'scrooloose/syntastic'
-Plug 'hsanson/vim-android'
-
-"python
-Plug 'davidhalter/jedi-vim'
-Plug 'zchee/deoplete-jedi'
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -284,81 +277,7 @@ set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
 
-"---------------------------------------------
-"                python
-"---------------------------------------------
-let g:jedi#goto_command = "<leader>pg"
-let g:jedi#goto_assignments_command = "<leader>pa"
-let g:jedi#goto_definitions_command = "<leader>pp"
-let g:jedi#documentation_command = "<leader>pd"
-let g:jedi#usages_command = "<leader>pn"
-let g:jedi#completions_command = "<c-Space>"
-let g:jedi#rename_command = "<leader>pr"
-
-"jedi
-let g:jedi#show_call_signatures = "1"
-let g:jedi#popup_select_first = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#completions_enabled = 0
-
-"syntastic
-let g:syntastic_python_checkers=['flake8']
-let g:syntastic_python_flake8_args='--ignore=E501,E126,E128'
-
-"enable all Python syntax highlighting features
-if has('python3')
-    let g:jedi#force_py_version = 3
-endif
-let python_highlight_all = 1
-
-function! s:SetPythonSetting()
-    set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-    set nocindent
-    if has('python3')
-        set omnifunc=python3complete#Complete
-    endif
-endfunction
-
-autocmd FileType python setlocal completeopt-=preview
-autocmd BufRead *.py call s:SetPythonSetting()
-
-"---------------------------------------------
-"               java
-"---------------------------------------------
-exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
-
-au BufEnter *.java silent let @c=GetCanonicalClassName()
-au BufEnter *.java silent let @s=GetSimpleClassName()
-
 autocmd BufRead,BufNewFile *.gradle set ft=java
-autocmd FileType java setlocal omnifunc=javacomplete#Complete
-
-let g:syntastic_check_on_wq=0
-let g:android_sdk_path='~/Android/Sdk'
-let g:gradle_path='/home/brooth/.gradle-2.6'
-"let g:gradle_daemon=1
-
-"javacomplete2 mappings
-nmap <leader>ji <Plug>(JavaComplete-Imports-AddSmart)
-nmap <leader>jI <Plug>(JavaComplete-Imports-AddMissing)
-nmap <leader>jO <Plug>(JavaComplete-Imports-RemoveUnused)
-
-nmap <leader>jU :call UpdateJavaCtags()<cr>
-
-function! UpdateJavaCtags()
-    let l:cmd = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".
-        \ getcwd()." && ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --languages=java ".getcwd()
-    call system(l:cmd)
-    echo 'ctags updated!'
-endfunction
-
-function! GetCanonicalClassName()
-    return system("ctags -f - -u --java-kinds=pc " . expand('%:p') . " | grep -m 2 -o '^[^	]*' | tr '\\n' '.' | sed 's/.$/\\n/'")
-endfunction
-
-function! GetSimpleClassName()
-    return system("ctags -f - -u --java-kinds=c " . expand('%:p') . " | grep -m 1 -o '^[^	]*'")
-endfunction
 
 "---------------------------------------------
 "                git
