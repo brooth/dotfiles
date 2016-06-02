@@ -1,8 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
 
-[ -f .zshprc ] && source .zshprc
-
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
@@ -54,7 +52,8 @@ ZSH_THEME="gentoo"
 plugins=(git)
 
 # User configuration
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+#export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="$PATH:$HOME/gradle/bin:$HOME/Android/Sdk/platform-tools"
 export JAVA_HOME=/usr/lib/jvm/java-7-oracle
 export ANDROID_HOME=~/Android/Sdk
 
@@ -68,13 +67,15 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 source $ZSH/oh-my-zsh.sh
+source ~/.zshprc
 
 setopt no_share_history
 
-alias g=~/.gradle-2.6/bin/gradle
+setxkbmap -option ctrl:nocaps
+
+alias g=~/gradle/bin/gradle
 
 alias vi=nvim
-alias vim=nvim
 alias virc='vi -u .vimrc'
 
 alias em='emacs -nw'
