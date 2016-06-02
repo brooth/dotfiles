@@ -55,7 +55,7 @@ plugins=(git)
 
 # User configuration
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-7-oracle
 export ANDROID_HOME=~/Android/Sdk
 
 export PYTHONSTARTUP=~/.pystartup
