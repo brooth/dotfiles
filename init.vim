@@ -277,7 +277,7 @@ set wildignore+=*.class
 set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
 
-autocmd BufRead,BufNewFile *.gradle set ft=java
+autocmd BufRead,BufNewFile *.gradle set ft=groovy
 
 "---------------------------------------------
 "                git
@@ -454,8 +454,8 @@ nmap <leader><leader> :Unite -buffer-name=buffers
 
 let g:vimfiler_safe_mode_by_default=0
 let g:vimfiler_tree_closed_icon = '▸'
-"let g:vimfiler_default_columns = ''
-"let g:vimfiler_explorer_columns = ''
+let g:vimfiler_default_columns = ''
+let g:vimfiler_explorer_columns = ''
 let g:vimfiler_tree_indentation = 3
 let g:vimfiler_file_icon = ''
 let g:vimfiler_marked_file_icon = '*'

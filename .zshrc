@@ -71,8 +71,6 @@ source ~/.zshprc
 
 setopt no_share_history
 
-setxkbmap -option ctrl:nocaps
-
 alias g=~/gradle/bin/gradle
 
 alias vi=nvim
@@ -82,5 +80,3 @@ alias em='emacs -nw'
 alias emc='emacsclient -nw'
 
 alias ack-grep=ack
-
-
