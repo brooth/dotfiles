@@ -89,7 +89,10 @@ nmap <F1> <Esc>
 vmap <F1> <Esc>
 
 "disable ex mode
-:map Q <Nop>
+map Q <Nop>
+
+" Enter the command-line mode
+noremap <CR> :
 
 "yeah
 map Y y$
@@ -193,6 +196,9 @@ nmap <m-k> :tabnext<CR>
 "---------------------------------------------
 "move curson over empty space
 set virtualedit=all
+
+" indent everything
+noremap <Space>= miggvG=`i
 
 "indent when moving to the next line while writing code<Paste>
 set autoindent
@@ -456,6 +462,7 @@ let g:vimfiler_safe_mode_by_default=0
 let g:vimfiler_tree_closed_icon = '▸'
 let g:vimfiler_default_columns = ''
 let g:vimfiler_explorer_columns = ''
+let g:vimfiler_tree_leaf_icon = ''
 let g:vimfiler_tree_indentation = 3
 let g:vimfiler_file_icon = ''
 let g:vimfiler_marked_file_icon = '*'

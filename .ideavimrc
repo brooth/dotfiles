@@ -1,0 +1,60 @@
+"---------------------------------------------
+"                misc settings
+"---------------------------------------------
+
+"disable ex mode
+map Q <Nop>
+
+"yeah
+map Y y$
+
+"stay same position on insert mode exit
+inoremap <silent> <Esc> <Esc><Right>
+
+"F1 - Esc
+imap <F1> <Esc>
+nmap <F1> <Esc>
+vmap <F1> <Esc>
+
+"cursor movement in insert mode
+imap <c-h> <left>
+imap <c-k> <up>
+imap <c-j> <down>
+imap <c-l> <right>
+
+" Moving blocks of text in visual mode
+vnoremap < <gv
+vnoremap > >gv
+
+" Select all text
+map <Space>a ggVG
+
+" Indent everything
+noremap <Space>= miggvG=`i
+
+" Enter the command-line mode
+noremap <CR> :
+
+"---------------------------------------------
+"           Emulated Vim Plugins
+"---------------------------------------------
+set surround
+
+"---------------------------------------------
+"             windows/tabs
+"---------------------------------------------
+
+"---------------------------------------------
+"             IDE actions
+"---------------------------------------------
+"tabs
+nmap <A-j> :action VimMotionPreviousTab<CR>
+nmap <A-k> :action VimMotionNextTab<CR>
+
+nnoremap / :action Find<CR>
+nnoremap n :action FindNext<CR>
+nnoremap N :action FindPrevious<CR>
+
+nnoremap <F10> :action CloseContent<CR>
+nnoremap <Space>u :action RecentFiles<CR>
+
