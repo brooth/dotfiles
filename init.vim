@@ -334,6 +334,7 @@ let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
 let g:unite_source_rec_max_cache_files = 1000
 let g:unite_prompt = '» '
+let g:unite_source_file_mru_limit = 10
 
 if executable('ag')
   let g:unite_source_grep_command = 'ag'
