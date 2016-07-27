@@ -9,6 +9,8 @@
 " search & replace
 " :args **/*.java OR :args `ag -l <search> **/*.java`
 " :argdo %s/<search>/<replace>/ge | update
+"
+" to clean buffer cache remove dirs under ~/.local/share/nvim
 
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
@@ -78,7 +80,6 @@ let mapleader=" "
 set pastetoggle=<F12>
 set history=100
 "completion in command line
-set wildmode=longest,list,full
 set wildmenu
 
 let g:project_dir = getcwd()
@@ -312,7 +313,9 @@ nmap <Leader>ha <Plug>GitGutterStageHunk
 "       completion/neocomplete/deoplete
 "---------------------------------------------
 "ctrl+space - omni complition
-"imap <NUL> <c-x><c-o>
+imap <NUL> <C-Space>
+imap <C-@> <C-Space>
+imap <C-Space> <c-x><c-o>
 "set complete=.,w,b,u,k
 "set completeopt=longest,menu,menuone
 

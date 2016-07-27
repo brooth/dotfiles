@@ -11,11 +11,11 @@ let g:jedi#usages_command = "<leader>U"
 let g:jedi#rename_command = "<leader>R"
 let g:jedi#completions_command = "<C-W>"
 
-let g:jedi#auto_initialization = 0
+let g:jedi#auto_initialization = 1
 let g:jedi#show_call_signatures = "1"
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
-let g:jedi#completions_enabled = 0
+let g:jedi#completions_enabled = 1
 let g:jedi#popup_on_dot = 0
 
 "syntastic
@@ -24,7 +24,7 @@ let g:syntastic_python_flake8_args='--ignore=E501,E126,E128'
 
 "enable all Python syntax highlighting features
 if has('python3')
-"    let g:jedi#force_py_version = 3
+    let g:jedi#force_py_version = 3
 endif
 let python_highlight_all = 1
 
