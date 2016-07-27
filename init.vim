@@ -49,7 +49,6 @@ Plug 'SirVer/ultisnips'
 "python
 Plug 'scrooloose/syntastic', {'for': 'python'}
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
-Plug 'zchee/deoplete-jedi', {'for': 'python'}
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -79,7 +78,10 @@ let mapleader=" "
 set pastetoggle=<F12>
 set history=100
 "completion in command line
+set wildmode=longest,list,full
 set wildmenu
+
+let g:project_dir = getcwd()
 
 "no mouse support
 set mouse = ""
@@ -93,7 +95,7 @@ nmap <F1> <Esc>
 vmap <F1> <Esc>
 
 "disable ex mode
-map Q <Nop>
+"map Q <Nop>
 
 "yeah
 map Y y$
@@ -123,8 +125,8 @@ nnoremap <F10> :q<CR>
 "do not store vimrc options in session
 set ssop-=options
 
-function SaveSession()
-    let l:path = getcwd().'/.vimsession'
+function! SaveSession()
+    let l:path = g:project_dir.'/.vimsession'
     if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
         execute 'mksession! '.l:path
     endif
@@ -210,8 +212,8 @@ noremap <Space>= miggvG=`i
 "indent when moving to the next line while writing code<Paste>
 set autoindent
 
-"set smartindent
-"set smarttab
+set smartindent
+set smarttab
 
 set tabstop=4
 "when using the >> or << commands, shift lines by 4 spaces
@@ -219,6 +221,9 @@ set shiftwidth=4
 set softtabstop=4
 "expand tabs into spaces
 set expandtab
+
+" show tabs and whitespaces
+set list
 
 "show vertical line
 "set colorcolumn=80
@@ -279,8 +284,8 @@ nmap <leader>cm :retab<cr>
 
 "goto next, prev. open error
 nmap <leader>co :lopen<cr>
-nmap ]c :lnext<cr>
-nmap [c :lprevious<cr>
+nmap <leader>] :lnext<cr>
+nmap <leader>[ :lprevious<cr>
 
 "---------------------------------------------
 "                files/types
@@ -307,8 +312,8 @@ nmap <Leader>ha <Plug>GitGutterStageHunk
 "       completion/neocomplete/deoplete
 "---------------------------------------------
 "ctrl+space - omni complition
-imap <NUL> <c-x><c-o>
-set complete=.,w,b,u,k
+"imap <NUL> <c-x><c-o>
+"set complete=.,w,b,u,k
 "set completeopt=longest,menu,menuone
 
 "up/down with tab
@@ -323,9 +328,6 @@ if has('nvim')
     "close popup on esc
     "imap <expr> <Esc> pumvisible() ? deoplete#mappings#cancel_popup() : "\<Esc>"
 
-    "todo: until the lag is
-    let g:deoplete#ignore_sources = {}
-    let g:deoplete#ignore_sources.java = ['javacomplete2']
 else
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
@@ -356,6 +358,7 @@ call unite#filters#sorter_default#use(['sorter_rank'])
 call unite#custom#source('file_rec/async', 'ignore_pattern', join([
                 \ '\.git/',
                 \ '\.idea/',
+                \ '\.env/',
                 \ '\.gradle/',
                 \ 'build/[^gen]',
                 \ ], '\|'))
