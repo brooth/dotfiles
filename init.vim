@@ -46,9 +46,13 @@ Plug 'airblade/vim-gitgutter'
 "dev
 Plug 'SirVer/ultisnips'
 
+"python
+Plug 'scrooloose/syntastic', {'for': 'python'}
+Plug 'davidhalter/jedi-vim', {'for': 'python'}
+Plug 'zchee/deoplete-jedi', {'for': 'python'}
+
 "unite
 Plug 'Shougo/unite.vim'
-Plug 'Shougo/neomru.vim'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'Shougo/unite-outline'
 Plug 'Shougo/vimfiler.vim'
@@ -91,9 +95,6 @@ vmap <F1> <Esc>
 "disable ex mode
 map Q <Nop>
 
-" Enter the command-line mode
-noremap <CR> :
-
 "yeah
 map Y y$
 "stay same position on insert mode exit
@@ -118,12 +119,18 @@ set showcmd
 nnoremap <F2> :w<CR>
 inoremap <F2> <Esc>:w<CR>
 nnoremap <F10> :q<CR>
-nmap <leader>E :e!<cr>
 
 "do not store vimrc options in session
 set ssop-=options
 
-nmap <leader>S :mksession! <c-r>r/.vimsession<cr>
+function SaveSession()
+    let l:path = getcwd().'/.vimsession'
+    if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
+        execute 'mksession! '.l:path
+    endif
+endfunction
+
+nmap <leader>S :call SaveSession()<cr>
 nmap <leader>R :source <c-r>r/.vimsession<cr>
 
 "tell it to use an undo file
@@ -279,8 +286,6 @@ nmap [c :lprevious<cr>
 "                files/types
 "---------------------------------------------
 set wildignore+=*/bin/*
-set wildignore+=*.class
-set wildignore+=*.pyc
 set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
@@ -334,18 +339,21 @@ let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
 let g:unite_source_rec_max_cache_files = 1000
 let g:unite_prompt = '» '
-let g:unite_source_file_mru_limit = 10
 
 if executable('ag')
   let g:unite_source_grep_command = 'ag'
   let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
   let g:unite_source_grep_recursive_opt = ''
+  
+  let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
+  let g:ackprg = 'ag --nogroup --column'
+
 endif
 
 call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
-call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
+call unite#custom#source('file_rec/async', 'ignore_pattern', join([
                 \ '\.git/',
                 \ '\.idea/',
                 \ '\.gradle/',
@@ -367,7 +375,7 @@ endfunction
 
 call unite#define_filter(s:filters)
 unlet s:filters
-call unite#custom#source('buffer,neomru/file,file_rec/neovim',
+call unite#custom#source('buffer,file_rec/async',
     \ 'converters', 'custom_buffer_converter')
 
 let s:filters = {"name" : "custom_grep_converter"}
@@ -398,16 +406,17 @@ nmap <leader>u :Unite -buffer-name=files
                 \ -buffer-name=files
                 \ -start-insert
                 \ -no-split
-                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+                \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>U :UniteWithCursorWord -buffer-name=files
                 \ -buffer-name=files
+                \ -start-insert
                 \ -no-split
-                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+                \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>y :UniteWithBufferDir
                 \ -buffer-name=./files
                 \ -start-insert
                 \ -no-split
-                \ buffer neomru/file file_rec/neovim file/new directory/new<CR>
+                \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
                 \ -no-quit
                 \ grep:.<cr>
