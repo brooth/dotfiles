@@ -10,7 +10,7 @@
 " :args **/*.java OR :args `ag -l <search> **/*.java`
 " :argdo %s/<search>/<replace>/ge | update
 "
-" to clean buffer cache remove dirs under ~/.local/share/nvim
+" to clean buffer cache remove sub! dirs ~/.local/share/nvim
 
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
@@ -349,7 +349,7 @@ if executable('ag')
   let g:unite_source_grep_command = 'ag'
   let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
   let g:unite_source_grep_recursive_opt = ''
-  
+
   let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
   let g:ackprg = 'ag --nogroup --column'
 
@@ -589,3 +589,63 @@ let g:airline_theme='oceanicnext'
 "---------------------------------------------
 nmap <F4> :MundoToggle<cr>
 imap <F4> <esc><f4>
+
+"---------------------------------------------
+"               python
+"---------------------------------------------
+let g:python_inited = 0
+
+function! InitPythonSessing()
+    " buffer settings
+    set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+    set nocindent
+
+    " global settings
+    if g:python_inited != 0
+        return
+    endif
+    let g:python_inited = 1
+
+    set wildignore+=*.pyc
+    set wildignore+=*/env/^[^g]*
+
+    let g:jedi#goto_command = "<leader>G"
+    let g:jedi#goto_assignments_command = "<leader>A"
+    let g:jedi#goto_definitions_command = "<leader>P"
+    let g:jedi#documentation_command = "<leader>D"
+    let g:jedi#usages_command = "<leader>U"
+    let g:jedi#rename_command = "<leader>R"
+    let g:jedi#completions_command = "<C-W>"
+
+    let g:jedi#auto_initialization = 1
+    let g:jedi#show_call_signatures = "1"
+    let g:jedi#popup_select_first = 0
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#completions_enabled = 1
+    let g:jedi#popup_on_dot = 0
+
+    "syntastic
+    let g:syntastic_python_checkers=['flake8']
+    let g:syntastic_python_flake8_args='--ignore=E501,E126,E128'
+
+    "enable all Python syntax highlighting features
+    if has('python3')
+        let g:jedi#force_py_version = 3
+    endif
+    let python_highlight_all = 1
+
+    set completeopt-=preview
+    set omnifunc=jedi#completions
+    exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
+
+    function! UpdatePythonCtags()
+        let l:cmd = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".
+            \ getcwd()." && ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --exclude=.env".
+            \ " --exclude=.git --languages=python ".getcwd()
+        call system(l:cmd)
+        echo 'ctags updated!'
+    endfunction
+    nnoremap <leader>T :call UpdatePythonCtags()<Cr>
+
+endfunction
+autocmd BufRead *.py call InitPythonSessing()
