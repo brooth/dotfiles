@@ -229,9 +229,9 @@ set list
 "show vertical line
 "set colorcolumn=80
 
-"indent text in visual mode
-vmap < <gv
-vmap > >gv
+"indent text in visual mode with tab
+vmap <s-tab> <gv
+vmap <tab> >gv
 
 "---------------------------------------------
 "            lines/numbers/wrap
@@ -316,7 +316,7 @@ nmap <Leader>ha <Plug>GitGutterStageHunk
 imap <NUL> <C-Space>
 imap <C-@> <C-Space>
 imap <C-Space> <c-x><c-o>
-"set complete=.,w,b,u,k
+set complete=.,w,b,u,k
 "set completeopt=longest,menu,menuone
 
 "up/down with tab
@@ -597,8 +597,11 @@ let g:python_inited = 0
 
 function! InitPythonSessing()
     " buffer settings
-    set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-    set nocindent
+    setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+    setlocal nocindent
+
+    setlocal completeopt-=preview
+    setlocal omnifunc=jedi#completions
 
     " global settings
     if g:python_inited != 0
@@ -618,7 +621,7 @@ function! InitPythonSessing()
     let g:jedi#completions_command = "<C-W>"
 
     let g:jedi#auto_initialization = 1
-    let g:jedi#show_call_signatures = "1"
+    let g:jedi#show_call_signatures = 0
     let g:jedi#popup_select_first = 0
     let g:jedi#auto_vim_configuration = 0
     let g:jedi#completions_enabled = 1
@@ -634,8 +637,12 @@ function! InitPythonSessing()
     endif
     let python_highlight_all = 1
 
-    set completeopt-=preview
-    set omnifunc=jedi#completions
+    let g:syntastic_mode_map = { 'mode': 'active',
+            \ 'active_filetypes': [],
+            \ 'passive_filetypes': ['python']
+            \ }
+    map <F5> :SyntasticCheck<cr>
+
     exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
 
     function! UpdatePythonCtags()
