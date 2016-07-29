@@ -121,6 +121,7 @@ set showcmd
 "save current file with F2
 nnoremap <F2> :w<CR>
 inoremap <F2> <Esc>:w<CR>
+vnoremap <F2> <Esc>:w<CR>
 nnoremap <F10> :q<CR>
 
 "do not store vimrc options in session
