@@ -615,8 +615,8 @@ function! InitPythonSessing()
 
     let g:jedi#goto_command = "<leader>G"
     let g:jedi#goto_assignments_command = "<leader>A"
-    let g:jedi#goto_definitions_command = "<leader>P"
-    let g:jedi#documentation_command = "<leader>D"
+    let g:jedi#goto_definitions_command = "<leader>D"
+    let g:jedi#documentation_command = "<leader>K"
     let g:jedi#usages_command = "<leader>U"
     let g:jedi#rename_command = "<leader>R"
     let g:jedi#completions_command = "<C-W>"
@@ -628,8 +628,15 @@ function! InitPythonSessing()
     let g:jedi#completions_enabled = 1
     let g:jedi#popup_on_dot = 0
 
-    let g:neomake_python_enabled_makers = ['flake8']
-    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501,E126,E128'], }
+    let g:neomake_python_enabled_makers = ['pep8']
+    let g:neomake_python_pep8_maker = { 'args': ['--ignore=E126,E128'], }
+
+    let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
+    let g:neomake_warning_sign = {'text': 'w', 'texthl': 'airline_warning'}
+    let g:neomake_message_sign = {'text': 'm', 'texthl': 'NeomakeMessageSign'}
+    let g:neomake_info_sign = {'text': 'i', 'texthl': 'NeomakeInfoSign'}
+
+    autocmd! BufRead *.py Neomake
     autocmd! BufWritePost *.py Neomake
 
     "enable all Python syntax highlighting features
@@ -637,11 +644,6 @@ function! InitPythonSessing()
         let g:jedi#force_py_version = 3
     endif
     let python_highlight_all = 1
-
-    let g:syntastic_mode_map = { 'mode': 'active',
-            \ 'active_filetypes': [],
-            \ 'passive_filetypes': ['python']
-            \ }
 
     exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
 
