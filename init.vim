@@ -49,7 +49,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'SirVer/ultisnips'
 
 "python
-Plug 'scrooloose/syntastic', {'for': 'python'}
+Plug 'neomake/neomake', {'for': 'python'}
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
 
 "unite
@@ -628,9 +628,9 @@ function! InitPythonSessing()
     let g:jedi#completions_enabled = 1
     let g:jedi#popup_on_dot = 0
 
-    "syntastic
-    let g:syntastic_python_checkers=['flake8']
-    let g:syntastic_python_flake8_args='--ignore=E501,E126,E128'
+    let g:neomake_python_enabled_makers = ['flake8']
+    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501,E126,E128'], }
+    autocmd! BufWritePost *.py Neomake
 
     "enable all Python syntax highlighting features
     if has('python3')
@@ -642,7 +642,6 @@ function! InitPythonSessing()
             \ 'active_filetypes': [],
             \ 'passive_filetypes': ['python']
             \ }
-    map <F5> :SyntasticCheck<cr>
 
     exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
 
