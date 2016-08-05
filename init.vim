@@ -32,14 +32,10 @@ Plug 'Yggdroot/indentLine'
 
 "utils
 Plug 'tpope/vim-repeat'
-Plug 'simnalamburt/vim-mundo'
+Plug 'mbbill/undotree'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
-
-"tmux
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'benmills/vimux'
 
 "git
 Plug 'tpope/vim-fugitive'
@@ -51,6 +47,7 @@ Plug 'SirVer/ultisnips'
 "python
 Plug 'neomake/neomake', {'for': 'python'}
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
+Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -76,13 +73,15 @@ let g:indentLine_faster = 1
 filetype plugin indent on
 
 let mapleader=" "
+"leader key timeout
+set timeoutlen=3000
 
 set pastetoggle=<F12>
 set history=100
 "completion in command line
 set wildmenu
 
-let g:project_dir = getcwd()
+autocmd VimEnter * let g:initial_dir = getcwd()
 
 "no mouse support
 set mouse = ""
@@ -96,7 +95,7 @@ nmap <F1> <Esc>
 vmap <F1> <Esc>
 
 "disable ex mode
-"map Q <Nop>
+map Q <Nop>
 
 "yeah
 map Y y$
@@ -128,14 +127,14 @@ nnoremap <F10> :q<CR>
 set ssop-=options
 
 function! SaveSession()
-    let l:path = g:project_dir.'/.vimsession'
+    let l:path = g:initial_dir.'/.vimsession'
     if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
         execute 'mksession! '.l:path
     endif
 endfunction
 
 nmap <leader>S :call SaveSession()<cr>
-nmap <leader>R :source <c-r>r/.vimsession<cr>
+nmap <leader>R :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
 "tell it to use an undo file
 set undofile
@@ -145,26 +144,11 @@ exec 'set undodir='.$VIMHOME.'/undo'
 exec 'set dir='.$VIMHOME.'/tmp'
 
 "---------------------------------------------
-"                  buffers
-"---------------------------------------------
-nmap <leader>bD :%bd<cr>:e #<cr>
-
-"---------------------------------------------
 "          search/replace/subtitude
 "---------------------------------------------
-"case sensetive search in CtrlP if enter capitals
 set smartcase
-"with smartcase ignores case when all in lowercase
 set ignorecase
-"highlight search
 set hlsearch
-"highlight search while typing
-set smartcase
-"with smartcase ignores case when all in lowercase
-set ignorecase
-"highlight search
-set hlsearch
-"highlight search while typing
 set incsearch
 
 "no hightlight
@@ -181,7 +165,7 @@ if executable('ag')
 endif
 
 "---------------------------------------------
-"             windows/tabs
+"             windows/tabs/buffers
 "---------------------------------------------
 "set splitright
 "set splitbelow
@@ -191,6 +175,13 @@ nmap <leader>1 1<c-w><c-w>
 nmap <leader>2 2<c-w><c-w>
 nmap <leader>3 3<c-w><c-w>
 nmap <leader>4 4<c-w><c-w>
+nmap <leader>5 5<c-w><c-w>
+
+nmap <leader>! 1<c-w>c
+nmap <leader>@ 2<c-w>c
+nmap <leader># 3<c-w>c
+nmap <leader>$ 4<c-w>c
+nmap <leader>% 5<c-w>c
 
 "windows
 nmap <c-j> <C-w><Down>
@@ -202,6 +193,9 @@ nmap <c-k> <C-w><Up>
 nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
 
+"kill other buffers
+nmap <leader>bD :%bd<cr>:e #<cr>
+
 "---------------------------------------------
 "               indent/tab/spaces
 "---------------------------------------------
@@ -211,7 +205,7 @@ set virtualedit=all
 " indent everything
 noremap <Space>= miggvG=`i
 
-"indent when moving to the next line while writing code<Paste>
+"indent when moving to the next line while writing code
 set autoindent
 
 set smartindent
@@ -250,7 +244,7 @@ set rnu
 set cursorline
 set nowrap
 "keep 3 lines below and above cursor
-set scrolloff=3
+set scrolloff=5
 "show bracket pair
 "set showmatch
 
@@ -262,9 +256,6 @@ nmap <leader>ln :set nonumber<cr>:set nornu<cr>
 
 "folding
 set foldmethod=manual
-
-au BufWinEnter *.java,*.py silent! loadview
-au BufWinLeave *.java,*.py mkview
 
 "fold file header (e.g. license javadoc)
 nmap zh mmggzf%`m
@@ -286,8 +277,8 @@ nmap <leader>cm :retab<cr>
 
 "goto next, prev. open error
 nmap <leader>co :lopen<cr>
-nmap <leader>] :lnext<cr>
-nmap <leader>[ :lprevious<cr>
+nmap ]l :lnext<cr>
+nmap [l :lprevious<cr>
 
 "---------------------------------------------
 "                files/types
@@ -307,8 +298,8 @@ let g:gitgutter_map_keys = 0
 nmap <leader>hv <Plug>GitGutterPreviewHunk
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-nmap <Leader>hr <Plug>GitGutterRevertHunk
-nmap <Leader>ha <Plug>GitGutterStageHunk
+nmap <leader>hr :GitGutterRevertHunk<cr>
+nmap <leader>ha <Plug>GitGutterStageHunk
 
 "---------------------------------------------
 "       completion/neocomplete/deoplete
@@ -527,17 +518,6 @@ endfunction
 imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 "---------------------------------------------
-"                vimux
-"---------------------------------------------
-let g:VimuxHeight = "40"
-let @r=getcwd()
-
-nmap <Leader>vl :VimuxRunLastCommand<CR>
-nmap <Leader>vq :VimuxCloseRunner<CR>
-nmap <Leader>vi :VimuxInspectRunner<CR>
-nmap <Leader>vz :call VimuxZoomRunner()<CR>
-
-"---------------------------------------------
 "                theme
 "---------------------------------------------
 set background=dark
@@ -574,6 +554,9 @@ autocmd InsertLeave * call s:SetNormalCursorLine()
 autocmd WinEnter * set cul
 autocmd WinLeave * set nocul
 
+"hl TODO in blue
+highlight Todo ctermfg=blue
+
 "---------------------------------------------
 "                airline
 "---------------------------------------------
@@ -586,9 +569,9 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_theme='oceanicnext'
 
 "---------------------------------------------
-"                Gundo
+"                undo tree
 "---------------------------------------------
-nmap <F4> :MundoToggle<cr>
+nmap <F4> :UndotreeToggle<cr>
 imap <F4> <esc><f4>
 
 "---------------------------------------------
@@ -601,8 +584,8 @@ function! InitPythonSessing()
     setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
     setlocal nocindent
 
-    setlocal completeopt-=preview
-    setlocal omnifunc=jedi#completions
+    autocmd FileType python setlocal completeopt-=preview
+    autocmd FileType python setlocal omnifunc=jedi#completions
 
     " global settings
     if g:python_inited != 0
@@ -628,8 +611,9 @@ function! InitPythonSessing()
     let g:jedi#completions_enabled = 1
     let g:jedi#popup_on_dot = 0
 
-    let g:neomake_python_enabled_makers = ['pep8']
-    let g:neomake_python_pep8_maker = { 'args': ['--ignore=E126,E128'], }
+    let g:neomake_python_enabled_makers = ['pylint', 'flake8']
+    "??? let g:neomake_python_pylint_maker = { 'args': ['--disable=C0112'], }
+    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
 
     let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
     let g:neomake_warning_sign = {'text': 'w', 'texthl': 'airline_warning'}
@@ -638,6 +622,14 @@ function! InitPythonSessing()
 
     autocmd! BufRead *.py Neomake
     autocmd! BufWritePost *.py Neomake
+
+    "hl self
+    highlight PythonSelf ctermfg=109
+    function! s:HighlightPython()
+        syn keyword PythonSelf self
+    endfunction
+    autocmd! BufEnter *.py call s:HighlightPython()
+    autocmd! WinEnter *.py call s:HighlightPython()
 
     "enable all Python syntax highlighting features
     if has('python3')
@@ -657,4 +649,4 @@ function! InitPythonSessing()
     nnoremap <leader>T :call UpdatePythonCtags()<Cr>
 
 endfunction
-autocmd BufRead *.py call InitPythonSessing()
+autocmd BufReadPost *.py call InitPythonSessing()
