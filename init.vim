@@ -114,6 +114,9 @@ set showcmd
 "redraw only when we need to.
 "set lazyredraw
 
+"search for TODOs
+nmap <Leader>T :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
+
 "---------------------------------------------
 "          save/restore/quit
 "---------------------------------------------
@@ -587,6 +590,9 @@ function! InitPythonSessing()
     autocmd FileType python setlocal completeopt-=preview
     autocmd FileType python setlocal omnifunc=jedi#completions
 
+    " god damn, who overrides this and why?..
+    nmap <leader>cp :setlocal omnifunc=jedi#completions<cr>
+
     " global settings
     if g:python_inited != 0
         return
@@ -612,7 +618,6 @@ function! InitPythonSessing()
     let g:jedi#popup_on_dot = 0
 
     let g:neomake_python_enabled_makers = ['pylint', 'flake8']
-    "??? let g:neomake_python_pylint_maker = { 'args': ['--disable=C0112'], }
     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
 
     let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
@@ -623,11 +628,15 @@ function! InitPythonSessing()
     autocmd! BufRead *.py Neomake
     autocmd! BufWritePost *.py Neomake
 
-    "hl self
-    highlight PythonSelf ctermfg=109
+    "hl
+    highlight pythonSelf ctermfg=109
+    highlight pylintSuppress ctermfg=8
+
     function! s:HighlightPython()
-        syn keyword PythonSelf self
+        syn keyword pythonSelf self
+        syn region pylintSuppress start='# pylint' end='$'
     endfunction
+
     autocmd! BufEnter *.py call s:HighlightPython()
     autocmd! WinEnter *.py call s:HighlightPython()
 
