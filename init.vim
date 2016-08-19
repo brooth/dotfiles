@@ -434,6 +434,7 @@ nmap <leader>O :Unite -buffer-name=outline
                 \ outline<cr>
 nmap <leader><leader> :Unite -buffer-name=buffers
                 \ -no-split
+                \ -start-insert
                 \ buffer<cr>
 
 "---------------------------------------------
