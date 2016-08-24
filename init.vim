@@ -28,7 +28,6 @@ call plug#begin('$VIMHOME/plugged')
 "appearance
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
-Plug 'Yggdroot/indentLine'
 
 "utils
 Plug 'tpope/vim-repeat'
