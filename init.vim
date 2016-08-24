@@ -114,7 +114,7 @@ set showcmd
 "set lazyredraw
 
 "search for TODOs
-nmap <Leader>T :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
+nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
 
 "---------------------------------------------
 "          save/restore/quit
@@ -626,7 +626,6 @@ function! InitPythonSessing()
     let g:neomake_info_sign = {'text': 'i', 'texthl': 'NeomakeInfoSign'}
 
     autocmd! BufRead *.py Neomake
-    autocmd! BufWritePost *.py Neomake
 
     "hl
     highlight pythonSelf ctermfg=109
@@ -646,16 +645,23 @@ function! InitPythonSessing()
     endif
     let python_highlight_all = 1
 
+    let l:mktags = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".getcwd()"
+    call system(l:mktags)
     exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
 
     function! UpdatePythonCtags()
-        let l:cmd = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".
-            \ getcwd()." && ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --exclude=.env".
+        let l:cmd = "ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --exclude=.env".
             \ " --exclude=.git --languages=python ".getcwd()
         call system(l:cmd)
-        echo 'ctags updated!'
     endfunction
     nnoremap <leader>T :call UpdatePythonCtags()<Cr>
+    call UpdatePythonCtags()
+
+    function! PyBufWritePost()
+        Neomake
+        call UpdatePythonCtags()
+    endfunction
+    autocmd! BufWritePost *.py :call PyBufWritePost()
 
 endfunction
 autocmd BufReadPost *.py call InitPythonSessing()
