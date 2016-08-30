@@ -42,11 +42,15 @@ Plug 'airblade/vim-gitgutter'
 
 "dev
 Plug 'SirVer/ultisnips'
+Plug 'neomake/neomake', {'for': 'python'}
 
 "python
-Plug 'neomake/neomake', {'for': 'python'}
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
+
+"typescript
+Plug 'leafgarland/typescript-vim', {'for': 'typescript'}
+Plug 'Quramy/tsuquyomi', {'for': 'typescript'}
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -63,8 +67,6 @@ else
 endif
 
 call plug#end()
-
-let g:indentLine_faster = 1
 
 "---------------------------------------------
 "                misc settings
@@ -286,6 +288,8 @@ nmap [l :lprevious<cr>
 "                files/types
 "---------------------------------------------
 set wildignore+=*/bin/*
+set wildignore+=*/.git/*
+set wildignore+=*/.idea/*
 set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
@@ -353,10 +357,8 @@ call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 call unite#custom#source('file_rec/async', 'ignore_pattern', join([
-                \ '\.git/',
-                \ '\.idea/',
-                \ '\.env/',
-                \ '\.gradle/',
+                \ '\..*/',
+                \ 'node_modules/',
                 \ 'build/[^gen]',
                 \ ], '\|'))
 
@@ -578,10 +580,32 @@ nmap <F4> :UndotreeToggle<cr>
 imap <F4> <esc><f4>
 
 "---------------------------------------------
+"                neomake
+"---------------------------------------------
+let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
+let g:neomake_warning_sign = {'text': 'w', 'texthl': 'airline_warning'}
+let g:neomake_message_sign = {'text': 'm', 'texthl': 'NeomakeMessageSign'}
+let g:neomake_info_sign = {'text': 'i', 'texthl': 'NeomakeInfoSign'}
+
+"---------------------------------------------
 "               python
 "---------------------------------------------
-let g:python_inited = 0
+let g:jedi#goto_command = "<leader>G"
+let g:jedi#goto_assignments_command = "<leader>A"
+let g:jedi#goto_definitions_command = "<leader>D"
+let g:jedi#documentation_command = "<leader>K"
+let g:jedi#usages_command = "<leader>U"
+let g:jedi#rename_command = "<leader>R"
+let g:jedi#completions_command = "<C-W>"
 
+let g:jedi#auto_initialization = 1
+let g:jedi#show_call_signatures = 0
+let g:jedi#popup_select_first = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#completions_enabled = 1
+let g:jedi#popup_on_dot = 0
+
+let g:python_inited = 0
 function! InitPythonSessing()
     " buffer settings
     setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
@@ -589,7 +613,6 @@ function! InitPythonSessing()
 
     autocmd FileType python setlocal completeopt-=preview
     autocmd FileType python setlocal omnifunc=jedi#completions
-
     " god damn, who overrides this and why?..
     nmap <leader>cp :setlocal omnifunc=jedi#completions<cr>
 
@@ -600,31 +623,11 @@ function! InitPythonSessing()
     let g:python_inited = 1
 
     set wildignore+=*.pyc
-    set wildignore+=*/env/^[^g]*
-
-    let g:jedi#goto_command = "<leader>G"
-    let g:jedi#goto_assignments_command = "<leader>A"
-    let g:jedi#goto_definitions_command = "<leader>D"
-    let g:jedi#documentation_command = "<leader>K"
-    let g:jedi#usages_command = "<leader>U"
-    let g:jedi#rename_command = "<leader>R"
-    let g:jedi#completions_command = "<C-W>"
-
-    let g:jedi#auto_initialization = 1
-    let g:jedi#show_call_signatures = 0
-    let g:jedi#popup_select_first = 0
-    let g:jedi#auto_vim_configuration = 0
-    let g:jedi#completions_enabled = 1
-    let g:jedi#popup_on_dot = 0
+    set wildignore+=*/node_modules/*
+    set wildignore+=*/.env/^[^g]*
 
     let g:neomake_python_enabled_makers = ['pylint', 'flake8']
     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
-
-    let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
-    let g:neomake_warning_sign = {'text': 'w', 'texthl': 'airline_warning'}
-    let g:neomake_message_sign = {'text': 'm', 'texthl': 'NeomakeMessageSign'}
-    let g:neomake_info_sign = {'text': 'i', 'texthl': 'NeomakeInfoSign'}
-
     autocmd! BufRead *.py Neomake
 
     "hl
