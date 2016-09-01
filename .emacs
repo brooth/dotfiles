@@ -22,10 +22,8 @@
 
 ;; TODO:
 ; Plug 'tpope/vim-surround'
-; Plug 'jiangmiao/auto-pairs'
 ; "stay same position on insert mode exit
 ; inoremap <silent> <Esc> <Esc>`^
-
 
 ;;---------------------------------------------------------------
 ;;                            base
@@ -33,28 +31,53 @@
 (ensure-package-installed
   'evil
   'evil-leader
-  'helm
-  'helm-ag
+  'evil-multiedit   ;; edit matching text at the time
   'flx-ido          ;; fuzzy matching
-  'hideshowvis
+  'smartparens      ;; close brackets
   )
 
 ;; startup emacs directory
 (setq root-dir default-directory)
 
-(setq evil-want-C-u-scroll t)
-;; vi undo
-(setq evil-want-fine-undo t)
-
-(require 'evil)
-(evil-mode t)
-
-;; helm
-
 ;; evil-leader
 (global-evil-leader-mode)
 (evil-leader/set-leader "<SPC>")
 
+;; evil mode
+(setq evil-want-C-u-scroll t)
+;; vi undo
+(setq evil-want-fine-undo t)
+
+(require 'evil-multiedit)
+(evil-multiedit-default-keybinds)
+
+(require 'evil)
+(evil-mode t)
+
+;; flx-ido-mode
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+(require 'smartparens-config)
+(add-hook 'python-mode-hook #'smartparens-mode)
+(add-hook 'emacs-lisp-mode-hook #'smartparens-mode)
+
+;;---------------------------------------------------------------
+;;                         helm
+;;---------------------------------------------------------------
+; (ensure-package-installed
+;   'helm
+;   'helm-ag
+;   )
+
+; (require 'helm-config)
+
+; (global-set-key (kbd "M-x") 'helm-M-x)
 
 ;;---------------------------------------------------------------
 ;;                       sessions
@@ -66,6 +89,12 @@
 
 ;; save commands history
 (savehist-mode 1)
+
+;; recent files
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
 ;; desktop (saving sessions)
 (require 'desktop)
@@ -104,7 +133,7 @@
 ;;                      windows, frames
 ;;---------------------------------------------------------------
 (ensure-package-installed
-  'popwin ;; open popups (help, etc) in popup windows
+  'popwin           ;; open popups (help, etc) in bottom popup window
   'window-numbering ;; window number in modeline
   )
 
@@ -114,20 +143,20 @@
 (window-numbering-mode)
 
 (evil-leader/set-key
+  "TAB" 'other-window
+  "<backtab>" 'previous-multiframe-window
   "1" 'select-window-1
   "2" 'select-window-2
   "3" 'select-window-3
   "4" 'select-window-4
   "5" 'select-window-5
+  ;; delete windows
   "!" '(lambda () (interactive) (select-window-1) (delete-window))
   "@" '(lambda () (interactive) (select-window-2) (delete-window))
   "#" '(lambda () (interactive) (select-window-3) (delete-window))
   "$" '(lambda () (interactive) (select-window-4) (delete-window))
   "%" '(lambda () (interactive) (select-window-5) (delete-window))
   )
-
-;; delete windows
-(global-set-key (kbd "M-1") (lambda () (interactive) (select-window 1) (delete-window)))
 
 ;;---------------------------------------------------------------
 ;;                     intent, tabs, spaces
@@ -136,11 +165,11 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
-
 ;;---------------------------------------------------------------
 ;;                         ui, theme
 ;;---------------------------------------------------------------
 (ensure-package-installed
+  'rainbow-delimiters
   'linum-relative
   'gruvbox-theme
   'eyebrowse
@@ -150,8 +179,22 @@
   ; 'anzu             ;; search matching info in modeline
   )
 
-;; show matching parentheses
-; (show-smartparens-global-mode t)
+;; hl current line 
+(global-hl-line-mode 1)
+
+(defun hl-evil-insert-state()
+  (interactive)
+  (set-face-background 'hl-line "color-52"))
+
+(defun nohl-evil-insert-state()
+  (interactive)
+  (set-face-background 'hl-line "color-237"))
+
+(add-hook 'evil-insert-state-entry-hook 'hl-evil-insert-state)
+(add-hook 'evil-insert-state-exit-hook 'nohl-evil-insert-state)
+
+;; color delimeters in diff colors
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 ;; smooth scrolling?
 (setq scroll-step 1
@@ -185,7 +228,7 @@
       ; spaceline-window-numbers-unicode t
       spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
 (spaceline-spacemacs-theme)
-(spaceline-toggle-minor-modes-off)  ;; hide minor modes
+; (spaceline-toggle-minor-modes-off)  ;; hide minor modes
 (spaceline-toggle-projectile-root-on) ;; not working?
 ; (spaceline-toggle-anzu-on)
 
