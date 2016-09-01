@@ -20,6 +20,13 @@
 (or (file-exists-p package-user-dir)
     (package-refresh-contents))
 
+;; TODO:
+; Plug 'tpope/vim-surround'
+; Plug 'jiangmiao/auto-pairs'
+; "stay same position on insert mode exit
+; inoremap <silent> <Esc> <Esc>`^
+
+
 ;;---------------------------------------------------------------
 ;;                            base
 ;;---------------------------------------------------------------
@@ -35,7 +42,6 @@
 ;; startup emacs directory
 (setq root-dir default-directory)
 
-
 (setq evil-want-C-u-scroll t)
 ;; vi undo
 (setq evil-want-fine-undo t)
@@ -45,12 +51,22 @@
 
 ;; helm
 
+;; evil-leader
+(global-evil-leader-mode)
+(evil-leader/set-leader "<SPC>")
+
+
 ;;---------------------------------------------------------------
 ;;                       sessions
 ;;---------------------------------------------------------------
 (ensure-package-installed
   'desktop          ;; save sessions
+  'restart-emacs
   )
+
+;; save commands history
+(savehist-mode 1)
+
 ;; desktop (saving sessions)
 (require 'desktop)
 ;; an error w/out next 3 lines...
@@ -79,21 +95,39 @@
     (desktop-read session-dir)
     (message "No seved session")))
 
+(evil-leader/set-key
+  "S" 'save-session
+  "R" 'restore-session
+  )
+
 ;;---------------------------------------------------------------
 ;;                      windows, frames
 ;;---------------------------------------------------------------
-(global-evil-leader-mode)
-(evil-leader/set-leader "<SPC>")
+(ensure-package-installed
+  'popwin ;; open popups (help, etc) in popup windows
+  'window-numbering ;; window number in modeline
+  )
+
+(require 'popwin)
+(popwin-mode 1)
+
+(window-numbering-mode)
+
 (evil-leader/set-key
   "1" 'select-window-1
   "2" 'select-window-2
   "3" 'select-window-3
   "4" 'select-window-4
   "5" 'select-window-5
-  "S" 'save-session
-  "R" 'restore-session
+  "!" '(lambda () (interactive) (select-window-1) (delete-window))
+  "@" '(lambda () (interactive) (select-window-2) (delete-window))
+  "#" '(lambda () (interactive) (select-window-3) (delete-window))
+  "$" '(lambda () (interactive) (select-window-4) (delete-window))
+  "%" '(lambda () (interactive) (select-window-5) (delete-window))
   )
 
+;; delete windows
+(global-set-key (kbd "M-1") (lambda () (interactive) (select-window 1) (delete-window)))
 
 ;;---------------------------------------------------------------
 ;;                     intent, tabs, spaces
@@ -110,7 +144,6 @@
   'linum-relative
   'gruvbox-theme
   'eyebrowse
-  'window-numbering ;; window number in modeline
   ; 'powerline-evil
   'spaceline
   ; 'persp-mode
@@ -145,7 +178,6 @@
 
 ;; spaceline
 (eyebrowse-mode)
-(window-numbering-mode)
 
 (require 'spaceline-config)
 (setq spaceline-toggle-workspace-number-on nil
