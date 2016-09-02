@@ -1,8 +1,8 @@
 (require 'package)
 
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 
 (setq package-enable-at-startup nil)
 (package-initialize)
@@ -24,6 +24,8 @@
 ; Plug 'tpope/vim-surround'
 ; "stay same position on insert mode exit
 ; inoremap <silent> <Esc> <Esc>`^
+; indent with tab
+; dim inactive windows
 
 ;;---------------------------------------------------------------
 ;;                            base
@@ -34,6 +36,7 @@
   'evil-multiedit   ;; edit matching text at the time
   'flx-ido          ;; fuzzy matching
   'smartparens      ;; close brackets
+  'which-key        ;; popup with available key bindings
   )
 
 ;; startup emacs directory
@@ -54,6 +57,10 @@
 (require 'evil)
 (evil-mode t)
 
+;; which-key-mode
+(require 'which-key)
+(which-key-mode)
+
 ;; flx-ido-mode
 (require 'flx-ido)
 (ido-mode 1)
@@ -68,16 +75,15 @@
 (add-hook 'emacs-lisp-mode-hook #'smartparens-mode)
 
 ;;---------------------------------------------------------------
-;;                         helm
+;;                    files, find, locate
 ;;---------------------------------------------------------------
-; (ensure-package-installed
-;   'helm
-;   'helm-ag
-;   )
+(ensure-package-installed
+  'ag
+  'helm
+  'helm-ag
+  )
 
-; (require 'helm-config)
-
-; (global-set-key (kbd "M-x") 'helm-M-x)
+(require 'helm-config)
 
 ;;---------------------------------------------------------------
 ;;                       sessions
@@ -94,7 +100,6 @@
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
 ;; desktop (saving sessions)
 (require 'desktop)
@@ -124,10 +129,23 @@
     (desktop-read session-dir)
     (message "No seved session")))
 
+;; session
 (evil-leader/set-key
-  "S" 'save-session
-  "R" 'restore-session
+  "s s" 'save-session
+  "s r" 'restore-session
   )
+
+(which-key-add-key-based-replacements "SPC s" "session")
+
+;; quit
+(evil-leader/set-key
+  "q q" 'save-buffers-kill-terminal
+  "q R" 'restart-emacs
+  "q b" 'kill-this-buffer
+  "q w" 'delete-window
+  )
+
+(which-key-add-key-based-replacements "SPC q" "quit")
 
 ;;---------------------------------------------------------------
 ;;                      windows, frames
@@ -158,6 +176,12 @@
   "%" '(lambda () (interactive) (select-window-5) (delete-window))
   )
 
+(which-key-add-key-based-replacements "SPC !" "delete-window-1")
+(which-key-add-key-based-replacements "SPC @" "delete-window-2")
+(which-key-add-key-based-replacements "SPC #" "delete-window-3")
+(which-key-add-key-based-replacements "SPC $" "delete-window-4")
+(which-key-add-key-based-replacements "SPC %" "delete-window-5")
+
 ;;---------------------------------------------------------------
 ;;                     intent, tabs, spaces
 ;;---------------------------------------------------------------
@@ -165,6 +189,7 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
+(define-key 'evil-visual-mo')
 ;;---------------------------------------------------------------
 ;;                         ui, theme
 ;;---------------------------------------------------------------
@@ -179,12 +204,12 @@
   ; 'anzu             ;; search matching info in modeline
   )
 
-;; hl current line 
+;; hl current line
 (global-hl-line-mode 1)
 
 (defun hl-evil-insert-state()
   (interactive)
-  (set-face-background 'hl-line "color-52"))
+  (set-face-background 'hl-line "OrangeRed4"))
 
 (defun nohl-evil-insert-state()
   (interactive)
@@ -237,10 +262,30 @@
 ;;---------------------------------------------------------------
 (ensure-package-installed
   'projectile       ;; manage projects
+  'helm-projectile
   'magit            ;; git
   )
 
 (require 'projectile)
+(setq projectile-indexing-method 'alien)
+(setq projectile-enable-caching t)
+(projectile-global-mode)
+
+(require 'helm-projectile)
+(helm-projectile-on)
+
+(add-to-list 'projectile-globally-ignored-directories ".git")
+
+(evil-leader/set-key
+  "p p" 'helm-projectile
+  "p g" 'helm-projectile-ag
+  "p f" 'helm-projectile-find-file
+  "p d" 'helm-projectile-find-dir
+  "p s" 'helm-projectile-switch-project
+  "p I" 'projectile-invalidate-cache
+  )
+
+(which-key-add-key-based-replacements "SPC p" "projectile")
 
 ;;---------------------------------------------------------------
 ;;                           python
@@ -256,3 +301,9 @@
 ; (when (require 'flycheck nil t)
 ;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 ;   (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+(add-to-list 'projectile-globally-ignored-files "*.py")
+(add-to-list 'projectile-globally-ignored-files "#*")
+(add-to-list 'projectile-globally-ignored-directories ".env")
+(add-to-list 'projectile-globally-ignored-directories "__pycache__")
+(add-to-list 'projectile-globally-ignored-directories "node_modules")
