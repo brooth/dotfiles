@@ -189,7 +189,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
-(define-key 'evil-visual-mo')
 ;;---------------------------------------------------------------
 ;;                         ui, theme
 ;;---------------------------------------------------------------
@@ -307,3 +306,20 @@
 (add-to-list 'projectile-globally-ignored-directories ".env")
 (add-to-list 'projectile-globally-ignored-directories "__pycache__")
 (add-to-list 'projectile-globally-ignored-directories "node_modules")
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-header ((t (:background "magenta" :foreground "brightwhite" :underline nil))))
+ '(helm-selection ((t (:background "color-239" :foreground "brightmagenta"))))
+ '(isearch ((t (:background "blue")))))
