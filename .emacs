@@ -47,10 +47,9 @@
 (global-evil-leader-mode)
 (evil-leader/set-leader "<SPC>")
 
-;; evil mode
-(setq evil-want-C-u-scroll t)
-;; vi undo
-(setq evil-want-fine-undo t)
+(setq evil-want-C-u-scroll t)   ;; evil mode
+(setq evil-want-fine-undo t)    ;; vi undo
+(setq evil-want-C-i-jump nil)   ;; fix TAB behavior????
 
 (require 'evil-multiedit)
 (evil-multiedit-default-keybinds)
@@ -313,7 +312,7 @@
   ac-source-filename
   ))
 
-(global-set-key (kbd "TAB") 'ac-start) ;; start ac with TAB
+;;(global-set-key (kbd "TAB") 'ac-start) ;; start ac with TAB
 
 ;; yasnippet
 (require 'yasnippet)
@@ -378,6 +377,8 @@
 
 (with-eval-after-load 'flycheck
   (flycheck-add-next-checker 'python-flake8 'python-pylint))
+
+(setq-default flycheck-flake8-maximum-line-length 100)
 
 (add-to-list 'projectile-globally-ignored-files "*.py")
 (add-to-list 'projectile-globally-ignored-files "#*")
