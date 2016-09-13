@@ -289,15 +289,35 @@
 ;;                           dev
 ;;---------------------------------------------------------------
 (ensure-package-installed
-  'projectile       ;; manage projects
+  'projectile           ;; manage projects
   'helm-projectile
-  'magit            ;; git
-  'yasnippet        ;; code snippets
-  'company
+  'magit                ;; git
+  'yasnippet            ;; code snippets
+  'auto-complete
+  'flycheck
   )
 
-(add-hook 'after-init-hook 'global-company-mode)
-(company-quickhelp-mode 1)
+;; auto-complete
+(ac-config-default)
+
+(setq ac-auto-start 1)      ;; chars to start ac
+(setq ac-menu-height 30)    ;; popup window height
+(setq ac-ignore-case nil)   ;; respect case
+(setq ac-use-menu-map t)    ;; show popup while C-p C-n
+
+(setq-default ac-sources '(
+  ac-source-words-in-buffer
+  ac-source-words-in-same-mode-buffers
+  ac-source-yasnippet
+  ac-source-abbrev
+  ac-source-filename
+  ))
+
+(global-set-key (kbd "TAB") 'ac-start) ;; start ac with TAB
+
+;; yasnippet
+(require 'yasnippet)
+(yas-reload-all)
 
 (require 'projectile)
 (setq projectile-indexing-method 'alien)
@@ -320,14 +340,44 @@
 
 (which-key-add-key-based-replacements "SPC p" "projectile")
 
+;; flycheck
+(evil-leader/set-key
+  "c n" 'flycheck-next-error
+  "c p" 'flycheck-previous-error
+  "c l" 'flycheck-list-errors
+  "c f" 'flycheck-first-error
+  )
+(which-key-add-key-based-replacements "SPC c" "flycheck")
+
+;; error list at the bottom
+(push '("\*Flycheck errors*" :position bottom) popwin:special-display-config)
+
 ;;---------------------------------------------------------------
 ;;                           python
 ;;---------------------------------------------------------------
 (ensure-package-installed
-  'flycheck         ;; add the flycheck package
-  'py-autopep8      ;; add the autopep8 package
+  'jedi
+;;  'py-autopep8      ;; add the autopep8 package
   )
 
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
+(add-hook 'python-mode-hook (lambda () (
+   add-to-list 'ac-sources 'ac-source-jedi-direct)))
+
+(evil-leader/set-key
+  "G" 'jedi:goto-definition
+  "K" 'jedi:show-doc
+  "U" 'helm-jedi-related-names
+  )
+
+(add-hook 'python-mode-hook 'yas-minor-mode)
+
+(add-hook 'python-mode-hook 'flycheck-mode)
+
+(with-eval-after-load 'flycheck
+  (flycheck-add-next-checker 'python-flake8 'python-pylint))
 
 (add-to-list 'projectile-globally-ignored-files "*.py")
 (add-to-list 'projectile-globally-ignored-files "#*")
@@ -338,12 +388,7 @@
 ;;---------------------------------------------------------------
 ;;                       customize
 ;;---------------------------------------------------------------
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
