@@ -363,6 +363,7 @@
 (add-hook 'evil-insert-state-entry-hook '(lambda ()
     (setq flycheck-check-syntax-automatically '(mode-enabled save))))
 (add-hook 'evil-insert-state-exit-hook '(lambda ()
+    (flycheck-buffer)
     (setq flycheck-check-syntax-automatically '(mode-enabled idle-change))))
 
 ;;---------------------------------------------------------------
@@ -372,6 +373,10 @@
   'jedi
 ;;  'py-autopep8      ;; add the autopep8 package
   )
+
+;; add 'async' and 'await' keywords
+(font-lock-add-keywords 'python-mode '(("async\s" . font-lock-keyword-face)))
+(font-lock-add-keywords 'python-mode '(("\sawait\s" . font-lock-keyword-face)))
 
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
