@@ -37,6 +37,7 @@
   'flx-ido          ;; fuzzy matching
   'smartparens      ;; close brackets
   'which-key        ;; popup with available key bindings
+  'expand-region    ;; select regions (inside blocks, methods, stuff)
   )
 
 ;; startup emacs directory
@@ -74,6 +75,12 @@
 (add-hook 'python-mode-hook #'smartparens-mode)
 (add-hook 'emacs-lisp-mode-hook #'smartparens-mode)
 
+;; short messages
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; expand-region keys
+(global-set-key (kbd "C-=") 'er/expand-region)
+
 ;;---------------------------------------------------------------
 ;;                    files, find, locate
 ;;---------------------------------------------------------------
@@ -85,16 +92,27 @@
 
 (require 'helm-config)
 
+;; always at the bottom
+(add-to-list 'display-buffer-alist
+                    `(,(rx bos "*helm" (* not-newline) "*" eos)
+                         (display-buffer-in-side-window)
+                         (inhibit-same-window . t)
+                         (window-height . 0.4)))
+
 ;;---------------------------------------------------------------
 ;;                       sessions
 ;;---------------------------------------------------------------
 (ensure-package-installed
   'desktop          ;; save sessions
   'restart-emacs
+  'saveplace        ;; remember cursor position
   )
 
 ;; save commands history
 (savehist-mode 1)
+
+(require 'saveplace)
+(setq-default save-place t)
 
 ;; recent files
 (require 'recentf)
@@ -138,9 +156,16 @@
 (which-key-add-key-based-replacements "SPC s" "session")
 
 ;; quit
+(defun exit-emacs ()
+  "save some buffers, then exit unconditionally"
+  (interactive)
+  (save-some-buffers nil t)
+  (kill-emacs))
+(global-set-key (kbd "C-x C-c") 'exit-emacs)
+
 (evil-leader/set-key
-  "q q" 'save-buffers-kill-terminal
-  "q R" 'restart-emacs
+  "q q" 'exit-emacs
+  "q r" 'restart-emacs
   "q b" 'kill-this-buffer
   "q w" 'delete-window
   )
@@ -188,6 +213,7 @@
 ;; tabs => 4 spaces
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
+(setq tab-width 4)
 
 ;;---------------------------------------------------------------
 ;;                         ui, theme
@@ -221,14 +247,17 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 ;; smooth scrolling?
-(setq scroll-step 1
-      scroll-conservatively  10000
-      scroll-margin 5)
+(setq scroll-conservatively 0)
+(setq scroll-margin 5)
 
 ;; (setq inhibit-startup-message t) ;; hide the startup message
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+
+(setq use-dialog-box     nil) ;; никаких графических диалогов и окон - все через минибуфер
+(setq redisplay-dont-pause t)  ;; лучшая отрисовка буфера
+(setq ring-bell-function 'ignore) ;; отключить звуковой сигнал
 
 ;; relative line numbers
 (linum-relative-mode)
@@ -252,7 +281,7 @@
       ; spaceline-window-numbers-unicode t
       spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
 (spaceline-spacemacs-theme)
-; (spaceline-toggle-minor-modes-off)  ;; hide minor modes
+(spaceline-toggle-minor-modes-off)  ;; hide minor modes
 (spaceline-toggle-projectile-root-on) ;; not working?
 ; (spaceline-toggle-anzu-on)
 
@@ -263,7 +292,12 @@
   'projectile       ;; manage projects
   'helm-projectile
   'magit            ;; git
+  'yasnippet        ;; code snippets
+  'company
   )
+
+(add-hook 'after-init-hook 'global-company-mode)
+(company-quickhelp-mode 1)
 
 (require 'projectile)
 (setq projectile-indexing-method 'alien)
@@ -289,17 +323,11 @@
 ;;---------------------------------------------------------------
 ;;                           python
 ;;---------------------------------------------------------------
-; (ensure-package-installed
-;   'flycheck         ;; add the flycheck package
-;   'py-autopep8      ;; add the autopep8 package
-;   'elpy             ;; python mode
-;   )
+(ensure-package-installed
+  'flycheck         ;; add the flycheck package
+  'py-autopep8      ;; add the autopep8 package
+  )
 
-; (elpy-enable)
-
-; (when (require 'flycheck nil t)
-;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-;   (add-hook 'elpy-mode-hook 'flycheck-mode))
 
 (add-to-list 'projectile-globally-ignored-files "*.py")
 (add-to-list 'projectile-globally-ignored-files "#*")
@@ -307,8 +335,9 @@
 (add-to-list 'projectile-globally-ignored-directories "__pycache__")
 (add-to-list 'projectile-globally-ignored-directories "node_modules")
 
-
-
+;;---------------------------------------------------------------
+;;                       customize
+;;---------------------------------------------------------------
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

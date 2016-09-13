@@ -76,6 +76,8 @@ alias g=~/gradle/bin/gradle
 alias vi=nvim
 alias virc='vi -u .vimrc'
 
+alias e="emacs -nw"
+
 alias c='clear'
 
 alias ack-grep=ack
