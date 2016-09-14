@@ -306,6 +306,8 @@
 (setq ac-ignore-case nil)   ;; respect case
 (setq ac-use-menu-map t)    ;; show popup while C-p C-n
 (setq ac-candidate-limit 30)
+(setq ac-max-width 0.5)     ;; max menu width (window ratio)
+
 ;;(setq ac-use-comphist nil)
 ;;(setq ac-use-fuzzy t)
 
@@ -316,6 +318,7 @@
   ac-source-abbrev
   ))
 
+(global-set-key (kbd "C-@") 'ac-start)
 ;;(global-set-key (kbd "TAB") 'ac-start) ;; start ac with TAB
 
 ;; yasnippet
@@ -371,7 +374,8 @@
 ;;---------------------------------------------------------------
 (ensure-package-installed
   'jedi
-;;  'py-autopep8      ;; add the autopep8 package
+  'helm-pydoc           ;; browes package docs
+;;  'py-autopep8        ;; add the autopep8 package
   )
 
 ;; add 'async' and 'await' keywords
