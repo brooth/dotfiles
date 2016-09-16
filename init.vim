@@ -28,15 +28,20 @@ call plug#begin('$VIMHOME/plugged')
 "appearance
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
+Plug 'luochen1990/rainbow'      "hi brackets diff colors
 
 "utils
 Plug 'tpope/vim-repeat'
-Plug 'mbbill/undotree'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
 Plug 'haya14busa/incsearch.vim' "highlight search while entering
 Plug 'kshenoy/vim-signature'    "show marks
+Plug 'terryma/vim-expand-region'
+Plug 'easymotion/vim-easymotion'
+
+"files
+Plug 'mbbill/undotree'
 
 "git
 Plug 'tpope/vim-fugitive'
@@ -50,6 +55,7 @@ Plug 'neomake/neomake', {'for': 'python'}
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 Plug 'zchee/deoplete-jedi', {'for': 'python'}
+Plug 'hdima/python-syntax', {'for': 'python'}
 
 "typescript
 Plug 'leafgarland/typescript-vim', {'for': 'typescript'}
@@ -116,6 +122,10 @@ set showcmd
 
 "search for TODOs
 nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
+
+"expand-region
+map = <Plug>(expand_region_expand)
+map - <Plug>(expand_region_shrink)
 
 "---------------------------------------------
 "          save/restore/quit
@@ -293,9 +303,9 @@ set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
 
-" SPC f(iles) d(ot file)
-nmap <leader>fde :e ~/.config/nvim/init.vim
-nmap <leader>fdr :source ~/.config/nvim/init.vim
+" SPC d(ot files)
+nmap <leader>de :e ~/.config/nvim/init.vim<cr>
+nmap <leader>dr :source ~/.config/nvim/init.vim<cr>
 
 "---------------------------------------------
 "                git
@@ -556,6 +566,16 @@ autocmd WinLeave * set nocul
 "hl TODO in blue
 highlight Todo ctermfg=blue
 
+let g:rainbow_active = 1
+
+let g:rainbow_conf = {
+    \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118']
+    \ }
+
+"easymotion
+map <Leader> <Plug>(easymotion-prefix)
+nmap s <Plug>(easymotion-overwin-f2)
+
 "---------------------------------------------
 "                airline
 "---------------------------------------------
@@ -605,6 +625,8 @@ let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
 let g:jedi#popup_on_dot = 0
 
+let python_highlight_all = 1
+
 let g:python_inited = 0
 function! InitPythonSessing()
     " buffer settings
@@ -630,6 +652,7 @@ function! InitPythonSessing()
     highlight pylintSuppress ctermfg=8
 
     function! s:HighlightPython()
+        Python3Syntax
         syn keyword pythonSelf self
         syn match pythonSelf "[\w_]="
         syn region pylintSuppress start='# pylint' end='$'
