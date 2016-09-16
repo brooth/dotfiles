@@ -35,6 +35,8 @@ Plug 'mbbill/undotree'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
+Plug 'haya14busa/incsearch.vim' "highlight search while entering
+Plug 'kshenoy/vim-signature'    "show marks
 
 "git
 Plug 'tpope/vim-fugitive'
@@ -47,6 +49,7 @@ Plug 'neomake/neomake', {'for': 'python'}
 "python
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
+Plug 'zchee/deoplete-jedi', {'for': 'python'}
 
 "typescript
 Plug 'leafgarland/typescript-vim', {'for': 'typescript'}
@@ -60,11 +63,7 @@ Plug 'Shougo/vimfiler.vim'
 Plug 'tsukkee/unite-tag'
 
 "completion
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim'
-else
-    Plug 'Shougo/neocomplete.vim'
-endif
+Plug 'Shougo/deoplete.nvim'
 
 call plug#end()
 
@@ -137,8 +136,8 @@ function! SaveSession()
     endif
 endfunction
 
-nmap <leader>S :call SaveSession()<cr>
-nmap <leader>R :exec 'source '.g:initial_dir.'/.vimsession'<cr>
+nmap <leader>ss :call SaveSession()<cr>
+nmap <leader>sr :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
 "tell it to use an undo file
 set undofile
@@ -294,46 +293,46 @@ set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
 
+" SPC f(iles) d(ot file)
+nmap <leader>fde :e ~/.config/nvim/init.vim
+nmap <leader>fdr :source ~/.config/nvim/init.vim
+
 "---------------------------------------------
 "                git
 "---------------------------------------------
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-"hunks
-nmap <leader>hv <Plug>GitGutterPreviewHunk
+"SPC  g(it) h(unks)
+nmap <leader>ghp <Plug>GitGutterPreviewHunk
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-nmap <leader>hr :GitGutterRevertHunk<cr>
-nmap <leader>ha <Plug>GitGutterStageHunk
+nmap <leader>ghr :GitGutterRevertHunk<cr>
+nmap <leader>gha <Plug>GitGutterStageHunk
 
 "---------------------------------------------
-"       completion/neocomplete/deoplete
+"             completion/deoplete
 "---------------------------------------------
 "ctrl+space - omni complition
 imap <NUL> <C-Space>
 imap <C-@> <C-Space>
 imap <C-Space> <c-x><c-o>
-set complete=.,w,b,u,k
-"set completeopt=longest,menu,menuone
+
+"set complete=.,w,b,u,k ???
+set completeopt-=preview    "disable preview popup
 
 "up/down with tab
 inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <s-Tab>  pumvisible() ? "\<C-p>" : "\<s-Tab>"
 
-if has('nvim')
-    let g:deoplete#enable_at_startup = 1
-    let g:deoplete#enable_smart_case = 1
-    let g:deoplete#auto_completion_start_length = 1
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+let g:deoplete#auto_completion_start_length = 1
+let g:deoplete#auto_complete_start_length=1
+let g:deoplete#max_list=50
 
-    "close popup on esc
-    "imap <expr> <Esc> pumvisible() ? deoplete#mappings#cancel_popup() : "\<Esc>"
-
-else
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#sources#syntax#min_keyword_length = 1
-endif
+"close popup on esc
+"imap <expr> <Esc> pumvisible() ? deoplete#mappings#cancel_popup() : "\<Esc>"
 
 "---------------------------------------------
 "                  Unite
@@ -344,12 +343,12 @@ let g:unite_source_rec_max_cache_files = 1000
 let g:unite_prompt = '» '
 
 if executable('ag')
-  let g:unite_source_grep_command = 'ag'
-  let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
-  let g:unite_source_grep_recursive_opt = ''
+    let g:unite_source_grep_command = 'ag'
+    let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
+    let g:unite_source_grep_recursive_opt = ''
 
-  let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
-  let g:ackprg = 'ag --nogroup --column'
+    let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
+    let g:ackprg = 'ag --nogroup --column'
 
 endif
 
@@ -357,10 +356,10 @@ call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 call unite#custom#source('file_rec/async', 'ignore_pattern', join([
-                \ '\..*/',
-                \ 'node_modules/',
-                \ 'build/[^gen]',
-                \ ], '\|'))
+            \ '\..*/',
+            \ 'node_modules/',
+            \ 'build/[^gen]',
+            \ ], '\|'))
 
 let s:filters = {"name" : "custom_buffer_converter"}
 
@@ -378,7 +377,7 @@ endfunction
 call unite#define_filter(s:filters)
 unlet s:filters
 call unite#custom#source('buffer,file_rec/async',
-    \ 'converters', 'custom_buffer_converter')
+            \ 'converters', 'custom_buffer_converter')
 
 let s:filters = {"name" : "custom_grep_converter"}
 
@@ -405,38 +404,32 @@ endfunction
 autocmd FileType unite call <SID>UniteSetup()
 
 nmap <leader>u :Unite -buffer-name=files
-                \ -buffer-name=files
-                \ -start-insert
-                \ -no-split
-                \ buffer file_rec/async file/new directory/new<CR>
+            \ -buffer-name=files
+            \ -start-insert
+            \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>U :UniteWithCursorWord -buffer-name=files
-                \ -buffer-name=files
-                \ -start-insert
-                \ -no-split
-                \ buffer file_rec/async file/new directory/new<CR>
+            \ -buffer-name=files
+            \ -start-insert
+            \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>y :UniteWithBufferDir
-                \ -buffer-name=./files
-                \ -start-insert
-                \ -no-split
-                \ buffer file_rec/async file/new directory/new<CR>
+            \ -buffer-name=./files
+            \ -start-insert
+            \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
-                \ -no-quit
-                \ grep:.<cr>
+            \ -no-quit
+            \ grep:.<cr>
 nmap <leader>G :UniteWithCursorWord -buffer-name=grep
-                \ -no-quit
-                \ grep:.<cr>
+            \ -no-quit
+            \ grep:.<cr>
 nmap <leader>o :Unite -buffer-name=tags
-                \ -no-split
-                \ -start-insert
-                \ tag<cr>
+            \ -start-insert
+            \ tag<cr>
 nmap <leader>O :Unite -buffer-name=outline
-                \ -no-split
-                \ -start-insert
-                \ outline<cr>
+            \ -start-insert
+            \ outline<cr>
 nmap <leader><leader> :Unite -buffer-name=buffers
-                \ -no-split
-                \ -start-insert
-                \ buffer<cr>
+            \ -start-insert
+            \ buffer<cr>
 
 "---------------------------------------------
 "                 vimfiler
@@ -472,6 +465,7 @@ nmap <leader><leader> :Unite -buffer-name=buffers
 "I	   <Plug>(vimfiler_cd_input_directory)
 
 let g:vimfiler_safe_mode_by_default=0
+let g:vimfiler_tree_opened_icon = '▾'
 let g:vimfiler_tree_closed_icon = '▸'
 let g:vimfiler_default_columns = ''
 let g:vimfiler_explorer_columns = ''
@@ -482,8 +476,8 @@ let g:vimfiler_marked_file_icon = '*'
 let g:vimfiler_readonly_file_icon = '~'
 
 augroup vimfiler
-  autocmd!
-  autocmd FileType vimfiler call s:vimfiler_settings()
+    autocmd!
+    autocmd FileType vimfiler call s:vimfiler_settings()
 augroup END
 function! s:vimfiler_settings()
     map <silent><buffer> <Space> <NOP>
@@ -493,8 +487,8 @@ function! s:vimfiler_settings()
     nmap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
 endfunction
 
-nmap <leader>f :VimFilerCurrentDir<cr>
-nmap <leader>F :VimFilerBufferDir<cr>
+nmap <leader>f :VimFilerCurrentDir -status<cr>
+nmap <leader>F :VimFilerBufferDir -status <cr>
 
 "---------------------------------------------
 "                 markdown
@@ -545,7 +539,7 @@ autocmd WinLeave * call s:DimInactiveWindow()
 
 "hl line orange in insert mode
 function! s:SetNormalCursorLine()
-    hi cursorline cterm=none ctermbg=236 ctermfg=none
+    hi cursorline cterm=none ctermbg=237 ctermfg=none
 endfunction
 
 function! s:SetInsertCursorLine()
@@ -570,6 +564,11 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#fnamemod = ':t'
+function! s:ConfigAirlineSymbols()
+    let g:airline_symbols.maxlinenr = ''
+    let g:airline_symbols.linenr = ''
+endfunction
+autocmd VimEnter * call s:ConfigAirlineSymbols()
 
 let g:airline_theme='oceanicnext'
 
@@ -582,10 +581,11 @@ imap <F4> <esc><f4>
 "---------------------------------------------
 "                neomake
 "---------------------------------------------
-let g:neomake_error_sign = {'text': 'e', 'texthl': 'airline_error'}
-let g:neomake_warning_sign = {'text': 'w', 'texthl': 'airline_warning'}
-let g:neomake_message_sign = {'text': 'm', 'texthl': 'NeomakeMessageSign'}
-let g:neomake_info_sign = {'text': 'i', 'texthl': 'NeomakeInfoSign'}
+highlight neomakeErrorSign ctermfg=9 ctermbg=235
+highlight neomakeWarnSign ctermfg=208 ctermbg=235
+
+let g:neomake_error_sign = {'text': '⤷', 'texthl': 'neomakeErrorSign'}
+let g:neomake_warning_sign = {'text': '⤷', 'texthl': 'neomakeWarnSign'}
 
 "---------------------------------------------
 "               python
@@ -599,10 +599,10 @@ let g:jedi#rename_command = "<leader>R"
 let g:jedi#completions_command = "<C-W>"
 
 let g:jedi#auto_initialization = 1
-let g:jedi#show_call_signatures = 0
+let g:jedi#show_call_signatures = 1
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
-let g:jedi#completions_enabled = 1
+let g:jedi#completions_enabled = 0
 let g:jedi#popup_on_dot = 0
 
 let g:python_inited = 0
@@ -610,11 +610,6 @@ function! InitPythonSessing()
     " buffer settings
     setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
     setlocal nocindent
-
-    autocmd FileType python setlocal completeopt-=preview
-    autocmd FileType python setlocal omnifunc=jedi#completions
-    " god damn, who overrides this and why?..
-    nmap <leader>cp :setlocal omnifunc=jedi#completions<cr>
 
     " global settings
     if g:python_inited != 0
@@ -636,6 +631,7 @@ function! InitPythonSessing()
 
     function! s:HighlightPython()
         syn keyword pythonSelf self
+        syn match pythonSelf "[\w_]="
         syn region pylintSuppress start='# pylint' end='$'
     endfunction
 
@@ -654,7 +650,7 @@ function! InitPythonSessing()
 
     function! UpdatePythonCtags()
         let l:cmd = "ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --exclude=.env".
-            \ " --exclude=.git --languages=python ".getcwd()
+                    \ " --exclude=.git --languages=python ".getcwd()
         call system(l:cmd)
     endfunction
     nnoremap <leader>T :call UpdatePythonCtags()<Cr>

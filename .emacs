@@ -1,3 +1,6 @@
+;; kill-some-buffers - go through buffers and delete if needed
+;; C-x C-b - buffer list, d - mark to delete, x - delete marked
+
 (require 'package)
 
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
@@ -7,7 +10,7 @@
 (setq package-enable-at-startup nil)
 (package-initialize)
 
-(defun ensure-package-installed (&rest packages)
+(defun use-package (&rest packages)
     (mapcar
      (lambda (package)
        (if (package-installed-p package)
@@ -15,10 +18,6 @@
        (package-install package)
      ))
      packages))
-
-;; Make sure to have downloaded archive description.
-(or (file-exists-p package-user-dir)
-    (package-refresh-contents))
 
 ;; TODO:
 ; Plug 'tpope/vim-surround'
@@ -30,13 +29,14 @@
 ;;---------------------------------------------------------------
 ;;                            base
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'evil
   'evil-leader
   'evil-multiedit   ;; edit matching text at the time
   'flx-ido          ;; fuzzy matching
   'smartparens      ;; close brackets
   'which-key        ;; popup with available key bindings
+  ;;???
   'expand-region    ;; select regions (inside blocks, methods, stuff)
   )
 
@@ -44,7 +44,7 @@
 (setq root-dir default-directory)
 
 (setq evil-want-C-i-jump nil)   ;; fix TAB behavior????
-(setq evil-want-C-u-scroll t)   ;; evil mode
+(setq evil-want-C-u-scroll t)   ;; C-u = scroll up
 (setq evil-want-fine-undo t)    ;; vi undo
 
 (require 'evil)
@@ -70,20 +70,21 @@
 (setq ido-enable-flex-matching t)
 (setq ido-use-faces nil)
 
+;; smartparents
 (require 'smartparens-config)
 (add-hook 'python-mode-hook #'smartparens-mode)
 (add-hook 'emacs-lisp-mode-hook #'smartparens-mode)
 
-;; short messages
+;; short 'yes' 'no' messages
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; expand-region keys
-(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "M-5") 'er/expand-region)
 
 ;;---------------------------------------------------------------
 ;;                      windows, frames
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'popwin           ;; open popups (help, etc) in bottom popup window
   'window-numbering ;; window number in modeline
   )
@@ -125,7 +126,7 @@
 ;;---------------------------------------------------------------
 ;;                    files, find, locate
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'ag
   'helm
   'swiper       ;; isearch replacement
@@ -143,10 +144,27 @@
 ;; swiper
 (global-set-key (kbd "C-s") 'swiper)
 
+;; .emacs
+(defun edit-dot-emacs()
+  (interactive)
+  (find-file user-init-file))
+
+(defun reload-dot-emacs()
+  (interactive)
+  (load-file "~/.emacs"))
+
+(evil-leader/set-key
+  "f d e" 'edit-dot-emacs
+  "f d r" 'reload-dot-emacs
+  )
+
+(which-key-add-key-based-replacements "SPC f" "files")
+(which-key-add-key-based-replacements "SPC f d" ".emacs")
+
 ;;---------------------------------------------------------------
 ;;                       sessions
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'desktop          ;; save sessions
   'restart-emacs
   'saveplace        ;; remember cursor position
@@ -212,7 +230,7 @@
 ;;---------------------------------------------------------------
 ;;                     lines, scrolling, avy
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'avy
   )
 
@@ -248,7 +266,7 @@
 ;;---------------------------------------------------------------
 ;;                         ui, theme
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'rainbow-delimiters
   'gruvbox-theme
   'eyebrowse
@@ -289,7 +307,7 @@
 ;;---------------------------------------------------------------
 ;;                           dev
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'projectile           ;; manage projects
   'helm-projectile
   'magit                ;; git
@@ -313,9 +331,7 @@
 
 (setq-default ac-sources '(
   ac-source-words-in-buffer
-  ac-source-words-in-same-mode-buffers
   ac-source-yasnippet
-  ac-source-abbrev
   ))
 
 (global-set-key (kbd "C-@") 'ac-start)
@@ -364,15 +380,17 @@
 
 ;; dont check in insert-mode
 (add-hook 'evil-insert-state-entry-hook '(lambda ()
-    (setq flycheck-check-syntax-automatically '(mode-enabled save))))
+  (if flycheck-mode
+    (setq flycheck-check-syntax-automatically '(mode-enabled save)))))
 (add-hook 'evil-insert-state-exit-hook '(lambda ()
+  (if flycheck-mode
     (flycheck-buffer)
-    (setq flycheck-check-syntax-automatically '(mode-enabled idle-change))))
+    (setq flycheck-check-syntax-automatically '(mode-enabled idle-change)))))
 
 ;;---------------------------------------------------------------
 ;;                           python
 ;;---------------------------------------------------------------
-(ensure-package-installed
+(use-package
   'jedi
   'helm-pydoc           ;; browes package docs
 ;;  'py-autopep8        ;; add the autopep8 package
@@ -408,6 +426,10 @@
 (add-to-list 'projectile-globally-ignored-directories ".env")
 (add-to-list 'projectile-globally-ignored-directories "__pycache__")
 (add-to-list 'projectile-globally-ignored-directories "node_modules")
+
+;;---------------------------------------------------------------
+;;                       elisp
+;;---------------------------------------------------------------
 
 ;;---------------------------------------------------------------
 ;;                       customize

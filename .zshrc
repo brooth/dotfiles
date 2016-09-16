@@ -61,6 +61,8 @@ export PYTHONSTARTUP=~/.pystartup
 
 export TERM="xterm-256color"
 
+source ~/.config/nvim/plugged/gruvbox/gruvbox_256palette.sh
+
 # Setting ag as the default source for fzf
 export FZF_DEFAULT_COMMAND='ag -g ""'
 # To apply the command to CTRL-T as well
