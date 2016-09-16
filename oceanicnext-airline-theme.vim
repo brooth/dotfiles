@@ -26,7 +26,8 @@ let s:cterm07 = "15"
 let s:cterm08 = "203"
 let s:cterm09 = "37"
 let s:cterm0A = "221"
-let s:cterm0B = "166"
+"let s:cterm0B = "166"
+let s:cterm0B = "167"
 let s:cterm0C = "73"
 let s:cterm0D = "66"
 let s:cterm0E = "176"
@@ -36,32 +37,42 @@ let s:guiWhite = "#ffffff"
 let s:ctermWhite = "15"
 
 " Normal mode
-let s:N1 = [ s:guiWhite , s:gui0D , s:ctermWhite , s:cterm0D  ]
-let s:N2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03  ]
+let s:N1 = airline#themes#get_highlight2(['Normal', 'bg'], ['StatusLineNC', 'bg'])
+let s:N2 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['StatusLineNC', 'fg'])
+let s:N3 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['CursorLine', 'bg'])
 
-if &background == "light"
-  let s:N3 = [ s:gui00 , s:gui05 , s:cterm00 , s:cterm05  ]
-endif
-if &background == "dark"
-  let s:N3 = [ s:guiWhite , s:gui01 , s:ctermWhite , s:cterm01  ]
-endif
+" let s:N1 = [ s:guiWhite , s:gui0D , s:ctermWhite , s:cterm0D  ]
+" let s:N2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03  ]
 
+" if &background == "light"
+"   let s:N3 = [ s:gui00 , s:gui05 , s:cterm00 , s:cterm05  ]
+" endif
+" if &background == "dark"
+"   let s:N3 = [ s:guiWhite , s:gui01 , s:ctermWhite , s:cterm01  ]
+" endif
 
 " Insert mode
 let s:I1 = [ s:guiWhite , s:gui0B , s:ctermWhite , s:cterm0B  ]
-let s:I2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03  ]
-let s:I3 = [ s:guiWhite , s:gui01 , s:ctermWhite , s:cterm01 ]
+let s:I2 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['StatusLineNC', 'fg'])
+let s:I3 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['CursorLine', 'bg'])
+" let s:I2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03  ]
+" let s:I3 = [ s:guiWhite , s:gui01 , s:ctermWhite , s:cterm01 ]
 
 " Visual mode
-let s:V1 = [ s:guiWhite , s:gui09 , s:ctermWhite , s:cterm09 ]
-let s:V2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03 ]
-let s:V3 = [ s:guiWhite , s:gui01 , s:ctermWhite, s:cterm01 ]
+" let s:V1 = [ s:guiWhite , s:gui09 , s:ctermWhite , s:cterm09 ]
+let s:V1 = [ s:guiWhite , s:gui0D , s:ctermWhite , s:cterm0D  ]
+let s:V2 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['StatusLineNC', 'fg'])
+let s:V3 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['CursorLine', 'bg'])
+" let s:V2 = [ s:guiWhite , s:gui03 , s:ctermWhite , s:cterm03 ]
+" let s:V3 = [ s:guiWhite , s:gui01 , s:ctermWhite, s:cterm01 ]
 
 
 " Replace mode
 let s:R1 = [ s:guiWhite , s:gui08 , s:ctermWhite, s:cterm08 ]
-let s:R2 = [ s:guiWhite , s:gui03 , s:ctermWhite, s:cterm03 ]
-let s:R3 = [ s:guiWhite , s:gui01 , s:ctermWhite, s:cterm01 ]
+let s:R2 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['StatusLineNC', 'fg'])
+let s:R3 = airline#themes#get_highlight2(['StatusLineNC', 'bg'], ['CursorLine', 'bg'])
+" let s:R2 = [ s:guiWhite , s:gui03 , s:ctermWhite, s:cterm03 ]
+" let s:R3 = [ s:guiWhite , s:gui01 , s:ctermWhite, s:cterm01 ]
 
 let g:airline#themes#oceanicnext#palette = {}
 let g:airline#themes#oceanicnext#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
