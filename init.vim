@@ -573,7 +573,10 @@ let g:rainbow_conf = {
     \ }
 
 "easymotion
-map <Leader> <Plug>(easymotion-prefix)
+let g:EasyMotion_do_mapping = 0         "no default mappings
+let g:EasyMotion_keys = 'asdfghjljknmvcrtuiyopwqb'
+let g:EasyMotion_smartcase = 0
+
 nmap s <Plug>(easymotion-overwin-f2)
 
 "---------------------------------------------
