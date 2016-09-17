@@ -23,6 +23,14 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
+"focus window of last created buffer
+function! JumpLastBufferWindow()
+    call win_gotoid(win_getid(bufwinnr(last_buffer_nr())))
+endfunction
+
+"g:initial_dir = path where vim started
+autocmd VimEnter * let g:initial_dir = getcwd()
+
 "----------------------------------------------------------------
 "                           plugins
 "----------------------------------------------------------------
@@ -52,6 +60,7 @@ Plug 'airblade/vim-gitgutter'
 
 "dev
 Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 Plug 'neomake/neomake', {'for': 'python'}
 
 "python
@@ -83,14 +92,12 @@ filetype plugin indent on
 
 let mapleader=" "
 "leader key timeout
-set timeoutlen=3000
+set timeoutlen=5000
 
 set pastetoggle=<F12>
 set history=100
 "completion in command line
 set wildmenu
-
-autocmd VimEnter * let g:initial_dir = getcwd()
 
 "no mouse support
 set mouse = ""
@@ -145,18 +152,20 @@ nmap <F2> :w<CR>
 imap <F2> <Esc>:w<CR>
 vmap <F2> <Esc>:w<CR>
 
-"kill current buffer with F10
+"close current window
 nmap <F10> :q<cr>
+"kill current buffer
 nmap <F11> :bd %<cr>
 
 "kill current buffer and open previous
-function! KillBufferGoPrev()
+function! WipeBufferGoPrev()
     let buf_num = bufnr('%')
     exe 'bprevious'
     exe 'bd! '.buf_num
 endfunction
 
-nmap <leader>bd :call KillBufferGoPrev()<cr>
+nmap <leader>bd <F11>
+nmap <leader>bk :call WipeBufferGoPrev()<cr>
 "kill other buffers (only buffer)
 nmap <leader>bo :%bd<cr>:e #<cr>
 
@@ -246,19 +255,14 @@ noremap <Space>= miggvG=`i
 
 "indent when moving to the next line while writing code
 set autoindent
-
 set smartindent
 set smarttab
-
 set tabstop=4
 "when using the >> or << commands, shift lines by 4 spaces
 set shiftwidth=4
 set softtabstop=4
 "expand tabs into spaces
 set expandtab
-
-"show tabs and whitespaces FIXME
-set list
 
 "show vertical line
 "set colorcolumn=80
@@ -352,7 +356,7 @@ nmap <leader>gd :Gvdiff<cr>
 nmap <leader>gP :Gpush<cr>
 nmap <leader>gL :Gpull<cr>
 
-nmap <leader>gp :GitGutterPreviewHunk<cr>10<c-w>j
+nmap <leader>gp :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
 nmap <leader>gr :GitGutterRevertHunk<cr>
@@ -566,17 +570,18 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 let g:UltiSnipsListSnippets="<F6>"
 
-"respect neosnippet???
-" let g:ulti_expand_or_jump_res = 0
-" function! <SID>ExpandSnippetOrReturn()
-"     let snippet = UltiSnips#ExpandSnippetOrJump()
-"     if g:ulti_expand_or_jump_res > 0
-"         return snippet
-"     else
-"         return "\<C-Y>"
-"     endif
-" endfunction
-" imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+let g:ulti_expand_or_jump_res = 0
+
+"work nicely with deoplete. expand on cr
+function! <SID>ExpandSnippetOrReturn()
+    let snippet = UltiSnips#ExpandSnippetOrJump()
+    if g:ulti_expand_or_jump_res > 0
+        return snippet
+    else
+        return "\<C-Y>"
+    endif
+endfunction
+imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
 "----------------------------------------------------------------
 "                           theme
@@ -641,7 +646,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 "window number instead of mode
-let g:airline_section_a="%{winnr().':'.bufnr('%')}"
+let g:airline_section_a="%{winnr().':'.win_getid().':'.bufnr('%')}"
 
 function! s:ConfigAirlineSymbols()
     let g:airline_symbols.maxlinenr = ''
