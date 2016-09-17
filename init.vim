@@ -1,6 +1,6 @@
-"---------------------------------------------
-"                key scheme
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           info
+"----------------------------------------------------------------
 " Ctrl+R %    - copy current file name into command line
 " * (<s-8>)   - serch/highlight word
 " q:          - command history
@@ -12,6 +12,9 @@
 "
 " to clean buffer cache remove sub! dirs ~/.local/share/nvim
 
+"----------------------------------------------------------------
+"                           base
+"----------------------------------------------------------------
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
     "normal mode in terminal by Esc
@@ -20,9 +23,9 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
-"---------------------------------------------
-"                plugins
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           plugins
+"----------------------------------------------------------------
 call plug#begin('$VIMHOME/plugged')
 
 "appearance
@@ -73,9 +76,9 @@ Plug 'Shougo/deoplete.nvim'
 
 call plug#end()
 
-"---------------------------------------------
-"                misc settings
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           misc
+"----------------------------------------------------------------
 filetype plugin indent on
 
 let mapleader=" "
@@ -105,10 +108,11 @@ map Q <Nop>
 
 "yeah
 map Y y$
+
 "stay same position on insert mode exit
 inoremap <silent> <Esc> <Esc>`^
 
-"insert mode
+"insert mode moving
 imap <c-h> <left>
 imap <c-k> <up>
 imap <c-j> <down>
@@ -127,10 +131,10 @@ nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
 map = <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
-"---------------------------------------------
-"          save/restore/quit
-"---------------------------------------------
-"save current file with F2
+"----------------------------------------------------------------
+"                           session
+"----------------------------------------------------------------
+"save current buffer with F2
 nnoremap <F2> :w<CR>
 inoremap <F2> <Esc>:w<CR>
 vnoremap <F2> <Esc>:w<CR>
@@ -139,29 +143,34 @@ nnoremap <F10> :q<CR>
 "do not store vimrc options in session
 set ssop-=options
 
+"store marks
+set viminfo='1000,f1
+
+"TODO: ask on exit
 function! SaveSession()
     let l:path = g:initial_dir.'/.vimsession'
+    " TODO: if file exists...
     if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
         execute 'mksession! '.l:path
     endif
 endfunction
 
+" SPC - s(ession)
 nmap <leader>ss :call SaveSession()<cr>
 nmap <leader>sr :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
-"tell it to use an undo file
+"store undo history
 set undofile
 "set a directory to store the undo history
 exec 'set undodir='.$VIMHOME.'/undo'
-"store swp files in die
-exec 'set dir='.$VIMHOME.'/tmp'
+"store swp files in vim dir
+exec 'set dir='.$VIMHOME.'/swp'
 
-"---------------------------------------------
-"          search/replace/subtitude
-"---------------------------------------------
+"----------------------------------------------------------------
+"                   search/replace/subtitude
+"----------------------------------------------------------------
 set smartcase
 set ignorecase
-set hlsearch
 set incsearch
 
 "no hightlight
@@ -177,12 +186,13 @@ if executable('ag')
     set grepformat=%f:%l:%C:%m
 endif
 
-"---------------------------------------------
-"             windows/tabs/buffers
-"---------------------------------------------
+"----------------------------------------------------------------
+"                       windows/tabs/buffers
+"----------------------------------------------------------------
 "set splitright
 "set splitbelow
 
+"jump windows by numbers
 nmap <leader><tab> <c-w>p
 nmap <leader>1 1<c-w><c-w>
 nmap <leader>2 2<c-w><c-w>
@@ -190,32 +200,37 @@ nmap <leader>3 3<c-w><c-w>
 nmap <leader>4 4<c-w><c-w>
 nmap <leader>5 5<c-w><c-w>
 
+"kill windows by shift+numbers
 nmap <leader>! 1<c-w>c
 nmap <leader>@ 2<c-w>c
 nmap <leader># 3<c-w>c
 nmap <leader>$ 4<c-w>c
 nmap <leader>% 5<c-w>c
 
-"windows
+"jump windows by ctrl+direction
 nmap <c-j> <C-w><Down>
 nmap <c-h> <C-w><Left>
 nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
-"tabs
+"jump tabs by alt+direction
 nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
 
+"kill current buffer
+nmap <leader>bd :bd %<cr>
 "kill other buffers
 nmap <leader>bD :%bd<cr>:e #<cr>
 
-"---------------------------------------------
-"               indent/tab/spaces
-"---------------------------------------------
+"show buffers space+space (unite)
+
+"----------------------------------------------------------------
+"                       indent/tab/spaces
+"----------------------------------------------------------------
 "move curson over empty space
 set virtualedit=all
 
-" indent everything
+"indent everything
 noremap <Space>= miggvG=`i
 
 "indent when moving to the next line while writing code
@@ -231,7 +246,7 @@ set softtabstop=4
 "expand tabs into spaces
 set expandtab
 
-" show tabs and whitespaces
+"show tabs and whitespaces FIXME
 set list
 
 "show vertical line
@@ -241,9 +256,9 @@ set list
 vmap <s-tab> <gv
 vmap <tab> >gv
 
-"---------------------------------------------
-"            lines/numbers/wrap
-"---------------------------------------------
+"----------------------------------------------------------------
+"                       lines/numbers/wrap
+"----------------------------------------------------------------
 "go between wrapped lines
 map j gj
 map k gk
@@ -253,39 +268,45 @@ map <Up> gk
 set number
 "releative line numbers
 set rnu
+
+nmap <leader>ll :set nornu<cr>:set number<CR>
+nmap <leader>lr :set number<cr>:set rnu<cr>
+nmap <leader>ln :set nonumber<cr>:set nornu<cr>
+
 "show a visual line under the cursor's current line
 set cursorline
+
+"no wrapping by default
 set nowrap
-"keep 3 lines below and above cursor
+
+nmap <leader>lw :set wrap!<cr>
+
+"keep 5 lines below and above cursor
 set scrolloff=5
+
 "show bracket pair
 "set showmatch
 
-"line number/scroll/highlight
-nmap <leader>ll :set nornu<cr>:set number<CR>
-nmap <leader>lr :set number<cr>:set rnu<cr>
-nmap <leader>lw :set wrap!<cr>
-nmap <leader>ln :set nonumber<cr>:set nornu<cr>
-
-"folding
+"manual folding
 set foldmethod=manual
 
 "fold file header (e.g. license javadoc)
 nmap zh mmggzf%`m
-"fold current brackets
+"fold current statement
 nmap ze zf%
 
-"Return to last edit position when opening files (You want this!)
+"Return to last edit position when opening files
 autocmd BufReadPost *
-            \ if line("'\"") > 0 && line("'\"") <= line("$") |
-            \   exe "normal! g`\"" |
-            \ endif
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
 
-"---------------------------------------------
-"               correct
-"---------------------------------------------
+"----------------------------------------------------------------
+"                       lint/correcting
+"----------------------------------------------------------------
 "trailing
 nmap <leader>ct :%s/\s\+$//e<cr>
+"mixed indent
 nmap <leader>cm :retab<cr>
 
 "goto next, prev. open error
@@ -293,9 +314,9 @@ nmap <leader>co :lopen<cr>
 nmap ]l :lnext<cr>
 nmap [l :lprevious<cr>
 
-"---------------------------------------------
-"                files/types
-"---------------------------------------------
+"----------------------------------------------------------------
+"                       files/types
+"----------------------------------------------------------------
 set wildignore+=*/bin/*
 set wildignore+=*/.git/*
 set wildignore+=*/.idea/*
@@ -307,9 +328,9 @@ autocmd BufRead,BufNewFile *.gradle set ft=groovy
 nmap <leader>de :e ~/.config/nvim/init.vim<cr>
 nmap <leader>dr :source ~/.config/nvim/init.vim<cr>
 
-"---------------------------------------------
-"                git
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           git
+"----------------------------------------------------------------
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
@@ -320,16 +341,23 @@ nmap ]h <Plug>GitGutterNextHunk
 nmap <leader>ghr :GitGutterRevertHunk<cr>
 nmap <leader>gha <Plug>GitGutterStageHunk
 
-"---------------------------------------------
-"             completion/deoplete
-"---------------------------------------------
+let g:gitgutter_sign_added = '↪'
+let g:gitgutter_sign_removed = '↩'
+let g:gitgutter_sign_modified = '↬'
+let g:gitgutter_sign_modified_removed = '↫'
+
+"----------------------------------------------------------------
+"                       completion/deoplete
+"----------------------------------------------------------------
 "ctrl+space - omni complition
 imap <NUL> <C-Space>
 imap <C-@> <C-Space>
 imap <C-Space> <c-x><c-o>
 
-"set complete=.,w,b,u,k ???
-set completeopt-=preview    "disable preview popup
+"set complete=.,w,b,u,k FIXME ???
+
+"disable preview popup buffer
+set completeopt-=preview
 
 "up/down with tab
 inoremap <expr> <Tab>  pumvisible() ? "\<C-n>" : "\<Tab>"
@@ -341,16 +369,13 @@ let g:deoplete#auto_completion_start_length = 1
 let g:deoplete#auto_complete_start_length=1
 let g:deoplete#max_list=50
 
-"close popup on esc
-"imap <expr> <Esc> pumvisible() ? deoplete#mappings#cancel_popup() : "\<Esc>"
-
-"---------------------------------------------
-"                  Unite
-"-------------------------------------------
+"----------------------------------------------------------------
+"                             Unite
+"----------------------------------------------------------------
 let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
 let g:unite_source_rec_max_cache_files = 1000
-let g:unite_prompt = '» '
+let g:unite_prompt = '➥ '
 
 if executable('ag')
     let g:unite_source_grep_command = 'ag'
@@ -359,12 +384,12 @@ if executable('ag')
 
     let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
     let g:ackprg = 'ag --nogroup --column'
-
 endif
 
 call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
+"TODO: from wildignore
 call unite#custom#source('file_rec/async', 'ignore_pattern', join([
             \ '\..*/',
             \ 'node_modules/',
@@ -386,8 +411,7 @@ endfunction
 
 call unite#define_filter(s:filters)
 unlet s:filters
-call unite#custom#source('buffer,file_rec/async',
-            \ 'converters', 'custom_buffer_converter')
+call unite#custom#source('buffer,file_rec/async', 'converters', 'custom_buffer_converter')
 
 let s:filters = {"name" : "custom_grep_converter"}
 
@@ -416,14 +440,12 @@ autocmd FileType unite call <SID>UniteSetup()
 nmap <leader>u :Unite -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
+            \ -no-split
             \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>U :UniteWithCursorWord -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
-            \ buffer file_rec/async file/new directory/new<CR>
-nmap <leader>y :UniteWithBufferDir
-            \ -buffer-name=./files
-            \ -start-insert
+            \ -no-split
             \ buffer file_rec/async file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
             \ -no-quit
@@ -433,17 +455,20 @@ nmap <leader>G :UniteWithCursorWord -buffer-name=grep
             \ grep:.<cr>
 nmap <leader>o :Unite -buffer-name=tags
             \ -start-insert
+            \ -no-split
             \ tag<cr>
 nmap <leader>O :Unite -buffer-name=outline
             \ -start-insert
+            \ -no-split
             \ outline<cr>
 nmap <leader><leader> :Unite -buffer-name=buffers
             \ -start-insert
+            \ -no-split
             \ buffer<cr>
 
-"---------------------------------------------
+"----------------------------------------------------------------
 "                 vimfiler
-"---------------------------------------------
+"----------------------------------------------------------------
 "<C-l> <Plug>(vimfiler_redraw_screen)
 "*	   <Plug>(vimfiler_toggle_mark_all_lines)
 "U	   <Plug>(vimfiler_clear_mark_all_lines)
@@ -474,7 +499,7 @@ nmap <leader><leader> :Unite -buffer-name=buffers
 "T	   <Plug>(vimfiler_expand_tree_recursive)
 "I	   <Plug>(vimfiler_cd_input_directory)
 
-let g:vimfiler_safe_mode_by_default=0
+let g:vimfiler_safe_mode_by_default = 0
 let g:vimfiler_tree_opened_icon = '▾'
 let g:vimfiler_tree_closed_icon = '▸'
 let g:vimfiler_default_columns = ''
@@ -489,6 +514,7 @@ augroup vimfiler
     autocmd!
     autocmd FileType vimfiler call s:vimfiler_settings()
 augroup END
+
 function! s:vimfiler_settings()
     map <silent><buffer> <Space> <NOP>
     map <silent><buffer> <c-j> <NOP>
@@ -500,35 +526,35 @@ endfunction
 nmap <leader>f :VimFilerCurrentDir -status<cr>
 nmap <leader>F :VimFilerBufferDir -status <cr>
 
-"---------------------------------------------
-"                 markdown
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           markdown
+"----------------------------------------------------------------
 autocmd BufRead *.md set wrap lbr
 autocmd BufEnter *.md set syntax=markdown
 
-"---------------------------------------------
-"                ultisnips
-"---------------------------------------------
+"----------------------------------------------------------------
+"                          ultisnips
+"----------------------------------------------------------------
 let g:UltiSnipsExpandTrigger="<Nop>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 let g:UltiSnipsListSnippets="<F6>"
 
-"respect neosnippet
-let g:ulti_expand_or_jump_res = 0
-function! <SID>ExpandSnippetOrReturn()
-    let snippet = UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res > 0
-        return snippet
-    else
-        return "\<C-Y>"
-    endif
-endfunction
-imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+"respect neosnippet???
+" let g:ulti_expand_or_jump_res = 0
+" function! <SID>ExpandSnippetOrReturn()
+"     let snippet = UltiSnips#ExpandSnippetOrJump()
+"     if g:ulti_expand_or_jump_res > 0
+"         return snippet
+"     else
+"         return "\<C-Y>"
+"     endif
+" endfunction
+" imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
 
-"---------------------------------------------
-"                theme
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           theme
+"----------------------------------------------------------------
 set background=dark
 colorscheme gruvbox
 
@@ -547,7 +573,7 @@ autocmd BufEnter * call s:UndimActiveWindow()
 autocmd WinEnter * call s:UndimActiveWindow()
 autocmd WinLeave * call s:DimInactiveWindow()
 
-"hl line orange in insert mode
+"hl line in insert mode
 function! s:SetNormalCursorLine()
     hi cursorline cterm=none ctermbg=237 ctermfg=none
 endfunction
@@ -566,59 +592,61 @@ autocmd WinLeave * set nocul
 "hl TODO in blue
 highlight Todo ctermfg=blue
 
+"rainbow brackets
 let g:rainbow_active = 1
-
 let g:rainbow_conf = {
     \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118']
     \ }
 
 "easymotion
-let g:EasyMotion_do_mapping = 0         "no default mappings
+let g:EasyMotion_do_mapping = 0
 let g:EasyMotion_keys = 'asdfghjljknmvcrtuiyopwqb'
 let g:EasyMotion_smartcase = 0
 
 nmap s <Plug>(easymotion-overwin-f2)
 
-"---------------------------------------------
-"                airline
-"---------------------------------------------
+"----------------------------------------------------------------
+"                           airline
+"----------------------------------------------------------------
 set laststatus=2
+let g:airline_theme='oceanicnext'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
+"window number instead of mode
+let g:airline_section_a="%{winnr()}"
+
 function! s:ConfigAirlineSymbols()
     let g:airline_symbols.maxlinenr = ''
     let g:airline_symbols.linenr = ''
 endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
 
-let g:airline_theme='oceanicnext'
-
-"---------------------------------------------
-"                undo tree
-"---------------------------------------------
-nmap <F4> :UndotreeToggle<cr>
+"----------------------------------------------------------------
+"                           undo tree
+"----------------------------------------------------------------
+nmap <F4> :UndotreeToggle<cr> :UndotreeFocus<cr>
 imap <F4> <esc><f4>
 
-"---------------------------------------------
-"                neomake
-"---------------------------------------------
-highlight neomakeErrorSign ctermfg=9 ctermbg=235
-highlight neomakeWarnSign ctermfg=208 ctermbg=235
+"----------------------------------------------------------------
+"                           neomake
+"----------------------------------------------------------------
+highlight neomakeErrorSign ctermfg=196 ctermbg=237
+highlight neomakeWarnSign ctermfg=166 ctermbg=237
 
-let g:neomake_error_sign = {'text': '⤷', 'texthl': 'neomakeErrorSign'}
-let g:neomake_warning_sign = {'text': '⤷', 'texthl': 'neomakeWarnSign'}
+let g:neomake_error_sign = {'text': '∗', 'texthl': 'neomakeErrorSign'}
+let g:neomake_warning_sign = {'text': '∗', 'texthl': 'neomakeWarnSign'}
 
-"---------------------------------------------
-"               python
-"---------------------------------------------
-let g:jedi#goto_command = "<leader>G"
-let g:jedi#goto_assignments_command = "<leader>A"
-let g:jedi#goto_definitions_command = "<leader>D"
-let g:jedi#documentation_command = "<leader>K"
+"----------------------------------------------------------------
+"                             python
+"----------------------------------------------------------------
+let g:jedi#goto_command = "<leader>pg"
+let g:jedi#goto_assignments_command = "<leader>pa"
+let g:jedi#goto_definitions_command = "<leader>pd"
+let g:jedi#documentation_command = "<leader>pd"
 let g:jedi#usages_command = "<leader>U"
-let g:jedi#rename_command = "<leader>R"
+let g:jedi#rename_command = "<leader>pr"
 let g:jedi#completions_command = "<C-W>"
 
 let g:jedi#auto_initialization = 1
@@ -627,8 +655,6 @@ let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
 let g:jedi#popup_on_dot = 0
-
-let python_highlight_all = 1
 
 let g:python_inited = 0
 function! InitPythonSessing()
@@ -650,7 +676,10 @@ function! InitPythonSessing()
     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
     autocmd! BufRead *.py Neomake
 
-    "hl
+    "enable all Python syntax highlighting features
+    let python_highlight_all = 1
+
+    "custom hl
     highlight pythonSelf ctermfg=109
     highlight pylintSuppress ctermfg=8
 
@@ -664,12 +693,11 @@ function! InitPythonSessing()
     autocmd! BufEnter *.py call s:HighlightPython()
     autocmd! WinEnter *.py call s:HighlightPython()
 
-    "enable all Python syntax highlighting features
     if has('python3')
         let g:jedi#force_py_version = 3
     endif
-    let python_highlight_all = 1
 
+    " ctags
     let l:mktags = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".getcwd()"
     call system(l:mktags)
     exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
