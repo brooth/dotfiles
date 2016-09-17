@@ -132,13 +132,33 @@ map = <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
 "----------------------------------------------------------------
-"                           session
+"                           help
+"----------------------------------------------------------------
+nmap <leader>hs :h usr_41.txt<cr>
+nmap <leader>hf :h function-list<cr>
+
+"----------------------------------------------------------------
+"                       session/buffers
 "----------------------------------------------------------------
 "save current buffer with F2
-nnoremap <F2> :w<CR>
-inoremap <F2> <Esc>:w<CR>
-vnoremap <F2> <Esc>:w<CR>
-nnoremap <F10> :q<CR>
+nmap <F2> :w<CR>
+imap <F2> <Esc>:w<CR>
+vmap <F2> <Esc>:w<CR>
+
+"kill current buffer with F10
+nmap <F10> :q<cr>
+nmap <F11> :bd %<cr>
+
+"kill current buffer and open previous
+function! KillBufferGoPrev()
+    let buf_num = bufnr('%')
+    exe 'bprevious'
+    exe 'bd! '.buf_num
+endfunction
+
+nmap <leader>bd :call KillBufferGoPrev()<cr>
+"kill other buffers (only buffer)
+nmap <leader>bo :%bd<cr>:e #<cr>
 
 "do not store vimrc options in session
 set ssop-=options
@@ -146,18 +166,16 @@ set ssop-=options
 "store marks
 set viminfo='1000,f1
 
-"TODO: ask on exit
 function! SaveSession()
     let l:path = g:initial_dir.'/.vimsession'
-    " TODO: if file exists...
     if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
         execute 'mksession! '.l:path
     endif
 endfunction
 
 " SPC - s(ession)
-nmap <leader>ss :call SaveSession()<cr>
-nmap <leader>sr :exec 'source '.g:initial_dir.'/.vimsession'<cr>
+nmap <silent><leader>ss :call SaveSession()<cr>
+nmap <silent><leader>sr :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
 "store undo history
 set undofile
@@ -187,7 +205,7 @@ if executable('ag')
 endif
 
 "----------------------------------------------------------------
-"                       windows/tabs/buffers
+"                       windows/tabs
 "----------------------------------------------------------------
 "set splitright
 "set splitbelow
@@ -216,13 +234,6 @@ nmap <c-k> <C-w><Up>
 "jump tabs by alt+direction
 nmap <m-j> :tabprev<CR>
 nmap <m-k> :tabnext<CR>
-
-"kill current buffer
-nmap <leader>bd :bd %<cr>
-"kill other buffers
-nmap <leader>bD :%bd<cr>:e #<cr>
-
-"show buffers space+space (unite)
 
 "----------------------------------------------------------------
 "                       indent/tab/spaces
@@ -334,17 +345,32 @@ nmap <leader>dr :source ~/.config/nvim/init.vim<cr>
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-"SPC  g(it) h(unks)
-nmap <leader>ghp <Plug>GitGutterPreviewHunk
+nmap <leader>gg :Gblame<cr>
+nmap <leader>gb :Gbrowse<cr>
+nmap <leader>gs :Gstatus<cr>
+nmap <leader>gd :Gvdiff<cr>
+nmap <leader>gP :Gpush<cr>
+nmap <leader>gL :Gpull<cr>
+
+nmap <leader>gp :GitGutterPreviewHunk<cr>10<c-w>j
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-nmap <leader>ghr :GitGutterRevertHunk<cr>
-nmap <leader>gha <Plug>GitGutterStageHunk
+nmap <leader>gr :GitGutterRevertHunk<cr>
+nmap <leader>gS :GitGutterStageHunk<cr>
+nmap <leader>gl :GitGutterLineHighlightsToggle<cr>
 
 let g:gitgutter_sign_added = '↪'
 let g:gitgutter_sign_removed = '↩'
 let g:gitgutter_sign_modified = '↬'
 let g:gitgutter_sign_modified_removed = '↫'
+
+function! s:ConfigGitGutter()
+    highlight GitGutterAdd ctermfg=244 ctermbg=237
+    highlight GitGutterChange ctermfg=244 ctermbg=237
+    highlight GitGutterDelete ctermfg=244 ctermbg=237
+    highlight GitGutterChangeDelete ctermfg=244 ctermbg=237
+endfunction
+autocmd VimEnter * call s:ConfigGitGutter()
 
 "----------------------------------------------------------------
 "                       completion/deoplete
@@ -382,7 +408,7 @@ if executable('ag')
     let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
     let g:unite_source_grep_recursive_opt = ''
 
-    let g:unite_source_rec_async_command = 'ag --follow --nocolor --nogroup --hidden -g ""'
+    let g:unite_source_rec_async_command = ['ag --follow --nocolor --nogroup --hidden -g ""']
     let g:ackprg = 'ag --nogroup --column'
 endif
 
@@ -615,7 +641,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 "window number instead of mode
-let g:airline_section_a="%{winnr()}"
+let g:airline_section_a="%{winnr().':'.bufnr('%')}"
 
 function! s:ConfigAirlineSymbols()
     let g:airline_symbols.maxlinenr = ''
@@ -635,8 +661,8 @@ imap <F4> <esc><f4>
 highlight neomakeErrorSign ctermfg=196 ctermbg=237
 highlight neomakeWarnSign ctermfg=166 ctermbg=237
 
-let g:neomake_error_sign = {'text': '∗', 'texthl': 'neomakeErrorSign'}
-let g:neomake_warning_sign = {'text': '∗', 'texthl': 'neomakeWarnSign'}
+let g:neomake_error_sign = {'text': '⚑', 'texthl': 'neomakeErrorSign'}
+let g:neomake_warning_sign = {'text': '⚑', 'texthl': 'neomakeWarnSign'}
 
 "----------------------------------------------------------------
 "                             python
@@ -644,7 +670,7 @@ let g:neomake_warning_sign = {'text': '∗', 'texthl': 'neomakeWarnSign'}
 let g:jedi#goto_command = "<leader>pg"
 let g:jedi#goto_assignments_command = "<leader>pa"
 let g:jedi#goto_definitions_command = "<leader>pd"
-let g:jedi#documentation_command = "<leader>pd"
+let g:jedi#documentation_command = "<leader>pk"
 let g:jedi#usages_command = "<leader>U"
 let g:jedi#rename_command = "<leader>pr"
 let g:jedi#completions_command = "<C-W>"
