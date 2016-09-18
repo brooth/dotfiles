@@ -138,6 +138,9 @@ nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
 map = <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
+"en spell checker
+set spell spelllang=en
+
 "----------------------------------------------------------------
 "                           help
 "----------------------------------------------------------------
@@ -151,6 +154,9 @@ nmap <leader>hf :h function-list<cr>
 nmap <F2> :w<CR>
 imap <F2> <Esc>:w<CR>
 vmap <F2> <Esc>:w<CR>
+
+nmap <m-k> :bnext<CR>
+nmap <m-j> :bprevious<CR>
 
 "close current window
 nmap <F10> :q<cr>
@@ -241,8 +247,8 @@ nmap <c-l> <C-w><Right>
 nmap <c-k> <C-w><Up>
 
 "jump tabs by alt+direction
-nmap <m-j> :tabprev<CR>
-nmap <m-k> :tabnext<CR>
+nmap ]t :tabprev<CR>
+nmap [t :tabnext<CR>
 
 "----------------------------------------------------------------
 "                       indent/tab/spaces
