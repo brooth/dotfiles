@@ -135,11 +135,14 @@ set showcmd
 nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
 
 "expand-region
-map = <Plug>(expand_region_expand)
-map - <Plug>(expand_region_shrink)
+map ]e <Plug>(expand_region_expand)
+map [e <Plug>(expand_region_shrink)
 
 "en spell checker
-set spell spelllang=en
+" set spell spelllang=en
+
+"no jump to exsiting pair, but insert
+let g:AutoPairsMultilineClose=0
 
 "----------------------------------------------------------------
 "                           help
@@ -171,7 +174,7 @@ function! WipeBufferGoPrev()
 endfunction
 
 nmap <leader>bd <F11>
-nmap <leader>bk :call WipeBufferGoPrev()<cr>
+nmap <leader>bw :call WipeBufferGoPrev()<cr>
 "kill other buffers (only buffer)
 nmap <leader>bo :%bd<cr>:e #<cr>
 
@@ -288,7 +291,7 @@ map <Up> gk
 
 set number
 "releative line numbers
-set rnu
+"set rnu
 
 nmap <leader>ll :set nornu<cr>:set number<CR>
 nmap <leader>lr :set number<cr>:set rnu<cr>
@@ -350,24 +353,24 @@ nmap <leader>de :e ~/.config/nvim/init.vim<cr>
 nmap <leader>dr :source ~/.config/nvim/init.vim<cr>
 
 "----------------------------------------------------------------
-"                           git
+"                           vcs/git
 "----------------------------------------------------------------
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-nmap <leader>gg :Gblame<cr>
-nmap <leader>gb :Gbrowse<cr>
-nmap <leader>gs :Gstatus<cr>
-nmap <leader>gd :Gvdiff<cr>
-nmap <leader>gP :Gpush<cr>
-nmap <leader>gL :Gpull<cr>
+nmap <leader>vv :Gblame<cr>
+nmap <leader>vb :Gbrowse<cr>
+nmap <leader>vs :Gstatus<cr>
+nmap <leader>vd :Gvdiff<cr>
+nmap <leader>vP :Gpush<cr>
+nmap <leader>vL :Gpull<cr>
 
-nmap <leader>gp :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
+nmap <leader>vp :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-nmap <leader>gr :GitGutterRevertHunk<cr>
-nmap <leader>gS :GitGutterStageHunk<cr>
-nmap <leader>gl :GitGutterLineHighlightsToggle<cr>
+nmap <leader>vr :GitGutterRevertHunk<cr>
+nmap <leader>vS :GitGutterStageHunk<cr>
+nmap <leader>vl :GitGutterLineHighlightsToggle<cr>
 
 let g:gitgutter_sign_added = '↪'
 let g:gitgutter_sign_removed = '↩'
@@ -390,7 +393,8 @@ imap <NUL> <C-Space>
 imap <C-@> <C-Space>
 imap <C-Space> <c-x><c-o>
 
-"set complete=.,w,b,u,k FIXME ???
+" FIXME ???
+set complete=.,w,b,u,k
 
 "disable preview popup buffer
 set completeopt-=preview
@@ -426,7 +430,7 @@ call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 "TODO: from wildignore
-call unite#custom#source('file_rec/async', 'ignore_pattern', join([
+call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
             \ '\..*/',
             \ 'node_modules/',
             \ 'build/[^gen]',
@@ -447,7 +451,7 @@ endfunction
 
 call unite#define_filter(s:filters)
 unlet s:filters
-call unite#custom#source('buffer,file_rec/async', 'converters', 'custom_buffer_converter')
+call unite#custom#source('buffer,file_rec/neovim', 'converters', 'custom_buffer_converter')
 
 let s:filters = {"name" : "custom_grep_converter"}
 
@@ -477,12 +481,12 @@ nmap <leader>u :Unite -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
-            \ buffer file_rec/async file/new directory/new<CR>
+            \ buffer file_rec/neovim file/new directory/new<CR>
 nmap <leader>U :UniteWithCursorWord -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
-            \ buffer file_rec/async file/new directory/new<CR>
+            \ buffer file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
             \ -no-quit
             \ grep:.<cr>
@@ -563,12 +567,6 @@ nmap <leader>f :VimFilerCurrentDir -status<cr>
 nmap <leader>F :VimFilerBufferDir -status <cr>
 
 "----------------------------------------------------------------
-"                           markdown
-"----------------------------------------------------------------
-autocmd BufRead *.md set wrap lbr
-autocmd BufEnter *.md set syntax=markdown
-
-"----------------------------------------------------------------
 "                          ultisnips
 "----------------------------------------------------------------
 let g:UltiSnipsExpandTrigger="<Nop>"
@@ -596,19 +594,23 @@ set background=dark
 colorscheme gruvbox
 
 "dim inactive  windows
-hi def Dim cterm=none ctermbg=none ctermfg=242
+" hi def Dim cterm=none ctermbg=none ctermfg=242
 
-function! s:DimInactiveWindow()
-    syntax region Dim start='' end='$$$end$$$'
-endfunction
+" function! s:DimInactiveWindow()
+"     let b:cur_syntax = &syntax
+"     syntax clear
+"     syntax region Dim start='' end='$$$end$$$'
+" endfunction
 
-function! s:UndimActiveWindow()
-    ownsyntax
-endfunction
+" function! s:UndimActiveWindow()
+"     if exists("b:cur_syntax")
+"         execute 'set syntax='.b:cur_syntax
+"     endif
+" endfunction
 
-autocmd BufEnter * call s:UndimActiveWindow()
-autocmd WinEnter * call s:UndimActiveWindow()
-autocmd WinLeave * call s:DimInactiveWindow()
+" autocmd BufEnter * call s:UndimActiveWindow()
+" autocmd WinEnter * call s:UndimActiveWindow()
+" autocmd WinLeave * call s:DimInactiveWindow()
 
 "hl line in insert mode
 function! s:SetNormalCursorLine()
@@ -632,8 +634,11 @@ highlight Todo ctermfg=blue
 "rainbow brackets
 let g:rainbow_active = 1
 let g:rainbow_conf = {
-    \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118']
-    \ }
+            \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118'],
+            \ 'separately': {
+            \       'html': {}
+            \ }
+            \ }
 
 "easymotion
 let g:EasyMotion_do_mapping = 0
@@ -641,6 +646,13 @@ let g:EasyMotion_keys = 'asdfghjljknmvcrtuiyopwqb'
 let g:EasyMotion_smartcase = 0
 
 nmap s <Plug>(easymotion-overwin-f2)
+
+function! SyntaxUnderCursor()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
 
 "----------------------------------------------------------------
 "                           airline
@@ -651,6 +663,9 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:airline#extensions#tabline#buffer_nr_format = '%s '
+
 "window number instead of mode
 let g:airline_section_a="%{winnr().':'.win_getid().':'.bufnr('%')}"
 
@@ -676,13 +691,40 @@ let g:neomake_error_sign = {'text': '⚑', 'texthl': 'neomakeErrorSign'}
 let g:neomake_warning_sign = {'text': '⚑', 'texthl': 'neomakeWarnSign'}
 
 "----------------------------------------------------------------
+"                           markdown
+"----------------------------------------------------------------
+autocmd BufRead *.md set wrap lbr
+autocmd BufEnter *.md set syntax=markdown
+
+"----------------------------------------------------------------
+"                        html/templates
+"----------------------------------------------------------------
+let g:html_inited = 0
+function! SetupHtmlSettings()
+    set syntax=html
+    syntax keyword javaScriptConditional var
+
+    if g:html_inited != 0
+        return
+    endif
+    let g:html_inited = 1
+
+    " highlights
+    highlight htmlTagName ctermfg=208
+    highlight htmlTag ctermfg=109
+    highlight htmlArg ctermfg=109
+    highlight javaScript ctermfg=250
+endfunction
+autocmd BufEnter *.html call SetupHtmlSettings()
+
+"----------------------------------------------------------------
 "                             python
 "----------------------------------------------------------------
 let g:jedi#goto_command = "<leader>pg"
 let g:jedi#goto_assignments_command = "<leader>pa"
 let g:jedi#goto_definitions_command = "<leader>pd"
 let g:jedi#documentation_command = "<leader>pk"
-let g:jedi#usages_command = "<leader>U"
+let g:jedi#usages_command = "<leader>pu"
 let g:jedi#rename_command = "<leader>pr"
 let g:jedi#completions_command = "<C-W>"
 
@@ -755,3 +797,6 @@ function! InitPythonSessing()
 
 endfunction
 autocmd BufReadPost *.py call InitPythonSessing()
+
+autocmd BufWinEnter *.py setlocal omnifunc=jedi#completions
+
