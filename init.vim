@@ -371,6 +371,7 @@ nmap ]h <Plug>GitGutterNextHunk
 nmap <leader>vr :GitGutterRevertHunk<cr>
 nmap <leader>vS :GitGutterStageHunk<cr>
 nmap <leader>vl :GitGutterLineHighlightsToggle<cr>
+nmap <leader>vR :!git checkout <c-r>%<cr><cr>
 
 let g:gitgutter_sign_added = '↪'
 let g:gitgutter_sign_removed = '↩'
