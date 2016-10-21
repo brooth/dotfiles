@@ -29,7 +29,11 @@ function! JumpLastBufferWindow()
 endfunction
 
 "g:initial_dir = path where vim started
-autocmd VimEnter * let g:initial_dir = getcwd()
+function! InitVimEnterSettings()
+    let g:initial_dir = getcwd()
+    exec 'set path='.g:initial_dir.','.g:initial_dir.'/**'
+endfunction
+autocmd VimEnter * call InitVimEnterSettings()
 
 "----------------------------------------------------------------
 "                           plugins
@@ -46,7 +50,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
-Plug 'haya14busa/incsearch.vim' "highlight search while entering
 Plug 'kshenoy/vim-signature'    "show marks
 Plug 'terryma/vim-expand-region'
 Plug 'easymotion/vim-easymotion'
@@ -60,7 +63,6 @@ Plug 'airblade/vim-gitgutter'
 
 "dev
 Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
 Plug 'neomake/neomake', {'for': 'python'}
 
 "python
@@ -68,10 +70,6 @@ Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 Plug 'zchee/deoplete-jedi', {'for': 'python'}
 Plug 'hdima/python-syntax', {'for': 'python'}
-
-"typescript
-Plug 'leafgarland/typescript-vim', {'for': 'typescript'}
-Plug 'Quramy/tsuquyomi', {'for': 'typescript'}
 
 "unite
 Plug 'Shougo/unite.vim'
@@ -131,9 +129,6 @@ set showcmd
 "redraw only when we need to.
 "set lazyredraw
 
-"search for TODOs
-nmap <Leader>t :noautocmd vimgrep /TODO/j **/*.*<CR>:botright cw<CR>
-
 "expand-region
 map ]e <Plug>(expand_region_expand)
 map [e <Plug>(expand_region_shrink)
@@ -149,6 +144,14 @@ let g:AutoPairsMultilineClose=0
 "----------------------------------------------------------------
 nmap <leader>hs :h usr_41.txt<cr>
 nmap <leader>hf :h function-list<cr>
+
+"----------------------------------------------------------------
+"                     command shortcuts
+"----------------------------------------------------------------
+nmap ,f :find 
+nmap ,b :b 
+nmap ,aa :args **/*.
+nmap ,ad :argdo %s//ge \| update<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>
 
 "----------------------------------------------------------------
 "                       session/buffers
@@ -173,10 +176,23 @@ function! WipeBufferGoPrev()
     exe 'bd! '.buf_num
 endfunction
 
+"kill background buffers
+function! CloseBackBuffers()
+  let i = 0
+  let n = bufnr('$')
+  while i < n
+    let i = i + 1
+    if bufloaded(i) && bufwinnr(i) < 0
+      exe 'bd ' . i
+    endif
+  endwhile
+endfun
+
 nmap <leader>bd <F11>
 nmap <leader>bw :call WipeBufferGoPrev()<cr>
+nmap <leader>bb :call CloseBackBuffers()<cr>
 "kill other buffers (only buffer)
-nmap <leader>bo :%bd<cr>:e #<cr>
+nmap <leader>bo :%bd<cr>:e #<cr>:bnext<cr>:bd %<cr>
 
 "do not store vimrc options in session
 set ssop-=options
@@ -429,13 +445,15 @@ endif
 
 call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
+" call unite#filters#matcher_default#use(['matcher_fuzzy', 'converter_tail'])
+" call unite#filters#sorter_default#use(['sorter_selecta'])
 
 "TODO: from wildignore
-call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
-            \ '\..*/',
-            \ 'node_modules/',
-            \ 'build/[^gen]',
-            \ ], '\|'))
+" call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
+"             \ '\..*/',
+"             \ 'node_modules/',
+"             \ 'build/[^gen]',
+"             \ ], '\|'))
 
 let s:filters = {"name" : "custom_buffer_converter"}
 
@@ -444,8 +462,11 @@ function! s:filters.filter(candidates, context)
         "echo candidate
         let word = get(candidate, 'word')
         let path = get(candidate, 'action__path', '')
-        let candidate.abbr = printf("%s   %s", word, path)
-        " let candidate.abbr = word
+        let word = word.repeat(' ', (30 - len(word)))
+        if len(path) > 50
+            let path = path[0:10].'..'.path[len(path)-38:]
+        endif
+        let candidate.abbr = printf("%s%s", word, path)
     endfor
     return a:candidates
 endfunction
@@ -482,15 +503,15 @@ nmap <leader>u :Unite -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
-            \ buffer file_rec/neovim file/new directory/new<CR>
-nmap <leader>U :UniteWithCursorWord -buffer-name=files
+            \ buffer file_rec/neovim<CR>
+nmap <leader>U :UniteWithBufferDir -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
             \ buffer file_rec/neovim file/new directory/new<CR>
 nmap <leader>g :Unite -buffer-name=grep
             \ -no-quit
-            \ grep:.<cr>
+            \ grep:<cr>
 nmap <leader>G :UniteWithCursorWord -buffer-name=grep
             \ -no-quit
             \ grep:.<cr>
@@ -506,6 +527,9 @@ nmap <leader><leader> :Unite -buffer-name=buffers
             \ -start-insert
             \ -no-split
             \ buffer<cr>
+nmap <leader>t :Unite -buffer-name=todos
+            \ -no-quit
+            \ vimgrep:**:\\\TODO\:\\\|FIXME\:<cr>
 
 "----------------------------------------------------------------
 "                 vimfiler
@@ -668,7 +692,7 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#buffer_nr_format = '%s '
 
 "window number instead of mode
-let g:airline_section_a="%{winnr().':'.win_getid().':'.bufnr('%')}"
+let g:airline_section_a="%{winnr().':'.bufnr('%')}"
 
 function! s:ConfigAirlineSymbols()
     let g:airline_symbols.maxlinenr = ''
@@ -721,6 +745,11 @@ autocmd BufEnter *.html call SetupHtmlSettings()
 "----------------------------------------------------------------
 "                             python
 "----------------------------------------------------------------
+set wildignore+=*.pyc
+set wildignore+=*/__pycache__/**
+set wildignore+=*/__pycache__
+set wildignore+=*/.env/^[^g]*
+
 let g:jedi#goto_command = "<leader>pg"
 let g:jedi#goto_assignments_command = "<leader>pa"
 let g:jedi#goto_definitions_command = "<leader>pd"
@@ -747,12 +776,7 @@ function! InitPythonSessing()
         return
     endif
     let g:python_inited = 1
-
-    set wildignore+=*.pyc
-    set wildignore+=*/node_modules/*
-    set wildignore+=*/.env/^[^g]*
-
-    let g:neomake_python_enabled_makers = ['pylint', 'flake8']
+    let g:neomake_python_enabled_makers = ['flake8']
     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
     autocmd! BufRead *.py Neomake
 
