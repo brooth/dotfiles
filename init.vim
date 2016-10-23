@@ -11,6 +11,11 @@
 " :argdo %s/<search>/<replace>/ge | update
 "
 " to clean buffer cache remove sub! dirs ~/.local/share/nvim
+"
+" replace with register
+" [count]["x]gr{motion} - Replace {motion} text with the contents of register x.
+" [count]["x]grr          Replace [count] lines with the contents of register x.
+" {Visual}["x]gr          Replace the selection with the contents of register x.
 
 "----------------------------------------------------------------
 "                           base
@@ -53,6 +58,8 @@ Plug 'tpope/vim-commentary'
 Plug 'kshenoy/vim-signature'    "show marks
 Plug 'terryma/vim-expand-region'
 Plug 'easymotion/vim-easymotion'
+Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
+Plug '~/Projects/far.vim'
 
 "files
 Plug 'mbbill/undotree'
@@ -235,7 +242,7 @@ nmap ]q :cnext<cr>
 
 if executable('ag')
     set grepprg=ag\ --nogroup\ --column\ --nocolor
-    set grepformat=%f:%l:%C:%m
+    set grepformat=%f:%l:%c:%m
 endif
 
 "----------------------------------------------------------------
@@ -347,7 +354,7 @@ autocmd BufReadPost *
 "trailing
 nmap <leader>ct :%s/\s\+$//e<cr>
 "mixed indent
-nmap <leader>cm :retab<cr>
+nmap <leader>ci :retab<cr>
 
 "goto next, prev. open error
 nmap <leader>co :lopen<cr>
@@ -394,13 +401,13 @@ let g:gitgutter_sign_removed = '↩'
 let g:gitgutter_sign_modified = '↬'
 let g:gitgutter_sign_modified_removed = '↫'
 
-function! s:ConfigGitGutter()
-    highlight GitGutterAdd ctermfg=244 ctermbg=237
-    highlight GitGutterChange ctermfg=244 ctermbg=237
-    highlight GitGutterDelete ctermfg=244 ctermbg=237
-    highlight GitGutterChangeDelete ctermfg=244 ctermbg=237
-endfunction
-autocmd VimEnter * call s:ConfigGitGutter()
+" function! s:ConfigGitGutter()
+"     highlight GitGutterAdd ctermfg=244 ctermbg=237
+"     highlight GitGutterChange ctermfg=244 ctermbg=237
+"     highlight GitGutterDelete ctermfg=244 ctermbg=237
+"     highlight GitGutterChangeDelete ctermfg=244 ctermbg=237
+" endfunction
+" autocmd VimEnter * call s:ConfigGitGutter()
 
 "----------------------------------------------------------------
 "                       completion/deoplete
