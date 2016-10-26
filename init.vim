@@ -53,7 +53,7 @@ Plug 'luochen1990/rainbow'      "hi brackets diff colors
 "utils
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'jiangmiao/auto-pairs'
+" Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
 Plug 'kshenoy/vim-signature'    "show marks
 Plug 'terryma/vim-expand-region'
@@ -185,21 +185,30 @@ endfunction
 
 "kill background buffers
 function! CloseBackBuffers()
-  let i = 0
   let n = bufnr('$')
-  while i < n
-    let i = i + 1
-    if bufloaded(i) && bufwinnr(i) < 0
-      exe 'bd ' . i
+  while n > 0
+    if bufloaded(n) && bufwinnr(n) < 0
+      exe 'bd ' . n
     endif
+    let n -= 1
+  endwhile
+endfun
+
+function! CloseOtherBuffers()
+  let n = bufnr('$')
+  let cb = bufnr('%')
+  while n > 0
+    if n != cb && bufloaded(n)
+      exe 'bd ' . n
+    endif
+    let n -= 1
   endwhile
 endfun
 
 nmap <leader>bd <F11>
 nmap <leader>bw :call WipeBufferGoPrev()<cr>
 nmap <leader>bb :call CloseBackBuffers()<cr>
-"kill other buffers (only buffer)
-nmap <leader>bo :%bd<cr>:e #<cr>:bnext<cr>:bd %<cr>
+nmap <leader>bo :call CloseOtherBuffers()<cr>
 
 "do not store vimrc options in session
 set ssop-=options
@@ -384,6 +393,7 @@ let g:gitgutter_map_keys = 0
 nmap <leader>vv :Gblame<cr>
 nmap <leader>vb :Gbrowse<cr>
 nmap <leader>vs :Gstatus<cr>
+nmap <leader>vc :Gcommit<cr>
 nmap <leader>vd :Gvdiff<cr>
 nmap <leader>vP :Gpush<cr>
 nmap <leader>vL :Gpull<cr>
