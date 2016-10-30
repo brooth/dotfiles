@@ -155,10 +155,9 @@ nmap <leader>hf :h function-list<cr>
 "----------------------------------------------------------------
 "                     command shortcuts
 "----------------------------------------------------------------
-nmap ,f :find
-nmap ,b :b
-nmap ,aa :args **/*.
-nmap ,ad :argdo %s//ge \| update<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>
+exec 'nmap ,f :find '
+exec 'nmap ,b :b '
+exec 'nmap ,d :bd '
 
 "----------------------------------------------------------------
 "                       session/buffers
@@ -206,7 +205,7 @@ function! CloseOtherBuffers()
   silent exec 'norm! o'
 endfun
 
-nmap <silent>:<leader>bd <F11>
+nmap <silent><leader>bd <F11>
 nmap <silent><leader>bw :call WipeBufferGoPrev()<cr>
 nmap <silent><leader>bb :call CloseBackBuffers()<cr>
 nmap <silent><leader>bo :call CloseOtherBuffers()<cr>
@@ -260,7 +259,8 @@ let g:far#debug = 1
 let g:far#auto_write_replaced_buffers = 0
 let g:far#confirm_fardo = 0
 let g:far#check_window_resize_period = 3000
-let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.gradle', '**/*.vim']
+let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
+    \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
 
 "----------------------------------------------------------------
 "                       windows/tabs
@@ -331,7 +331,7 @@ map <Up> gk
 
 set number
 "releative line numbers
-"set rnu
+set rnu
 
 nmap <leader>ll :set nornu<cr>:set number<CR>
 nmap <leader>lr :set number<cr>:set rnu<cr>
@@ -347,6 +347,8 @@ nmap <leader>lw :set wrap!<cr>
 
 "keep 5 lines below and above cursor
 set scrolloff=5
+"horizontal scroll by 1 col
+set sidescroll=1
 
 "show bracket pair
 "set showmatch
@@ -409,7 +411,7 @@ nmap <leader>vL :Gpull<cr>
 nmap <leader>vp :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-nmap <leader>vr :GitGutterRevertHunk<cr>
+nmap <leader>vr :GitGutterUndoHunk<cr>
 nmap <leader>vS :GitGutterStageHunk<cr>
 nmap <leader>vl :GitGutterLineHighlightsToggle<cr>
 nmap <leader>vR :!git checkout <c-r>%<cr><cr>
