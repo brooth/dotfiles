@@ -332,13 +332,12 @@ nnoremap <c-g>d :Gvdiff<cr>
 nnoremap <c-g>P :Gpush<cr>
 nnoremap <c-g>L :Gpull<cr>
 nnoremap <c-g>R :!git checkout <c-r>%<cr><cr>
-
-nnoremap <c-h>v :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
-nnoremap <c-h>p GitGutterPrevHunk
-nnoremap <c-h>n GitGutterNextHunk
-nnoremap <c-h>r :GitGutterUndoHunk<cr>
-nnoremap <c-h>S :GitGutterStageHunk<cr>
-nnoremap <c-h>l :GitGutterLineHighlightsToggle<cr>
+nnoremap <c-g>p :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
+nnoremap <c-g>r :GitGutterUndoHunk<cr>
+nnoremap <c-g>S :GitGutterStageHunk<cr>
+nnoremap <c-g>l :GitGutterLineHighlightsToggle<cr>
+nnoremap [h :GitGutterPrevHunk<cr>
+nnoremap ]h :GitGutterNextHunk<cr>
 
 let g:gitgutter_sign_added = '↪'
 let g:gitgutter_sign_removed = '↩'
