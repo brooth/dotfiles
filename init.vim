@@ -1,10 +1,5 @@
-"----------------------------------------------------------------
-"                           info
-"----------------------------------------------------------------
+"info {{{
 " Ctrl+R %    - copy current file name into command line
-" * (<s-8>)   - serch/highlight word
-" q:          - command history
-" gv          - re-select last visual selection
 "
 " search & replace
 " :args **/*.java OR :args `ag -l <search> **/*.java`
@@ -16,10 +11,9 @@
 " [count]["x]gr{motion} - Replace {motion} text with the contents of register x.
 " [count]["x]grr          Replace [count] lines with the contents of register x.
 " {Visual}["x]gr          Replace the selection with the contents of register x.
+"}}}
 
-"----------------------------------------------------------------
-"                           base
-"----------------------------------------------------------------
+"base {{{
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
     "normal mode in terminal by Esc
@@ -39,10 +33,9 @@ function! InitVimEnterSettings()
     exec 'set path='.g:initial_dir.','.g:initial_dir.'/**'
 endfunction
 autocmd VimEnter * call InitVimEnterSettings()
+"}}}
 
-"----------------------------------------------------------------
-"                           plugins
-"----------------------------------------------------------------
+"plugins {{{
 call plug#begin('$VIMHOME/plugged')
 
 "appearance
@@ -69,7 +62,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
 "dev
-Plug 'SirVer/ultisnips'
+" Plug 'SirVer/ultisnips'
 Plug 'neomake/neomake', {'for': 'python'}
 
 "python
@@ -89,93 +82,95 @@ Plug 'tsukkee/unite-tag'
 Plug 'Shougo/deoplete.nvim'
 
 call plug#end()
+"}}}
 
-"----------------------------------------------------------------
-"                           misc
-"----------------------------------------------------------------
+"misc {{{
 filetype plugin indent on
 
 let mapleader=" "
+
 "leader key timeout
 set timeoutlen=5000
-
 set pastetoggle=<F12>
-set history=100
-"completion in command line
+set history=300
+"view complete items in command line
 set wildmenu
-
 "no mouse support
 set mouse = ""
-
 "allow switching away from a changed buffer without saving.
 set hidden
-
-"F1 - Esc
-imap <F1> <Esc>
-nmap <F1> <Esc>
-vmap <F1> <Esc>
+"Display what command is waiting for an operator
+set showcmd
+"redraw only when we need to.
+"set lazyredraw
+"en spell checker
+"set spell spelllang=en
 
 "disable ex mode
-map Q <Nop>
+nnoremap Q <Nop>
+nnoremap q: <Nop>
 
 "yeah
-map Y y$
+nnoremap Y y$
 
 "stay same position on insert mode exit
 inoremap <silent> <Esc> <Esc>`^
 
 "insert mode moving
-imap <c-h> <left>
-imap <c-k> <up>
-imap <c-j> <down>
-imap <c-l> <right>
-
-"Display what command is waiting for an operator
-set showcmd
-
-"redraw only when we need to.
-"set lazyredraw
+inoremap <c-h> <left>
+inoremap <c-k> <up>
+inoremap <c-j> <down>
+inoremap <c-l> <right>
 
 "expand-region
-map ]e <Plug>(expand_region_expand)
-map [e <Plug>(expand_region_shrink)
-
-"en spell checker
-" set spell spelllang=en
+nnoremap ]e <Plug>(expand_region_expand)
+nnoremap [e <Plug>(expand_region_shrink)
 
 "no jump to exsiting pair, but insert
 let g:AutoPairsMultilineClose=0
+"}}}
 
-"----------------------------------------------------------------
-"                           help
-"----------------------------------------------------------------
-nmap <leader>hs :h usr_41.txt<cr>
-nmap <leader>hf :h function-list<cr>
+"help {{{
+nnoremap <F1>u :h usr_41.txt<cr>
+nnoremap <F1>f :h function-list<cr>
+"}}}
 
-"----------------------------------------------------------------
-"                     command shortcuts
-"----------------------------------------------------------------
-exec 'nmap ,f :find '
-exec 'nmap ,b :b '
-exec 'nmap ,d :bd '
+"cmd templates "{{{
+exec 'nnoremap ;f :find '
+exec 'nnoremap ;b :b '
+exec 'nnoremap ;d :bd '
+"}}}
 
-"----------------------------------------------------------------
-"                       session/buffers
-"----------------------------------------------------------------
-"save current buffer with F2
-nmap <F2> :w<CR>
-imap <F2> <Esc>:w<CR>
-vmap <F2> <Esc>:w<CR>
+"session/source {{{
+"do not store vimrc options in session
+set ssop-=options
+"store marks
+set viminfo='1000,f1
+"store undo history
+set undofile
+"set a directory to store the undo history
+exec 'set undodir='.$VIMHOME.'/undo'
+"store swp files in vim dir
+exec 'set dir='.$VIMHOME.'/swp'
 
-nmap ]b :bnext<CR>
-nmap [b :bprevious<CR>
+function! SaveSession()
+    let l:path = g:initial_dir.'/.vimsession'
+    if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
+        execute 'mksession! '.l:path
+    endif
+endfunction
 
-"close current window
-nmap <F10> :q<cr>
-"kill current buffer
-nmap <F11> :bd %<cr>
+" Ctrl-S - Session/Source
+nnoremap <silent><c-s>s :call SaveSession()<cr>
+nnoremap <silent><c-s>r :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
-"kill current buffer and open previous
+nnoremap <silent><c-s>e :e ~/.config/nvim/init.vim<cr>
+nnoremap <silent><c-s>r :source ~/.config/nvim/init.vim<cr>
+nnoremap <c-s>t :source %<cr>
+"}}}
+
+"buffers/windows/tabs {{{
+"kill current buffer and goto previous
 function! WipeBufferGoPrev()
     let buf_num = bufnr('%')
     exe 'bprevious'
@@ -205,49 +200,30 @@ function! CloseOtherBuffers()
   silent exec 'norm! o'
 endfun
 
-nmap <silent><leader>bd <F11>
-nmap <silent><leader>bw :call WipeBufferGoPrev()<cr>
-nmap <silent><leader>bb :call CloseBackBuffers()<cr>
-nmap <silent><leader>bo :call CloseOtherBuffers()<cr>
+"Ctrl-B - Buffers
+nnoremap <silent><c-b>n :bnext<cr>
+nnoremap <silent><c-b>p :bprevious<cr>
+nnoremap <silent><c-b>d :bd %<cr>
+nnoremap <silent><c-b>w :call WipeBufferGoPrev()<cr>
+nnoremap <silent><c-b>b :call CloseBackBuffers()<cr>
+nnoremap <silent><c-b>o :call CloseOtherBuffers()<cr>
 
-"do not store vimrc options in session
-set ssop-=options
+"save current buffer with F2
+nnoremap <F2> :w<cr>
+inoremap <F2> <Esc>:w<cr>
+vnoremap <F2> <Esc>:w<cr>
+"close current window
+nnoremap <F10> :q<cr>
+"}}}
 
-"store marks
-set viminfo='1000,f1
-
-function! SaveSession()
-    let l:path = g:initial_dir.'/.vimsession'
-    if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
-        execute 'mksession! '.l:path
-    endif
-endfunction
-
-" SPC - s(ession)
-nmap <silent><leader>ss :call SaveSession()<cr>
-nmap <silent><leader>sr :exec 'source '.g:initial_dir.'/.vimsession'<cr>
-
-"store undo history
-set undofile
-"set a directory to store the undo history
-exec 'set undodir='.$VIMHOME.'/undo'
-"store swp files in vim dir
-exec 'set dir='.$VIMHOME.'/swp'
-
-"----------------------------------------------------------------
-"                   search/replace/subtitude
-"----------------------------------------------------------------
+"search/replace/subtitude "{{{
 set smartcase
 set ignorecase
 set incsearch
 
 "no hightlight
-nmap <F3> :noh<CR>
-imap <F3> <esc>:noh<CR>
-
-"go to next/prev of vimgrep result
-nmap [q :cprev<cr>
-nmap ]q :cnext<cr>
+nnoremap <F3> :noh<cr>
+inoremap <F3> <esc>:noh<cr>
 
 if executable('ag')
     set grepprg=ag\ --nogroup\ --column\ --nocolor
@@ -261,47 +237,11 @@ let g:far#confirm_fardo = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
+"}}}
 
-"----------------------------------------------------------------
-"                       windows/tabs
-"----------------------------------------------------------------
-"set splitright
-"set splitbelow
-
-"jump windows by numbers
-nmap <leader><tab> <c-w>p
-nmap <leader>1 1<c-w><c-w>
-nmap <leader>2 2<c-w><c-w>
-nmap <leader>3 3<c-w><c-w>
-nmap <leader>4 4<c-w><c-w>
-nmap <leader>5 5<c-w><c-w>
-
-"kill windows by shift+numbers
-nmap <leader>! 1<c-w>c
-nmap <leader>@ 2<c-w>c
-nmap <leader># 3<c-w>c
-nmap <leader>$ 4<c-w>c
-nmap <leader>% 5<c-w>c
-
-"jump windows by ctrl+direction
-nmap <c-j> <C-w><Down>
-nmap <c-h> <C-w><Left>
-nmap <c-l> <C-w><Right>
-nmap <c-k> <C-w><Up>
-
-"jump tabs by alt+direction
-nmap ]t :tabprev<CR>
-nmap [t :tabnext<CR>
-
-"----------------------------------------------------------------
-"                       indent/tab/spaces
-"----------------------------------------------------------------
+"indent/tab/spaces "{{{
 "move curson over empty space
 set virtualedit=all
-
-"indent everything
-noremap <Space>= miggvG=`i
-
 "indent when moving to the next line while writing code
 set autoindent
 set smartindent
@@ -317,104 +257,88 @@ set expandtab
 "set colorcolumn=80
 
 "indent text in visual mode with tab
-vmap <s-tab> <gv
-vmap <tab> >gv
+vnoremap <s-tab> <gv
+vnoremap <tab> >gv
+"}}}
 
-"----------------------------------------------------------------
-"                       lines/numbers/wrap
-"----------------------------------------------------------------
+"lines/numbers/wrap {{{
+set number
+"releative line numbers
+set rnu
+"show a visual line under the cursor's current line
+set cursorline
+"no wrapping by default
+set nowrap
+"keep 5 lines below and above cursor
+set scrolloff=5
+"horizontal scroll by 1 col
+set sidescroll=1
+"manual folding
+set foldmethod=manual
+
+"return to last edit position
+autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
+
 "go between wrapped lines
 map j gj
 map k gk
 map <Down> gj
 map <Up> gk
 
-set number
-"releative line numbers
-set rnu
-
-nmap <leader>ll :set nornu<cr>:set number<CR>
-nmap <leader>lr :set number<cr>:set rnu<cr>
-nmap <leader>ln :set nonumber<cr>:set nornu<cr>
-
-"show a visual line under the cursor's current line
-set cursorline
-
-"no wrapping by default
-set nowrap
-
-nmap <leader>lw :set wrap!<cr>
-
-"keep 5 lines below and above cursor
-set scrolloff=5
-"horizontal scroll by 1 col
-set sidescroll=1
-
-"show bracket pair
-"set showmatch
-
-"manual folding
-set foldmethod=manual
+"Ctrl-L - Lines
+nnoremap <c-l>r :set number<cr>:set rnu<cr>
+nnoremap <c-l>n :set nornu<cr>:set number<cr>
+nnoremap <c-l>h :set nonumber<cr>:set nornu<cr>
+nnoremap <c-l>w :set wrap!<cr>
 
 "fold file header (e.g. license javadoc)
-nmap zh mmggzf%`m
+nnoremap zh mmggzf%`m
 "fold current statement
-nmap ze zf%
+nnoremap ze zf%
+"}}}
 
-"Return to last edit position when opening files
-autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-"----------------------------------------------------------------
-"                       lint/correcting
-"----------------------------------------------------------------
+"lint/correcting {{{
 "trailing
-nmap <leader>ct :%s/\s\+$//e<cr>:nohl<cr>
+nnoremap <c-c>t :%s/\s\+$//e<cr>:nohl<cr>
 "mixed indent
-nmap <leader>ci :retab<cr>
-
+nnoremap <c-c>i :retab<cr>
 "goto next, prev. open error
-nmap <leader>co :lopen<cr>
-nmap ]l :lnext<cr>
-nmap [l :lprevious<cr>
+nnoremap <c-c>q :lopen<cr>
+nnoremap <c-c>n :lnext<cr>
+nnoremap <c-c>p :lprevious<cr>
+"}}}
 
-"----------------------------------------------------------------
-"                       files/types
-"----------------------------------------------------------------
+"files/types {{{
 set wildignore+=*/bin/*
 set wildignore+=*/.git/*
 set wildignore+=*/.idea/*
 set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
+"}}}
 
-" SPC d(ot files)
-nmap <leader>de :e ~/.config/nvim/init.vim<cr>
-nmap <leader>dr :source ~/.config/nvim/init.vim<cr>
-
-"----------------------------------------------------------------
-"                           vcs/git
-"----------------------------------------------------------------
+"git "{{{
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-nmap <leader>vv :Gblame<cr>
-nmap <leader>vb :Gbrowse<cr>
-nmap <leader>vs :Gstatus<cr>
-nmap <leader>vc :Gcommit<cr>
-nmap <leader>vd :Gvdiff<cr>
-nmap <leader>vP :Gpush<cr>
-nmap <leader>vL :Gpull<cr>
+nnoremap <c-g>b :Gblame<cr>
+nnoremap <c-g>B :Gbrowse<cr>
+nnoremap <c-g>s :Gstatus<cr>
+nnoremap <c-g>c :Gcommit<cr>
+nnoremap <c-g>d :Gvdiff<cr>
+nnoremap <c-g>P :Gpush<cr>
+nnoremap <c-g>L :Gpull<cr>
+nnoremap <c-g>R :!git checkout <c-r>%<cr><cr>
 
-nmap <leader>vp :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
-nmap [h <Plug>GitGutterPrevHunk
-nmap ]h <Plug>GitGutterNextHunk
-nmap <leader>vr :GitGutterUndoHunk<cr>
-nmap <leader>vS :GitGutterStageHunk<cr>
-nmap <leader>vl :GitGutterLineHighlightsToggle<cr>
-nmap <leader>vR :!git checkout <c-r>%<cr><cr>
+nnoremap <c-h>v :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
+nnoremap <c-h>p GitGutterPrevHunk
+nnoremap <c-h>n GitGutterNextHunk
+nnoremap <c-h>r :GitGutterUndoHunk<cr>
+nnoremap <c-h>S :GitGutterStageHunk<cr>
+nnoremap <c-h>l :GitGutterLineHighlightsToggle<cr>
 
 let g:gitgutter_sign_added = '↪'
 let g:gitgutter_sign_removed = '↩'
@@ -428,14 +352,13 @@ let g:gitgutter_sign_modified_removed = '↫'
 "     highlight GitGutterChangeDelete ctermfg=244 ctermbg=237
 " endfunction
 " autocmd VimEnter * call s:ConfigGitGutter()
+"}}}
 
-"----------------------------------------------------------------
-"                       completion/deoplete
-"----------------------------------------------------------------
+"completion/deoplete {{{
 "ctrl+space - omni complition
-imap <NUL> <C-Space>
-imap <C-@> <C-Space>
-imap <C-Space> <c-x><c-o>
+inoremap <NUL> <C-Space>
+inoremap <C-@> <C-Space>
+inoremap <C-Space> <c-x><c-o>
 
 " FIXME ???
 set complete=.,w,b,u,k
@@ -452,10 +375,9 @@ let g:deoplete#enable_smart_case = 1
 let g:deoplete#auto_completion_start_length = 1
 let g:deoplete#auto_complete_start_length=1
 let g:deoplete#max_list=50
+"}}}
 
-"----------------------------------------------------------------
-"                             Unite
-"----------------------------------------------------------------
+"unite {{{
 let g:unite_winheight = 13
 let g:unite_source_history_yank_enable = 1
 let g:unite_source_rec_max_cache_files = 1000
@@ -518,78 +440,77 @@ unlet s:filters
 call unite#custom#source('grep', 'converters', 'custom_grep_converter')
 
 function! <SID>UniteSetup()
-    nmap <buffer> <Esc> <plug>(unite_exit)
-    imap <buffer> <Esc> <plug>(unite_exit)
+    nnoremap <buffer> <Esc> <plug>(unite_exit)
+    inoremap <buffer> <Esc> <plug>(unite_exit)
 
     nnoremap <silent><buffer><expr> <C-s>     unite#do_action('split')
     nnoremap <silent><buffer><expr> <C-v>     unite#do_action('vsplit')
 endfunction
 autocmd FileType unite call <SID>UniteSetup()
 
-nmap <leader>u :Unite -buffer-name=files
+nnoremap <leader>u :Unite -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
-            \ buffer file_rec/neovim<CR>
-nmap <leader>U :UniteWithBufferDir -buffer-name=files
+            \ buffer file_rec/neovim<cr>
+nnoremap <leader>U :UniteWithBufferDir -buffer-name=files
             \ -buffer-name=files
             \ -start-insert
             \ -no-split
-            \ buffer file_rec/neovim file/new directory/new<CR>
-nmap <leader>g :Unite -buffer-name=grep
+            \ buffer file_rec/neovim file/new directory/new<cr>
+nnoremap <leader>g :Unite -buffer-name=grep
             \ -no-quit
             \ grep:<cr>
-nmap <leader>G :UniteWithCursorWord -buffer-name=grep
+nnoremap <leader>G :UniteWithCursorWord -buffer-name=grep
             \ -no-quit
             \ grep:.<cr>
-nmap <leader>o :Unite -buffer-name=tags
+nnoremap <leader>o :Unite -buffer-name=tags
             \ -start-insert
             \ -no-split
             \ tag<cr>
-nmap <leader>O :Unite -buffer-name=outline
+nnoremap <leader>O :Unite -buffer-name=outline
             \ -start-insert
             \ -no-split
             \ outline<cr>
-nmap <leader><leader> :Unite -buffer-name=buffers
+nnoremap <leader><leader> :Unite -buffer-name=buffers
             \ -start-insert
             \ -no-split
             \ buffer<cr>
-nmap <leader>t :Unite -buffer-name=todos
+nnoremap <leader>t :Unite -buffer-name=todos
             \ -no-quit
             \ vimgrep:**:\\\TODO\:\\\|FIXME\:<cr>
+"}}}
 
-"----------------------------------------------------------------
-"                 vimfiler
-"----------------------------------------------------------------
+"vimfiler "{{{
 "<C-l> <Plug>(vimfiler_redraw_screen)
-"*	   <Plug>(vimfiler_toggle_mark_all_lines)
-"U	   <Plug>(vimfiler_clear_mark_all_lines)
-"cc	   <Plug>(vimfiler_copy_file)
-"mm	   <Plug>(vimfiler_move_file)
-"dd	   <Plug>(vimfiler_delete_file)
-"Cc	   <Plug>(vimfiler_clipboard_copy_file)
-"Cm	   <Plug>(vimfiler_clipboard_move_file)
-"Cp	   <Plug>(vimfiler_clipboard_paste)
-"r	   <Plug>(vimfiler_rename_file)
-"K	   <Plug>(vimfiler_make_directory)
-"N	   <Plug>(vimfiler_new_file)
-"x	   <Plug>(vimfiler_execute_system_associated)
-"X	   <Plug>(vimfiler_execute_vimfiler_associated)
-"~	   <Plug>(vimfiler_switch_to_home_directory)
-"\	   <Plug>(vimfiler_switch_to_root_directory)
-"&	   <Plug>(vimfiler_switch_to_project_directory)
-".	   <Plug>(vimfiler_toggle_visible_ignore_files)
-"g?	   <Plug>(vimfiler_help)
-"v	   <Plug>(vimfiler_preview_file)
-"yy	   <Plug>(vimfiler_yank_full_path)
-"M	   <Plug>(vimfiler_set_current_mask)
-"S	   <Plug>(vimfiler_select_sort_type)
-"gs	   <Plug>(vimfiler_toggle_safe_mode)
-"a	   <Plug>(vimfiler_choose_action)
-"Y	   <Plug>(vimfiler_pushd)
-"P	   <Plug>(vimfiler_popd)
-"T	   <Plug>(vimfiler_expand_tree_recursive)
-"I	   <Plug>(vimfiler_cd_input_directory)
+"*     <Plug>(vimfiler_toggle_mark_all_lines)
+"U     <Plug>(vimfiler_clear_mark_all_lines)
+"cc    <Plug>(vimfiler_copy_file)
+"mm    <Plug>(vimfiler_move_file)
+"dd    <Plug>(vimfiler_delete_file)
+"Cc    <Plug>(vimfiler_clipboard_copy_file)
+"Cm    <Plug>(vimfiler_clipboard_move_file)
+"Cp    <Plug>(vimfiler_clipboard_paste)
+"r     <Plug>(vimfiler_rename_file)
+"K     <Plug>(vimfiler_make_directory)
+"N     <Plug>(vimfiler_new_file)
+"x     <Plug>(vimfiler_execute_system_associated)
+"X     <Plug>(vimfiler_execute_vimfiler_associated)
+"~     <Plug>(vimfiler_switch_to_home_directory)
+"\     <Plug>(vimfiler_switch_to_root_directory)
+"&     <Plug>(vimfiler_switch_to_project_directory)
+".     <Plug>(vimfiler_toggle_visible_ignore_files)
+"g?    <Plug>(vimfiler_help)
+"v     <Plug>(vimfiler_preview_file)
+"yy    <Plug>(vimfiler_yank_full_path)
+"M     <Plug>(vimfiler_set_current_mask)
+"S     <Plug>(vimfiler_select_sort_type)
+"gs    <Plug>(vimfiler_toggle_safe_mode)
+"a     <Plug>(vimfiler_choose_action)
+"Y     <Plug>(vimfiler_pushd)
+"P     <Plug>(vimfiler_popd)
+"T     <Plug>(vimfiler_expand_tree_recursive)
+"I     <Plug>(vimfiler_cd_input_directory)
 
 let g:vimfiler_safe_mode_by_default = 0
 let g:vimfiler_tree_opened_icon = '▾'
@@ -610,38 +531,36 @@ augroup END
 function! s:vimfiler_settings()
     map <silent><buffer> <Space> <NOP>
     map <silent><buffer> <c-j> <NOP>
-    nmap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
-    nmap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
-    nmap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
+    nnoremap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
+    nnoremap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
+    nnoremap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
 endfunction
 
-nmap <leader>f :VimFilerCurrentDir -status<cr>
-nmap <leader>F :VimFilerBufferDir -status <cr>
+nnoremap <leader>f :VimFilerCurrentDir -status<cr>
+nnoremap <leader>F :VimFilerBufferDir -status <cr>
+"}}}
 
-"----------------------------------------------------------------
-"                          ultisnips
-"----------------------------------------------------------------
-let g:UltiSnipsExpandTrigger="<Nop>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsListSnippets="<F6>"
+"ultisnips {{{
+" let g:UltiSnipsExpandTrigger="<Nop>"
+" let g:UltiSnipsJumpForwardTrigger="<tab>"
+" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" let g:UltiSnipsListSnippets="<F6>"
 
-let g:ulti_expand_or_jump_res = 0
+" let g:ulti_expand_or_jump_res = 0
 
-"work nicely with deoplete. expand on cr
-function! <SID>ExpandSnippetOrReturn()
-    let snippet = UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res > 0
-        return snippet
-    else
-        return "\<C-Y>"
-    endif
-endfunction
-imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+" "work nicely with deoplete. expand on cr
+" function! <SID>ExpandSnippetOrReturn()
+"     let snippet = UltiSnips#ExpandSnippetOrJump()
+"     if g:ulti_expand_or_jump_res > 0
+"         return snippet
+"     else
+"         return "\<C-Y>"
+"     endif
+" endfunction
+" inoremap <expr> <cr> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<cr>" : "\<cr>"
+"}}}
 
-"----------------------------------------------------------------
-"                           theme
-"----------------------------------------------------------------
+"theme {{{
 set background=dark
 colorscheme gruvbox
 
@@ -670,7 +589,7 @@ function! s:SetNormalCursorLine()
 endfunction
 
 function! s:SetInsertCursorLine()
-    hi cursorline cterm=none ctermbg=52 ctermfg=none
+    hi cursorline cterm=none ctermbg=235 ctermfg=none
 endfunction
 
 autocmd InsertEnter * call s:SetInsertCursorLine()
@@ -697,7 +616,7 @@ let g:EasyMotion_do_mapping = 0
 let g:EasyMotion_keys = 'asdfghjljknmvcrtuiyopwqb'
 let g:EasyMotion_smartcase = 0
 
-nmap s <Plug>(easymotion-overwin-f2)
+nmap s <Plug>(easymotion-overwin-f)
 
 function! SyntaxUnderCursor()
   if !exists("*synstack")
@@ -705,10 +624,9 @@ function! SyntaxUnderCursor()
   endif
   echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
 endfunc
+"}}}
 
-"----------------------------------------------------------------
-"                           airline
-"----------------------------------------------------------------
+"airline {{{
 set laststatus=2
 let g:airline_theme='oceanicnext'
 let g:airline_powerline_fonts = 1
@@ -726,31 +644,27 @@ function! s:ConfigAirlineSymbols()
     let g:airline_symbols.linenr = ''
 endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
+"}}}
 
-"----------------------------------------------------------------
-"                           undo tree
-"----------------------------------------------------------------
-nmap <F4> :UndotreeToggle<cr> :UndotreeFocus<cr>
-imap <F4> <esc><f4>
+"undo tree {{{
+nnoremap <F4> :UndotreeToggle<cr> :UndotreeFocus<cr>
+inoremap <F4> <esc><f4>
+"}}}
 
-"----------------------------------------------------------------
-"                           neomake
-"----------------------------------------------------------------
+"neomake "{{{
 highlight neomakeErrorSign ctermfg=196 ctermbg=237
 highlight neomakeWarnSign ctermfg=166 ctermbg=237
 
 let g:neomake_error_sign = {'text': '⚑', 'texthl': 'neomakeErrorSign'}
 let g:neomake_warning_sign = {'text': '⚑', 'texthl': 'neomakeWarnSign'}
+"}}}
 
-"----------------------------------------------------------------
-"                           markdown
-"----------------------------------------------------------------
+"markdown "{{{
 autocmd BufRead *.md set wrap lbr
 autocmd BufEnter *.md set syntax=markdown
+"}}}
 
-"----------------------------------------------------------------
-"                        html/templates
-"----------------------------------------------------------------
+"html/templates "{{{
 let g:html_inited = 0
 function! SetupHtmlSettings()
     set syntax=html
@@ -768,10 +682,9 @@ function! SetupHtmlSettings()
     highlight javaScript ctermfg=250
 endfunction
 autocmd BufEnter *.html call SetupHtmlSettings()
+"}}}
 
-"----------------------------------------------------------------
-"                             python
-"----------------------------------------------------------------
+"python "{{{
 set wildignore+=*.pyc
 set wildignore+=*/__pycache__/**
 set wildignore+=*/__pycache__
@@ -851,4 +764,6 @@ endfunction
 autocmd BufReadPost *.py call InitPythonSessing()
 
 autocmd BufWinEnter *.py setlocal omnifunc=jedi#completions
+"}}}
 
+" vim: set et fdm=marker sts=4 sw=4:
