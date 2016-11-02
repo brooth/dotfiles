@@ -178,26 +178,57 @@ function! WipeBufferGoPrev()
 endfunction
 
 "kill background buffers
-function! CloseBackBuffers()
+function! DeleteBackBuffers()
   let n = bufnr('$')
   while n > 0
-    if bufloaded(n) && bufwinnr(n) < 0
-      exe 'bd! ' . n
+    if bufloaded(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
+      exe 'bd ' . n
     endif
     let n -= 1
   endwhile
 endfun
 
-function! CloseOtherBuffers()
+function! DeleteOtherBuffers()
   let n = bufnr('$')
   let cb = bufnr('%')
   while n > 0
-    if n != cb && bufloaded(n)
-      exe 'bd! ' . n
+    if n != cb && bufloaded(n) && !getbufvar(n, '&mod')
+      exe 'bd ' . n
     endif
     let n -= 1
   endwhile
   silent exec 'norm! o'
+endfun
+
+function! DeleteUnmodifiedBuffers()
+  let n = bufnr('$')
+  while n > 0
+    if bufloaded(n) && !getbufvar(n, '&mod')
+      exe 'bd ' . n
+    endif
+    let n -= 1
+  endwhile
+endfun
+
+function! DeleteRightBuffers()
+  let n = bufnr('%') + 1
+  let l = bufnr('$')
+  while n <= l
+    if bufloaded(n) && !getbufvar(n, '&mod')
+      exe 'bd ' . n
+    endif
+    let n += 1
+  endwhile
+endfun
+
+function! DeleteLeftBuffers()
+  let n = bufnr('%') - 1
+  while n > 0
+    if bufloaded(n) && !getbufvar(n, '&mod')
+      exe 'bd ' . n
+    endif
+    let n -= 1
+  endwhile
 endfun
 
 "Ctrl-B - Buffers
@@ -205,8 +236,11 @@ nnoremap <silent><c-b>n :bnext<cr>
 nnoremap <silent><c-b>p :bprevious<cr>
 nnoremap <silent><c-b>d :bd %<cr>
 nnoremap <silent><c-b>w :call WipeBufferGoPrev()<cr>
-nnoremap <silent><c-b>b :call CloseBackBuffers()<cr>
-nnoremap <silent><c-b>o :call CloseOtherBuffers()<cr>
+nnoremap <silent><c-b>b :call DeleteBackBuffers()<cr>
+nnoremap <silent><c-b>o :call DeleteOtherBuffers()<cr>
+nnoremap <silent><c-b>u :call DeleteUnmodifiedBuffers()<cr>
+nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
+nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
 
 "save current buffer with F2
 nnoremap <F2> :w<cr>
