@@ -182,7 +182,7 @@ function! CloseBackBuffers()
   let n = bufnr('$')
   while n > 0
     if bufloaded(n) && bufwinnr(n) < 0
-      exe 'bd ' . n
+      exe 'bd! ' . n
     endif
     let n -= 1
   endwhile
@@ -193,7 +193,7 @@ function! CloseOtherBuffers()
   let cb = bufnr('%')
   while n > 0
     if n != cb && bufloaded(n)
-      exe 'bd ' . n
+      exe 'bd! ' . n
     endif
     let n -= 1
   endwhile

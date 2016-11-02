@@ -6,8 +6,8 @@ from deoplete.util import parse_buffer_pattern
 
 logger = getLogger('above')
 
-class Source(Base):
 
+class Source(Base):
     def __init__(self, vim):
         super().__init__(vim)
         self.name = 'above'
@@ -19,7 +19,7 @@ class Source(Base):
 
         line = context['position'][1]
         candidates = parse_buffer_pattern(
-                        self.vim.call('getline', max([1, line-20]), line),
+                        reversed(self.vim.call('getline', max([1, line - 20]), line)),
                         context['keyword_patterns'],
                         context['complete_str'])
         return [{'word': x} for x in candidates]
