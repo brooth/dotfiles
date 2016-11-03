@@ -162,7 +162,7 @@ endfunction
 
 " Ctrl-S - Session/Source
 nnoremap <silent><c-s>s :call SaveSession()<cr>
-nnoremap <silent><c-s>r :exec 'source '.g:initial_dir.'/.vimsession'<cr>
+nnoremap <silent><c-s>l :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
 nnoremap <silent><c-s>e :e ~/.config/nvim/init.vim<cr>
 nnoremap <silent><c-s>r :source ~/.config/nvim/init.vim<cr>
@@ -241,6 +241,7 @@ nnoremap <silent><c-b>o :call DeleteOtherBuffers()<cr>
 nnoremap <silent><c-b>u :call DeleteUnmodifiedBuffers()<cr>
 nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
 nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
+nnoremap <silent><c-b>r :e!<cr>
 
 "save current buffer with F2
 nnoremap <F2> :w<cr>
@@ -623,11 +624,11 @@ colorscheme gruvbox
 
 "hl line in insert mode
 function! s:SetNormalCursorLine()
-    hi cursorline cterm=none ctermbg=237 ctermfg=none
+    hi cursorline cterm=none ctermbg=236 ctermfg=none
 endfunction
 
 function! s:SetInsertCursorLine()
-    hi cursorline cterm=none ctermbg=235 ctermfg=none
+    hi cursorline cterm=none ctermbg=238 ctermfg=none
 endfunction
 
 autocmd InsertEnter * call s:SetInsertCursorLine()
