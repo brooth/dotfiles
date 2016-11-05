@@ -61,6 +61,9 @@ Plug 'mbbill/undotree'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
+"completion
+Plug 'Shougo/deoplete.nvim'
+
 "dev
 " Plug 'SirVer/ultisnips'
 Plug 'neomake/neomake', {'for': 'python'}
@@ -68,7 +71,7 @@ Plug 'neomake/neomake', {'for': 'python'}
 "python
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
-" Plug 'zchee/deoplete-jedi', {'for': 'python'}
+Plug 'zchee/deoplete-jedi', {'for': 'python'}
 Plug 'hdima/python-syntax', {'for': 'python'}
 
 "unite
@@ -77,9 +80,6 @@ Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'Shougo/unite-outline'
 Plug 'Shougo/vimfiler.vim'
 Plug 'tsukkee/unite-tag'
-
-"completion
-Plug 'Shougo/deoplete.nvim'
 
 call plug#end()
 "}}}
@@ -241,7 +241,7 @@ nnoremap <silent><c-b>o :call DeleteOtherBuffers()<cr>
 nnoremap <silent><c-b>u :call DeleteUnmodifiedBuffers()<cr>
 nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
 nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
-nnoremap <silent><c-b>r :e!<cr>
+nnoremap <silent><c-b>e :e!<cr>
 
 "save current buffer with F2
 nnoremap <F2> :w<cr>
@@ -394,9 +394,6 @@ inoremap <NUL> <C-Space>
 inoremap <C-@> <C-Space>
 inoremap <C-Space> <c-x><c-o>
 
-" FIXME ???
-set complete=.,w,b,u,k
-
 "disable preview popup buffer
 set completeopt-=preview
 
@@ -409,11 +406,12 @@ let g:deoplete#enable_smart_case = 1
 let g:deoplete#enable_camal_case = 1
 let g:deoplete#auto_completion_start_length = 1
 let g:deoplete#auto_complete_start_length = 1
-let g:deoplete#max_list = 50
 let g:deoplete#auto_complete_delay = 50
+let g:deoplete#max_list = 30
+let g:deoplete#max_menu_width = 30
 
 let g:deoplete#sources = {}
-let g:deoplete#sources._ = ['above', 'buffer', 'omni']
+let g:deoplete#sources._ = ['above', 'changes', 'buffer']
 "}}}
 
 "unite {{{
@@ -729,20 +727,20 @@ set wildignore+=*/__pycache__/**
 set wildignore+=*/__pycache__
 set wildignore+=*/.env/^[^g]*
 
-let g:jedi#goto_command = "<leader>pg"
-let g:jedi#goto_assignments_command = "<leader>pa"
-let g:jedi#goto_definitions_command = "<leader>pd"
-let g:jedi#documentation_command = "<leader>pk"
-let g:jedi#usages_command = "<leader>pu"
-let g:jedi#rename_command = "<leader>pr"
-let g:jedi#completions_command = "<C-W>"
-
 let g:jedi#auto_initialization = 1
 let g:jedi#show_call_signatures = 1
 let g:jedi#popup_select_first = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#completions_enabled = 0
+let g:jedi#smart_auto_mappings = 0
 let g:jedi#popup_on_dot = 0
+
+let g:jedi#goto_command = "<c-p>g"
+let g:jedi#documentation_command = "<c-p>d"
+let g:jedi#usages_command = "<c-p>u"
+let g:jedi#rename_command = "<c-p>r"
+
+let g:deoplete#sources.python = ['above', 'changes', 'jedi', 'tags', 'buffer']
 
 let g:python_inited = 0
 function! InitPythonSessing()
@@ -755,6 +753,7 @@ function! InitPythonSessing()
         return
     endif
     let g:python_inited = 1
+
     let g:neomake_python_enabled_makers = ['flake8']
     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
     autocmd! BufRead *.py Neomake
@@ -767,10 +766,10 @@ function! InitPythonSessing()
     highlight pylintSuppress ctermfg=8
 
     function! s:HighlightPython()
-        Python3Syntax
         syn keyword pythonSelf self
         syn match pythonSelf "[\w_]="
         syn region pylintSuppress start='# pylint' end='$'
+        syn keyword pythonFunction str len print set dict list
     endfunction
 
     autocmd! BufEnter *.py call s:HighlightPython()
@@ -801,7 +800,6 @@ function! InitPythonSessing()
 
 endfunction
 autocmd BufReadPost *.py call InitPythonSessing()
-
 autocmd BufWinEnter *.py setlocal omnifunc=jedi#completions
 "}}}
 

@@ -12,12 +12,12 @@ class Source(Base):
         super().__init__(vim)
         self.name = 'above'
         self.mark = '[^]'
-        self.rank = 999
+        self.rank = 900
 
     def gather_candidates(self, context):
         line = context['position'][1]
         candidates = parse_buffer_pattern(
-                        reversed(self.vim.call('getline', max([1, line - 20]), line)),
+                        reversed(self.vim.call('getline', max([1, line - 50]), line)),
                         context['keyword_patterns'],
                         context['complete_str'])
         return [{'word': x} for x in candidates]
