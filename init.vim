@@ -56,6 +56,7 @@ Plug '~/Projects/far.vim'
 
 "files
 Plug 'mbbill/undotree'
+Plug 'ctrlpvim/ctrlp.vim'
 
 "git
 Plug 'tpope/vim-fugitive'
@@ -73,13 +74,6 @@ Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 Plug 'zchee/deoplete-jedi', {'for': 'python'}
 Plug 'hdima/python-syntax', {'for': 'python'}
-
-"unite
-Plug 'Shougo/unite.vim'
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
-Plug 'Shougo/unite-outline'
-Plug 'Shougo/vimfiler.vim'
-Plug 'tsukkee/unite-tag'
 
 call plug#end()
 "}}}
@@ -353,6 +347,12 @@ set wildignore+=*/.idea/*
 set wildignore+=*/build/^[^g]*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
+
+"Netrw
+let g:netrw_banner = 0
+let g:netrw_liststyle = 1
+
+nnoremap <silent> <c-n>e :Explore<cr>
 "}}}
 
 "git "{{{
@@ -414,167 +414,36 @@ let g:deoplete#sources = {}
 let g:deoplete#sources._ = ['above', 'changes', 'buffer']
 "}}}
 
-"unite {{{
-let g:unite_winheight = 13
-let g:unite_source_history_yank_enable = 1
-let g:unite_source_rec_max_cache_files = 1000
-let g:unite_prompt = '➥ '
+"ctrlp {{{
+let g:ctrlp_working_path_mode = ''
+let g:ctrlp_match_window = 'bottom,min:1,max:15,results:15'
+let g:ctrlp_mruf_relative = 1
+let g:ctrlp_mruf_max = 10
 
-if executable('ag')
-    let g:unite_source_grep_command = 'ag'
-    let g:unite_source_grep_default_opts = '--nocolor --nogroup --smart-case'
-    let g:unite_source_grep_recursive_opt = ''
+"TODO wildignore
+let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden'.
+      \ ' --ignore .git'.
+      \ ' --ignore .svn'.
+      \ ' --ignore __pycache__'.
+      \ ' --ignore "**/*.pyc"'.
+      \ ' -g ""'
 
-    let g:unite_source_rec_async_command = ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
-    let g:ackprg = 'ag --nogroup --column'
-endif
+let g:ctrlp_map = ''
+let g:ctrlp_prompt_mappings = {
+            \ 'PrtInsert()':          ['<c-r>'],
+            \ 'ToggleRegex()':        ['<c-q>'],
+            \ }
 
-call unite#filters#matcher_default#use(['converter_tail', 'matcher_fuzzy'])
-call unite#filters#sorter_default#use(['sorter_rank'])
-" call unite#filters#matcher_default#use(['matcher_fuzzy', 'converter_tail'])
-" call unite#filters#sorter_default#use(['sorter_selecta'])
-
-"TODO: from wildignore
-" call unite#custom#source('file_rec/neovim', 'ignore_pattern', join([
-"             \ '\..*/',
-"             \ 'node_modules/',
-"             \ 'build/[^gen]',
-"             \ ], '\|'))
-
-let s:filters = {"name" : "custom_buffer_converter"}
-
-function! s:filters.filter(candidates, context)
-    for candidate in a:candidates
-        "echo candidate
-        let word = get(candidate, 'word')
-        let path = get(candidate, 'action__path', '')
-        let word = word.repeat(' ', (30 - len(word)))
-        if len(path) > 50
-            let path = path[0:10].'..'.path[len(path)-38:]
-        endif
-        let candidate.abbr = printf("%s%s", word, path)
-    endfor
-    return a:candidates
-endfunction
-
-call unite#define_filter(s:filters)
-unlet s:filters
-call unite#custom#source('buffer,file_rec/neovim', 'converters', 'custom_buffer_converter')
-
-let s:filters = {"name" : "custom_grep_converter"}
-
-function! s:filters.filter(candidates, context)
-    for candidate in a:candidates
-        let filename = fnamemodify(get(candidate, 'action__path', candidate.word), ':t')
-        let trimmed = substitute(get(candidate, 'source__info')[2], '^\s\+\|\s\+$', '', 'g')
-        let candidate.abbr = printf("%s   %s", filename, trimmed)
-    endfor
-    return a:candidates
-endfunction
-
-call unite#define_filter(s:filters)
-unlet s:filters
-call unite#custom#source('grep', 'converters', 'custom_grep_converter')
-
-function! <SID>UniteSetup()
-    nnoremap <buffer> <Esc> <plug>(unite_exit)
-    inoremap <buffer> <Esc> <plug>(unite_exit)
-
-    nnoremap <silent><buffer><expr> <C-s>     unite#do_action('split')
-    nnoremap <silent><buffer><expr> <C-v>     unite#do_action('vsplit')
-endfunction
-autocmd FileType unite call <SID>UniteSetup()
-
-nnoremap <leader>u :Unite -buffer-name=files
-            \ -buffer-name=files
-            \ -start-insert
-            \ -no-split
-            \ buffer file_rec/neovim<cr>
-nnoremap <leader>U :UniteWithBufferDir -buffer-name=files
-            \ -buffer-name=files
-            \ -start-insert
-            \ -no-split
-            \ buffer file_rec/neovim file/new directory/new<cr>
-nnoremap <leader>g :Unite -buffer-name=grep
-            \ -no-quit
-            \ grep:<cr>
-nnoremap <leader>G :UniteWithCursorWord -buffer-name=grep
-            \ -no-quit
-            \ grep:.<cr>
-nnoremap <leader>o :Unite -buffer-name=tags
-            \ -start-insert
-            \ -no-split
-            \ tag<cr>
-nnoremap <leader>O :Unite -buffer-name=outline
-            \ -start-insert
-            \ -no-split
-            \ outline<cr>
-nnoremap <leader><leader> :Unite -buffer-name=buffers
-            \ -start-insert
-            \ -no-split
-            \ buffer<cr>
-nnoremap <leader>t :Unite -buffer-name=todos
-            \ -no-quit
-            \ vimgrep:**:\\\TODO\:\\\|FIXME\:<cr>
-"}}}
-
-"vimfiler "{{{
-"<C-l> <Plug>(vimfiler_redraw_screen)
-"*     <Plug>(vimfiler_toggle_mark_all_lines)
-"U     <Plug>(vimfiler_clear_mark_all_lines)
-"cc    <Plug>(vimfiler_copy_file)
-"mm    <Plug>(vimfiler_move_file)
-"dd    <Plug>(vimfiler_delete_file)
-"Cc    <Plug>(vimfiler_clipboard_copy_file)
-"Cm    <Plug>(vimfiler_clipboard_move_file)
-"Cp    <Plug>(vimfiler_clipboard_paste)
-"r     <Plug>(vimfiler_rename_file)
-"K     <Plug>(vimfiler_make_directory)
-"N     <Plug>(vimfiler_new_file)
-"x     <Plug>(vimfiler_execute_system_associated)
-"X     <Plug>(vimfiler_execute_vimfiler_associated)
-"~     <Plug>(vimfiler_switch_to_home_directory)
-"\     <Plug>(vimfiler_switch_to_root_directory)
-"&     <Plug>(vimfiler_switch_to_project_directory)
-".     <Plug>(vimfiler_toggle_visible_ignore_files)
-"g?    <Plug>(vimfiler_help)
-"v     <Plug>(vimfiler_preview_file)
-"yy    <Plug>(vimfiler_yank_full_path)
-"M     <Plug>(vimfiler_set_current_mask)
-"S     <Plug>(vimfiler_select_sort_type)
-"gs    <Plug>(vimfiler_toggle_safe_mode)
-"a     <Plug>(vimfiler_choose_action)
-"Y     <Plug>(vimfiler_pushd)
-"P     <Plug>(vimfiler_popd)
-"T     <Plug>(vimfiler_expand_tree_recursive)
-"I     <Plug>(vimfiler_cd_input_directory)
-
-let g:vimfiler_safe_mode_by_default = 0
-let g:vimfiler_tree_opened_icon = '▾'
-let g:vimfiler_tree_closed_icon = '▸'
-let g:vimfiler_default_columns = ''
-let g:vimfiler_explorer_columns = ''
-let g:vimfiler_tree_leaf_icon = ''
-let g:vimfiler_tree_indentation = 3
-let g:vimfiler_file_icon = ''
-let g:vimfiler_marked_file_icon = '*'
-let g:vimfiler_readonly_file_icon = '~'
-
-augroup vimfiler
-    autocmd!
-    autocmd FileType vimfiler call s:vimfiler_settings()
-augroup END
-
-function! s:vimfiler_settings()
-    map <silent><buffer> <Space> <NOP>
-    map <silent><buffer> <c-j> <NOP>
-    nnoremap <silent><buffer> i <Plug>(vimfiler_toggle_mark_current_line)
-    nnoremap <silent><buffer> gh <Plug>(vimfiler_switch_to_history_directory)
-    nnoremap <buffer> <Esc><Esc> <Plug>(vimfiler_exit)
-endfunction
-
-nnoremap <leader>f :VimFilerCurrentDir -status<cr>
-nnoremap <leader>F :VimFilerBufferDir -status <cr>
+nnoremap <silent> <c-n>f :CtrlP<cr>
+nnoremap <silent> <c-n>n :CtrlPMixed<cr>
+nnoremap <silent> <c-n>b :CtrlPBuffer<cr>
+nnoremap <silent> <c-n>t :CtrlPTag<cr>
+nnoremap <silent> <c-n>o :CtrlPBufTag<cr>
+nmap <silent> <c-n>O <c-n>o<c-r>w
+nnoremap <silent> <c-n>c :CtrlPChange<cr>
+nnoremap <silent> <c-n>c :CtrlPChange<cr>
+nnoremap <silent> <c-n>q :CtrlPQuickfix<cr>
+nnoremap <silent> <c-n>l :CtrlPLine<cr>
 "}}}
 
 "ultisnips {{{
@@ -622,11 +491,11 @@ colorscheme gruvbox
 
 "hl line in insert mode
 function! s:SetNormalCursorLine()
-    hi cursorline cterm=none ctermbg=236 ctermfg=none
+    hi cursorline cterm=none ctermbg=237 ctermfg=none
 endfunction
 
 function! s:SetInsertCursorLine()
-    hi cursorline cterm=none ctermbg=238 ctermfg=none
+    hi cursorline cterm=none ctermbg=239 ctermfg=none
 endfunction
 
 autocmd InsertEnter * call s:SetInsertCursorLine()
