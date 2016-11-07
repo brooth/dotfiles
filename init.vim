@@ -344,7 +344,7 @@ nnoremap <c-c>p :lprevious<cr>
 set wildignore+=*/bin/*
 set wildignore+=*/.git/*
 set wildignore+=*/.idea/*
-set wildignore+=*/build/^[^g]*
+set wildignore+=*/build/*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
 
@@ -436,6 +436,7 @@ let g:ctrlp_prompt_mappings = {
 
 nnoremap <silent> <c-n>f :CtrlP<cr>
 nnoremap <silent> <c-n>n :CtrlPMixed<cr>
+nmap <silent> <c-n><c-n> <c-n>n
 nnoremap <silent> <c-n>b :CtrlPBuffer<cr>
 nnoremap <silent> <c-n>t :CtrlPTag<cr>
 nnoremap <silent> <c-n>o :CtrlPBufTag<cr>
@@ -444,6 +445,7 @@ nnoremap <silent> <c-n>c :CtrlPChange<cr>
 nnoremap <silent> <c-n>c :CtrlPChange<cr>
 nnoremap <silent> <c-n>q :CtrlPQuickfix<cr>
 nnoremap <silent> <c-n>l :CtrlPLine<cr>
+nnoremap <silent> <c-n>d :vimgrep /TODO\\|FIXME/gj **/*.*<cr>:CtrlPQuickfix<cr>
 "}}}
 
 "ultisnips {{{
