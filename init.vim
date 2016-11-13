@@ -46,12 +46,12 @@ Plug 'luochen1990/rainbow'      "hi brackets diff colors
 "utils
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-" Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
 Plug 'kshenoy/vim-signature'    "show marks
 Plug 'terryma/vim-expand-region'
 Plug 'easymotion/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
+Plug 'terryma/vim-multiple-cursors'
 Plug '~/Projects/far.vim'
 
 "files
@@ -81,10 +81,7 @@ call plug#end()
 "misc {{{
 filetype plugin indent on
 
-let mapleader=" "
-
-"leader key timeout
-set timeoutlen=5000
+set timeoutlen=1500
 set pastetoggle=<F12>
 set history=300
 "view complete items in command line
@@ -133,6 +130,8 @@ nnoremap <F1>f :h function-list<cr>
 exec 'nnoremap ;f :find '
 exec 'nnoremap ;b :b '
 exec 'nnoremap ;d :bd '
+exec 'nnoremap ;q :qa'
+exec 'nnoremap ;s :%s//gc<left><left><left>'
 "}}}
 
 "session/source {{{
@@ -262,7 +261,7 @@ endif
 "far.vim
 let g:far#debug = 1
 let g:far#auto_write_replaced_buffers = 0
-let g:far#confirm_fardo = 0
+let g:far#auto_write_undo_buffers = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
@@ -327,6 +326,11 @@ nnoremap <c-l>w :set wrap!<cr>
 nnoremap zh mmggzf%`m
 "fold current statement
 nnoremap ze zf%
+
+"multiple cursor
+let g:multi_cursor_start_key='<c-m>'
+let g:multi_cursor_start_word_key='<c-M>'
+let g:multi_cursor_next_key='<C-m>'
 "}}}
 
 "lint/correcting {{{
@@ -472,40 +476,11 @@ nnoremap <silent> <c-n>d :vimgrep /TODO\\|FIXME/gj **/*.*<cr>:CtrlPQuickfix<cr>
 set background=dark
 colorscheme gruvbox
 
-"dim inactive  windows
-" hi def Dim cterm=none ctermbg=none ctermfg=242
-
-" function! s:DimInactiveWindow()
-"     let b:cur_syntax = &syntax
-"     syntax clear
-"     syntax region Dim start='' end='$$$end$$$'
-" endfunction
-
-" function! s:UndimActiveWindow()
-"     if exists("b:cur_syntax")
-"         execute 'set syntax='.b:cur_syntax
-"     endif
-" endfunction
-
-" autocmd BufEnter * call s:UndimActiveWindow()
-" autocmd WinEnter * call s:UndimActiveWindow()
-" autocmd WinLeave * call s:DimInactiveWindow()
-
-"hl line in insert mode
-function! s:SetNormalCursorLine()
-    hi cursorline cterm=none ctermbg=237 ctermfg=none
-endfunction
-
-function! s:SetInsertCursorLine()
-    hi cursorline cterm=none ctermbg=239 ctermfg=none
-endfunction
-
-autocmd InsertEnter * call s:SetInsertCursorLine()
-autocmd InsertLeave * call s:SetNormalCursorLine()
-
-"hl line in active window only
-autocmd WinEnter * set cul
-autocmd WinLeave * set nocul
+" highlight line in insert mode
+hi cursorline cterm=none ctermbg=238 ctermfg=none
+autocmd InsertEnter * set cul
+autocmd InsertLeave * set nocul
+set nocul
 
 "hl TODO in blue
 highlight Todo ctermfg=blue
@@ -516,7 +491,7 @@ let g:rainbow_conf = {
             \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118'],
             \ 'separately': {
             \       'html': {}
-            \ }
+            \   }
             \ }
 
 "easymotion
@@ -598,6 +573,7 @@ set wildignore+=*/__pycache__/**
 set wildignore+=*/__pycache__
 set wildignore+=*/.env/^[^g]*
 
+let g:jedi#force_py_version = 3
 let g:jedi#auto_initialization = 1
 let g:jedi#show_call_signatures = 1
 let g:jedi#popup_select_first = 0
@@ -640,15 +616,11 @@ function! InitPythonSessing()
         syn keyword pythonSelf self
         syn match pythonSelf "[\w_]="
         syn region pylintSuppress start='# pylint' end='$'
-        syn keyword pythonFunction str len print set dict list
+        syn keyword pythonFunction str len print set dict list int float eval super
     endfunction
 
     autocmd! BufEnter *.py call s:HighlightPython()
     autocmd! WinEnter *.py call s:HighlightPython()
-
-    if has('python3')
-        let g:jedi#force_py_version = 3
-    endif
 
     " ctags
     let l:mktags = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".getcwd()"
@@ -660,7 +632,7 @@ function! InitPythonSessing()
                     \ " --exclude=.git --languages=python ".getcwd()
         call system(l:cmd)
     endfunction
-    nnoremap <leader>T :call UpdatePythonCtags()<Cr>
+    nnoremap <c-p>T :call UpdatePythonCtags()<Cr>
     call UpdatePythonCtags()
 
     function! PyBufWritePost()

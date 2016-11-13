@@ -37,7 +37,6 @@ let g:far#window_width = 60
 let g:far#auto_preview = 1
 let g:far#preview_window_height = 7
 let g:far#auto_write_replaced_buffers = 0
-let g:far#confirm_fardo = 1
 let g:far#check_window_resize_period = 0
 let g:far#file_mask_favorites = ['%', '**/*.*', '**/*.py', '**/*.vim', '**/*.txt']
 
