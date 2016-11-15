@@ -236,6 +236,10 @@ nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
 nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
 nnoremap <silent><c-b>e :e!<cr>
 
+"split & focus
+nnoremap <c-w><c-v> <c-w><c-v><c-w>l
+nnoremap <c-w><c-s> <c-w><c-s><c-w>j
+
 "save current buffer with F2
 nnoremap <F2> :w<cr>
 inoremap <F2> <Esc>:w<cr>
