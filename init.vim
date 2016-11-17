@@ -236,9 +236,10 @@ nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
 nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
 nnoremap <silent><c-b>e :e!<cr>
 
-"split & focus
+"cmd & focus
 nnoremap <c-w><c-v> <c-w><c-v><c-w>l
 nnoremap <c-w><c-s> <c-w><c-s><c-w>j
+nnoremap <c-w><c-r> <c-w><c-r><c-w><c-w>
 
 "save current buffer with F2
 nnoremap <F2> :w<cr>
@@ -269,6 +270,12 @@ let g:far#auto_write_undo_buffers = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
+
+let g:far#sources = {}
+let g:far#sources.ack = {}
+let g:far#sources.ack.suggest = 0
+let g:far#sources.ack_nvim = {}
+let g:far#sources.ack_nvim.suggest = 0
 "}}}
 
 "indent/tab/spaces "{{{
