@@ -426,7 +426,7 @@ let g:deoplete#max_list = 30
 let g:deoplete#max_menu_width = 30
 
 let g:deoplete#sources = {}
-let g:deoplete#sources._ = ['above', 'changes', 'buffer']
+let g:deoplete#sources._ = ['beside', 'buffer']
 "}}}
 
 "ctrlp {{{
@@ -598,7 +598,7 @@ let g:jedi#documentation_command = "<c-p>d"
 let g:jedi#usages_command = "<c-p>u"
 let g:jedi#rename_command = "<c-p>r"
 
-let g:deoplete#sources.python = ['above', 'changes', 'jedi', 'tags', 'buffer']
+let g:deoplete#sources.python = ['beside', 'jedi', 'tags', 'buffer']
 
 let g:python_inited = 0
 function! InitPythonSessing()
