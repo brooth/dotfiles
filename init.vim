@@ -52,6 +52,7 @@ Plug 'terryma/vim-expand-region'
 Plug 'easymotion/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
 Plug 'terryma/vim-multiple-cursors'
+Plug 'haya14busa/incsearch.vim'
 Plug '~/Projects/far.vim'
 
 "files
@@ -78,7 +79,34 @@ Plug 'hdima/python-syntax', {'for': 'python'}
 call plug#end()
 "}}}
 
+
+" echohl WarningMsg | echo 'help' | echohl None | echon ' hoo' | echon ' fum' | echo ' newline'
+" echo getcompletion('', 'command', 0)
+
+function! Cm(line)
+    redraw
+    echo a:line
+
+    let line = a:line
+    let c = getchar()
+    if c == 13
+        return line
+    elseif c == 27
+        return ''
+    elseif c is# "\<BS>"
+        let line = line[:-2]
+    elseif c == 21 "C-U
+        let line = ''
+    else
+        let line = line . nr2char(c)
+    endif
+
+    return Cm(line)
+endfunction
+
 "misc {{{
+set encoding=utf-8
+
 filetype plugin indent on
 
 set timeoutlen=1500
@@ -120,6 +148,12 @@ nnoremap [e <Plug>(expand_region_shrink)
 "no jump to exsiting pair, but insert
 let g:AutoPairsMultilineClose=0
 "}}}
+
+"abbreviations {{{
+iabbrev bgc brooth@gmail.com
+iabbrev KO Khalidov Oleg
+" }}}
+
 
 "help {{{
 nnoremap <F1>u :h usr_41.txt<cr>
