@@ -54,6 +54,7 @@ Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
 Plug 'terryma/vim-multiple-cursors'
 Plug 'haya14busa/incsearch.vim'
 Plug '~/Projects/far.vim'
+Plug '~/Projects/meta-x.vim'
 
 "files
 Plug 'mbbill/undotree'
@@ -78,31 +79,6 @@ Plug 'hdima/python-syntax', {'for': 'python'}
 
 call plug#end()
 "}}}
-
-
-" echohl WarningMsg | echo 'help' | echohl None | echon ' hoo' | echon ' fum' | echo ' newline'
-" echo getcompletion('', 'command', 0)
-
-function! Cm(line)
-    redraw
-    echo a:line
-
-    let line = a:line
-    let c = getchar()
-    if c == 13
-        return line
-    elseif c == 27
-        return ''
-    elseif c is# "\<BS>"
-        let line = line[:-2]
-    elseif c == 21 "C-U
-        let line = ''
-    else
-        let line = line . nr2char(c)
-    endif
-
-    return Cm(line)
-endfunction
 
 "misc {{{
 set encoding=utf-8
@@ -153,7 +129,6 @@ let g:AutoPairsMultilineClose=0
 iabbrev bgc brooth@gmail.com
 iabbrev KO Khalidov Oleg
 " }}}
-
 
 "help {{{
 nnoremap <F1>u :h usr_41.txt<cr>
@@ -305,11 +280,13 @@ let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
 
-let g:far#sources = {}
-let g:far#sources.ack = {}
-let g:far#sources.ack.suggest = 0
-let g:far#sources.ack_nvim = {}
-let g:far#sources.ack_nvim.suggest = 0
+let g:far#cabbrevs_f = 'f'
+let g:far#cabbrevs_far = 'fa'
+let g:far#cabbrevs_farp = 'fp'
+let g:far#cabbrevs_refar = 'rf'
+let g:far#cabbrevs_fardo = 'fd'
+let g:far#cabbrevs_farundo = 'fu'
+
 "}}}
 
 "indent/tab/spaces "{{{
