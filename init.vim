@@ -88,8 +88,6 @@ filetype plugin indent on
 set timeoutlen=1500
 set pastetoggle=<F12>
 set history=300
-"view complete items in command line
-set wildmenu
 "no mouse support
 set mouse = ""
 "allow switching away from a changed buffer without saving.
@@ -135,12 +133,20 @@ nnoremap <F1>u :h usr_41.txt<cr>
 nnoremap <F1>f :h function-list<cr>
 "}}}
 
-"cmd templates "{{{
+"cmdline "{{{
+"view complete items in command line
+set wildmenu
+
+" templates
 exec 'nnoremap ;f :find '
 exec 'nnoremap ;b :b '
 exec 'nnoremap ;d :bd '
 exec 'nnoremap ;q :qa'
 exec 'nnoremap ;s :%s//gc<left><left><left>'
+
+" movement
+cnoremap <c-h> <left>
+cnoremap <c-l> <right>
 "}}}
 
 "session/source {{{
@@ -183,7 +189,7 @@ endfunction
 function! DeleteBackBuffers()
   let n = bufnr('$')
   while n > 0
-    if bufloaded(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
+    if buflisted(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
       exe 'bd ' . n
     endif
     let n -= 1
@@ -194,7 +200,7 @@ function! DeleteOtherBuffers()
   let n = bufnr('$')
   let cb = bufnr('%')
   while n > 0
-    if n != cb && bufloaded(n) && !getbufvar(n, '&mod')
+    if n != cb && buflisted(n) && !getbufvar(n, '&mod')
       exe 'bd ' . n
     endif
     let n -= 1
@@ -205,7 +211,7 @@ endfun
 function! DeleteUnmodifiedBuffers()
   let n = bufnr('$')
   while n > 0
-    if bufloaded(n) && !getbufvar(n, '&mod')
+    if buflisted(n) && !getbufvar(n, '&mod')
       exe 'bd ' . n
     endif
     let n -= 1
@@ -216,7 +222,7 @@ function! DeleteRightBuffers()
   let n = bufnr('%') + 1
   let l = bufnr('$')
   while n <= l
-    if bufloaded(n) && !getbufvar(n, '&mod')
+    if buflisted(n) && !getbufvar(n, '&mod')
       exe 'bd ' . n
     endif
     let n += 1
@@ -226,7 +232,7 @@ endfun
 function! DeleteLeftBuffers()
   let n = bufnr('%') - 1
   while n > 0
-    if bufloaded(n) && !getbufvar(n, '&mod')
+    if buflisted(n) && !getbufvar(n, '&mod')
       exe 'bd ' . n
     endif
     let n -= 1
