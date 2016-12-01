@@ -106,6 +106,9 @@ nnoremap q: <Nop>
 "yeah
 nnoremap Y y$
 
+"select pasted text
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+
 "stay same position on insert mode exit
 inoremap <silent> <Esc> <Esc>`^
 
@@ -138,11 +141,11 @@ nnoremap <F1>f :h function-list<cr>
 set wildmenu
 
 " templates
-exec 'nnoremap ;f :find '
-exec 'nnoremap ;b :b '
-exec 'nnoremap ;d :bd '
-exec 'nnoremap ;q :qa'
-exec 'nnoremap ;s :%s//gc<left><left><left>'
+" exec 'nnoremap ;f :find '
+" exec 'nnoremap ;b :b '
+" exec 'nnoremap ;d :bd '
+" exec 'nnoremap ;q :qa'
+" exec 'nnoremap ;s :%s//gc<left><left><left>'
 
 " movement
 cnoremap <c-h> <left>
@@ -285,14 +288,6 @@ let g:far#auto_write_undo_buffers = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
-
-let g:far#cabbrevs_f = 'f'
-let g:far#cabbrevs_far = 'fa'
-let g:far#cabbrevs_farp = 'fp'
-let g:far#cabbrevs_refar = 'rf'
-let g:far#cabbrevs_fardo = 'fd'
-let g:far#cabbrevs_farundo = 'fu'
-
 "}}}
 
 "indent/tab/spaces "{{{
