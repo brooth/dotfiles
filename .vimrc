@@ -4,6 +4,7 @@
 call plug#begin('~/.vim/plugged')
 Plug 'flazz/vim-colorschemes'
 Plug 'brooth/far.vim'
+" Plug '~/Projects/far.vim'
 call plug#end()
 
 "----------------------------------------------------------------

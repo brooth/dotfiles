@@ -82,6 +82,7 @@ call plug#end()
 
 "misc {{{
 set encoding=utf-8
+set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 filetype plugin indent on
 
@@ -150,6 +151,15 @@ set wildmenu
 " movement
 cnoremap <c-h> <left>
 cnoremap <c-l> <right>
+
+"insane.vim
+call mx#tools#setdefault('g:mx#favorits', [
+    \   {'word': 'find'},
+    \   {'word': 'so %'},
+    \   {'word': 'qall', 'short': 'qa'},
+    \   {'word': 'edit!'},
+    \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
+    \   ])
 "}}}
 
 "session/source {{{
@@ -283,8 +293,6 @@ endif
 
 "far.vim
 let g:far#debug = 1
-let g:far#auto_write_replaced_buffers = 0
-let g:far#auto_write_undo_buffers = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
     \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
@@ -293,6 +301,9 @@ let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
 "indent/tab/spaces "{{{
 "move curson over empty space
 set virtualedit=all
+"keep cursor position while C-u/C-d/gg/etc
+set nostartofline
+
 "indent when moving to the next line while writing code
 set autoindent
 set smartindent
@@ -305,7 +316,7 @@ set softtabstop=4
 set expandtab
 
 "show vertical line
-"set colorcolumn=80
+set colorcolumn=80
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
@@ -436,9 +447,6 @@ let g:deoplete#auto_complete_start_length = 1
 let g:deoplete#auto_complete_delay = 50
 let g:deoplete#max_list = 30
 let g:deoplete#max_menu_width = 30
-
-let g:deoplete#sources = {}
-let g:deoplete#sources._ = ['beside', 'buffer']
 "}}}
 
 "ctrlp {{{
@@ -610,7 +618,8 @@ let g:jedi#documentation_command = "<c-p>d"
 let g:jedi#usages_command = "<c-p>u"
 let g:jedi#rename_command = "<c-p>r"
 
-let g:deoplete#sources.python = ['beside', 'jedi', 'tags', 'buffer']
+let g:deoplete#sources = {}
+let g:deoplete#sources.python = ['around', 'jedi', 'tags', 'buffer']
 
 let g:python_inited = 0
 function! InitPythonSessing()
