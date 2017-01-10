@@ -52,7 +52,7 @@ Plug 'terryma/vim-expand-region'
 Plug 'easymotion/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
 Plug 'terryma/vim-multiple-cursors'
-Plug 'haya14busa/incsearch.vim'
+" Plug 'haya14busa/incsearch.vim' "wait cursor fix. implement in insane.vim?
 Plug '~/Projects/far.vim'
 Plug '~/Projects/meta-x.vim'
 
@@ -76,6 +76,15 @@ Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
 Plug 'zchee/deoplete-jedi', {'for': 'python'}
 Plug 'hdima/python-syntax', {'for': 'python'}
+
+"javascript, nodejs
+Plug 'mxw/vim-jsx', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
+Plug 'pangloss/vim-javascript', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
+Plug 'neomake/neomake', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
+Plug 'carlitux/deoplete-ternjs', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
+
+"markdown
+Plug 'davinche/godown-vim', {'for': 'markdown'} "instant md preview
 
 call plug#end()
 "}}}
@@ -447,6 +456,7 @@ let g:deoplete#auto_complete_start_length = 1
 let g:deoplete#auto_complete_delay = 50
 let g:deoplete#max_list = 30
 let g:deoplete#max_menu_width = 30
+let g:deoplete#sources = {}
 "}}}
 
 "ctrlp {{{
@@ -598,6 +608,49 @@ endfunction
 autocmd BufEnter *.html call SetupHtmlSettings()
 "}}}
 
+"javaScript/nodejs "{{{
+let g:jsx_ext_required = 0
+
+set wildignore+=*/node_modules
+set wildignore+=*/node_modules/**
+
+call deoplete#custom#set('ternjs', 'rank', 700)
+let js_sources = ['around', 'ternjs', 'omni', 'buffer']
+let g:deoplete#sources.js = js_sources
+let g:deoplete#sources.javascript = js_sources
+let g:deoplete#sources['javascript.jsx'] = js_sources
+
+let js_omni_patterns = '[^. *\t]\.\w*'
+let g:deoplete#omni#input_patterns = {}
+let g:deoplete#omni#input_patterns.js = js_omni_patterns
+let g:deoplete#omni#input_patterns.javascript = js_omni_patterns
+let g:deoplete#omni#input_patterns['javascript.jsx'] = js_omni_patterns
+
+let eslint_exec = getcwd() . '/node_modules/eslint/bin/eslint.js'
+let g:neomake_javascript_enabled_makers = ['eslint']
+let g:neomake_javascript_eslint_maker = {
+    \ 'exe': 'node',
+    \ 'args': [eslint_exec, '-f', 'compact'],
+    \ 'errorformat': '%E%f: line %l\, col %c\, Error - %m,'
+    \ }
+let g:neomake_jsx_enabled_makers = g:neomake_javascript_enabled_makers
+let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
+
+autocmd! BufRead *.js Neomake
+autocmd! BufWritePost *.js Neomake
+let g:neomake_logfile='/tmp/neomake.log'
+
+function! InitJsSessing()
+    function! s:HighlightJs()
+        syn keyword javaScriptReserved default case
+    endfunction
+
+    " autocmd! BufEnter *.js call s:HighlightJs()
+    " autocmd! WinEnter *.py call s:HighlightJs()
+endfunction
+autocmd BufReadPost *.js call InitJsSessing()
+"}}}
+
 "python "{{{
 set wildignore+=*.pyc
 set wildignore+=*/__pycache__/**
@@ -618,7 +671,6 @@ let g:jedi#documentation_command = "<c-p>d"
 let g:jedi#usages_command = "<c-p>u"
 let g:jedi#rename_command = "<c-p>r"
 
-let g:deoplete#sources = {}
 let g:deoplete#sources.python = ['around', 'jedi', 'tags', 'buffer']
 
 let g:python_inited = 0
