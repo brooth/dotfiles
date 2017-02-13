@@ -1,1 +1,107 @@
-/home/brooth/.config/Code/User/keybindings.json
+// Place your key bindings in this file to overwrite the defaults
+[
+    // {
+    //     "key": "ctrl+o",u
+    //     "command": "workbench.action.gotoSymbol"
+    // },
+    {
+        "key": "ctrl+shift+j",
+        "command": "editor.action.joinLines",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+shift+j",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "alt+right",
+        "command": "workbench.action.terminal.focusNext",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "alt+left",
+        "command": "workbench.action.terminal.focusPrevious",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "alt+t",
+        "command": "workbench.action.terminal.focus",
+        "when": "!terminalFocus"
+    },
+    // VIM
+    {
+        "key": "ctrl+u",
+        "command": "cursorPageUp",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "cursorPageDown",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "u",
+        "command": "undo",
+        "when": "editorTextFocus && vim.mode == 'Normal'" 
+    },
+    // {
+    //     "key": "ctrl+r",
+    //     "command": "redo",
+    //     "when": "editorTextFocus && !editorReadonly && vim.mode == 'Normal'" 
+    // },
+    {
+        "key": "ctrl+w v",
+        "command": "workbench.action.splitEditor"
+    },
+    {
+        "key": "ctrl+w k",
+        "command": "workbench.action.focusNextEditor"
+    },
+    {
+        "key": "ctrl+w l",
+        "command": "workbench.action.focusNextGroup"
+    },
+    {
+        "key": "ctrl+w k",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        "key": "ctrl+w j",
+        "command": "workbench.action.previousEditor"
+    },
+    {
+        "key": "ctrl+w h",
+        "command": "workbench.action.focusPreviousGroup"
+    },
+    {
+        "key": "ctrl+w c",
+        "command": "workbench.action.closeActiveEditor",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+w o",
+        "command": "workbench.action.closeOtherEditors",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+w ctrl+o",
+        "command": "workbench.action.closeEditorsInOtherGroups",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+w r",
+        "command": "workbench.action.closeEditorsToTheRight",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+w ctrl+c",
+        "command": "workbench.action.closeAllEditors",
+        "when": "editorFocus"
+    },
+]

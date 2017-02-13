@@ -1,1 +1,25 @@
-/home/brooth/.config/Code/User/settings.json
+// Place your settings in this file to overwrite the default settings
+{
+    "emmet.syntaxProfiles": {
+        "javascript": "html"
+     },
+    "files.exclude": {
+        "**/.env": true
+    },
+    "editor.fontSize": 14,
+    "editor.fontFamily": "ubuntu mono",
+    "window.zoomLevel": 0.6,
+    "editor.rulers": [
+        100
+    ],
+    "typescript.check.tscVersion": false,
+    "vsicons.projectDetection.disableDetect": true,
+    "vsicons.dontShowNewVersionMessage": true,
+
+    //Vim
+    "vim.useCtrlKeys": false,
+
+    // Local History
+    "local-history.daysLimit":  1, // A day number to purge local history. (0: no purge)
+    //"local-history.path": "./.vscode" // Specify another location for .history folder (null: use workspaceRoot)
+}
