@@ -1,29 +1,25 @@
 // Place your settings in this file to overwrite the default settings
 {
-    "emmet.syntaxProfiles": {
-        "javascript": "html"
-    },
-    "files.exclude": {
-        "**/.env": true
-    },
     "editor.fontSize": 14,
     "editor.fontFamily": "ubuntu mono",
-    "window.zoomLevel": 0.6,
+    "window.zoomLevel": 0.0,
     "editor.rulers": [
         100
     ],
-    "typescript.check.tscVersion": false,
-    "vsicons.projectDetection.disableDetect": true,
-    "vsicons.dontShowNewVersionMessage": true,
-
-    // Flow
-    "javascript.validate.enable": false,
-    "flow.pathToFlow": "/home/brooth/Projects/SouthTaxi/node_modules/.bin/flow",
+    "editor.renderIndentGuides": false,
+    "editor.lineNumbers": "relative",
 
     //Vim
     "vim.useCtrlKeys": false,
+    "vim.useSystemClipboard": false,
+    "vim.autoindent": true,
+    "vim.hlsearch": true,
+    "vim.ignorecase": true,
+    "vim.incsearch": true,
+    "vim.scroll": 10,
+    "vim.smartcase": true,
 
     // Local History
-    "local-history.daysLimit": 1, // A day number to purge local history. (0: no purge)
+    "local-history.daysLimit": 1
     //"local-history.path": "./.vscode" // Specify another location for .history folder (null: use workspaceRoot)
 }
