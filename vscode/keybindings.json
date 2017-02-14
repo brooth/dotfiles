@@ -1,5 +1,14 @@
 // Place your key bindings in this file to overwrite the defaults
 [
+    {
+        "key": "f2",
+        "command": "workbench.action.files.save"
+    },
+    {
+        "key": "shift+f6",
+        "command": "editor.action.save",
+        "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+    },
     // {
     //     "key": "ctrl+o",u
     //     "command": "workbench.action.gotoSymbol"
@@ -45,11 +54,11 @@
         "command": "cursorPageDown",
         "when": "editorTextFocus"
     },
-    {
-        "key": "u",
-        "command": "undo",
-        "when": "editorTextFocus && vim.mode == 'Normal'" 
-    },
+    // {
+    //     "key": "u",
+    //     "command": "undo",
+    //     "when": "editorTextFocus && vim.mode == 'Normal'"
+    // },
     // {
     //     "key": "ctrl+r",
     //     "command": "redo",
@@ -80,6 +89,14 @@
         "command": "workbench.action.focusPreviousGroup"
     },
     {
+        "key": "ctrl+w shift+h",
+        "command": "workbench.action.moveEditorToPreviousGroup"
+    },
+    {
+        "key": "ctrl+w shift+l",
+        "command": "workbench.action.moveEditorToNextGroup"
+    },
+    {
         "key": "ctrl+w c",
         "command": "workbench.action.closeActiveEditor",
         "when": "editorFocus"
@@ -104,4 +121,9 @@
         "command": "workbench.action.closeAllEditors",
         "when": "editorFocus"
     },
+    {
+        "key": "shift+8",
+        "command": "editor.action.addSelectionToNextFindMatch",
+        "when": "editorFocus"
+    }
 ]
