@@ -54,6 +54,14 @@
         "when": "editorTextFocus"
     },
     {
+        "key": "ctrl+o",
+        "command": "workbench.action.navigateBack"
+    },
+    {
+        "key": "ctrl+i",
+        "command": "workbench.action.navigateForward"
+    },
+    {
         "key": "ctrl+w v",
         "command": "workbench.action.splitEditor"
     },

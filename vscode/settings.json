@@ -8,7 +8,6 @@
     ],
     "editor.renderIndentGuides": false,
     "editor.lineNumbers": "relative",
-
     //Vim
     "vim.useCtrlKeys": false,
     "vim.useSystemClipboard": false,
@@ -18,7 +17,20 @@
     "vim.incsearch": true,
     "vim.scroll": 10,
     "vim.smartcase": true,
-
+    "vim.otherModesKeyBindingsNonRecursive": [
+        {
+            "before": [ "Y" ],
+            "after": [ "y", "$" ]
+        },
+        {
+            "before": [ "g", "r", "w" ],
+            "after": [ "P", "l", "d", "w"]
+        },
+        {
+            "before": [ "g", "r", "$" ],
+            "after": [ "P", "l", "d", "$"]
+        }
+    ],
     // Local History
     "local-history.daysLimit": 1
     //"local-history.path": "./.vscode" // Specify another location for .history folder (null: use workspaceRoot)
