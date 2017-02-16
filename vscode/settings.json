@@ -19,6 +19,11 @@
     "vim.smartcase": true,
     "vim.otherModesKeyBindingsNonRecursive": [
         {
+            "before": [ "shift+8" ],
+            "after": [],
+            "command": "editor.action.addSelectionToNextFindMatch"
+        },
+        {
             "before": [ "Y" ],
             "after": [ "y", "$" ]
         },

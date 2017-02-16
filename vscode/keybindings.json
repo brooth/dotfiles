@@ -118,11 +118,6 @@
         "command": "workbench.action.closeAllEditors",
         "when": "editorFocus"
     },
-    {
-        "key": "shift+8",
-        "command": "editor.action.addSelectionToNextFindMatch",
-        "when": "editorFocus"
-    },
     // remove ctrl+r bindings
     {
         "key": "ctrl+r",
