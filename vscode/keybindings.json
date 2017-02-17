@@ -10,6 +10,11 @@
         "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
     },
     {
+        "key": "ctrl+m",
+        "command": "editor.action.addSelectionToNextFindMatch",
+        "when": "editorFocus"
+    },
+    {
         "key": "ctrl+shift+r",
         "command": "workbench.action.tasks.runTask"
     },

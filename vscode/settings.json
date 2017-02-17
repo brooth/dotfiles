@@ -13,10 +13,10 @@
     "vim.useSystemClipboard": false,
     "vim.autoindent": true,
     "vim.hlsearch": true,
-    "vim.ignorecase": true,
     "vim.incsearch": true,
+    "vim.ignorecase": false,
+    "vim.smartcase": false,
     "vim.scroll": 10,
-    "vim.smartcase": true,
     "vim.otherModesKeyBindingsNonRecursive": [
         {
             "before": [ "shift+8" ],
