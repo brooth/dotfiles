@@ -41,6 +41,7 @@ call plug#begin('$VIMHOME/plugged')
 "appearance
 Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
+Plug 'mhartington/oceanic-next'
 Plug 'luochen1990/rainbow'      "hi brackets diff colors
 
 "utils
@@ -69,19 +70,14 @@ Plug 'Shougo/deoplete.nvim'
 
 "dev
 " Plug 'SirVer/ultisnips'
-Plug 'neomake/neomake', {'for': 'python'}
-
-"python
-Plug 'davidhalter/jedi-vim', {'for': 'python'}
-Plug 'hynek/vim-python-pep8-indent', {'for': 'python'}
-Plug 'zchee/deoplete-jedi', {'for': 'python'}
-Plug 'hdima/python-syntax', {'for': 'python'}
+Plug 'neomake/neomake', {'for': ['python', 'javascript', 'javascript.jsx']}
 
 "javascript, nodejs
-Plug 'mxw/vim-jsx', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
-Plug 'pangloss/vim-javascript', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
-Plug 'neomake/neomake', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
-Plug 'carlitux/deoplete-ternjs', {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+Plug 'othree/yajs'
+Plug 'steelsojka/deoplete-flow'
+" {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
 
 "markdown
 Plug 'davinche/godown-vim', {'for': 'markdown'} "instant md preview
@@ -163,12 +159,12 @@ cnoremap <c-l> <right>
 
 "insane.vim
 call mx#tools#setdefault('g:mx#favorits', [
-    \   {'word': 'find'},
-    \   {'word': 'so %'},
-    \   {'word': 'qall', 'short': 'qa'},
-    \   {'word': 'edit!'},
-    \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
-    \   ])
+            \   {'word': 'find'},
+            \   {'word': 'so %'},
+            \   {'word': 'qall', 'short': 'qa'},
+            \   {'word': 'edit!'},
+            \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
+            \   ])
 "}}}
 
 "session/source {{{
@@ -209,56 +205,56 @@ endfunction
 
 "kill background buffers
 function! DeleteBackBuffers()
-  let n = bufnr('$')
-  while n > 0
-    if buflisted(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
+    let n = bufnr('$')
+    while n > 0
+        if buflisted(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
+            exe 'bd ' . n
+        endif
+        let n -= 1
+    endwhile
 endfun
 
 function! DeleteOtherBuffers()
-  let n = bufnr('$')
-  let cb = bufnr('%')
-  while n > 0
-    if n != cb && buflisted(n) && !getbufvar(n, '&mod')
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
-  silent exec 'norm! o'
+    let n = bufnr('$')
+    let cb = bufnr('%')
+    while n > 0
+        if n != cb && buflisted(n) && !getbufvar(n, '&mod')
+            exe 'bd ' . n
+        endif
+        let n -= 1
+    endwhile
+    silent exec 'norm! o'
 endfun
 
 function! DeleteUnmodifiedBuffers()
-  let n = bufnr('$')
-  while n > 0
-    if buflisted(n) && !getbufvar(n, '&mod')
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
+    let n = bufnr('$')
+    while n > 0
+        if buflisted(n) && !getbufvar(n, '&mod')
+            exe 'bd ' . n
+        endif
+        let n -= 1
+    endwhile
 endfun
 
 function! DeleteRightBuffers()
-  let n = bufnr('%') + 1
-  let l = bufnr('$')
-  while n <= l
-    if buflisted(n) && !getbufvar(n, '&mod')
-      exe 'bd ' . n
-    endif
-    let n += 1
-  endwhile
+    let n = bufnr('%') + 1
+    let l = bufnr('$')
+    while n <= l
+        if buflisted(n) && !getbufvar(n, '&mod')
+            exe 'bd ' . n
+        endif
+        let n += 1
+    endwhile
 endfun
 
 function! DeleteLeftBuffers()
-  let n = bufnr('%') - 1
-  while n > 0
-    if buflisted(n) && !getbufvar(n, '&mod')
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
+    let n = bufnr('%') - 1
+    while n > 0
+        if buflisted(n) && !getbufvar(n, '&mod')
+            exe 'bd ' . n
+        endif
+        let n -= 1
+    endwhile
 endfun
 
 "Ctrl-B - Buffers
@@ -292,8 +288,8 @@ set ignorecase
 set incsearch
 
 "no hightlight
-nnoremap <F3> :noh<cr>
-inoremap <F3> <esc>:noh<cr>
+nnoremap <esc> :noh<cr><esc>
+inoremap <esc> <esc>:noh<cr><esc>
 
 if executable('ag')
     set grepprg=ag\ --nogroup\ --column\ --nocolor
@@ -301,10 +297,10 @@ if executable('ag')
 endif
 
 "far.vim
-let g:far#debug = 1
+let g:far#debug = 0
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
-    \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
+            \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
 "}}}
 
 "indent/tab/spaces "{{{
@@ -325,7 +321,7 @@ set softtabstop=4
 set expandtab
 
 "show vertical line
-set colorcolumn=80
+set colorcolumn=100
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
@@ -349,9 +345,9 @@ set foldmethod=manual
 
 "return to last edit position
 autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \   exe "normal! g`\"" |
+            \ endif
 
 "go between wrapped lines
 map j gj
@@ -385,6 +381,13 @@ nnoremap <c-c>i :retab<cr>
 nnoremap <c-c>q :lopen<cr>
 nnoremap <c-c>n :lnext<cr>
 nnoremap <c-c>p :lprevious<cr>
+
+"format all file
+nnoremap <c-c>= mCgg=G`cmC
+
+"comment line
+map  gcl
+
 "}}}
 
 "files/types {{{
@@ -467,11 +470,11 @@ let g:ctrlp_mruf_max = 10
 
 "TODO wildignore
 let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden'.
-      \ ' --ignore .git'.
-      \ ' --ignore .svn'.
-      \ ' --ignore __pycache__'.
-      \ ' --ignore "**/*.pyc"'.
-      \ ' -g ""'
+            \ ' --ignore .git'.
+            \ ' --ignore .svn'.
+            \ ' --ignore __pycache__'.
+            \ ' --ignore "**/*.pyc"'.
+            \ ' -g ""'
 
 let g:ctrlp_map = ''
 let g:ctrlp_prompt_mappings = {
@@ -514,8 +517,11 @@ nnoremap <silent> <c-n>d :vimgrep /TODO\\|FIXME/gj **/*.*<cr>:CtrlPQuickfix<cr>
 "}}}
 
 "theme {{{
-set background=dark
-colorscheme gruvbox
+if (has("termguicolors"))
+    set termguicolors
+endif
+" set background=dark
+colorscheme OceanicNext
 
 " highlight line in insert mode
 hi cursorline cterm=none ctermbg=238 ctermfg=none
@@ -529,6 +535,7 @@ highlight Todo ctermfg=blue
 "rainbow brackets
 let g:rainbow_active = 1
 let g:rainbow_conf = {
+            \ 'guifgs': ['#AB7967', '#C594C5', '#6699CC', '#5FB3B3', '#99C794'],
             \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118'],
             \ 'separately': {
             \       'html': {}
@@ -543,10 +550,10 @@ let g:EasyMotion_smartcase = 0
 nmap s <Plug>(easymotion-overwin-f)
 
 function! SyntaxUnderCursor()
-  if !exists("*synstack")
-    return
-  endif
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+    if !exists("*synstack")
+        return
+    endif
+    echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
 endfunc
 "}}}
 
@@ -576,11 +583,8 @@ inoremap <F4> <esc><f4>
 "}}}
 
 "neomake "{{{
-highlight neomakeErrorSign ctermfg=196 ctermbg=237
-highlight neomakeWarnSign ctermfg=166 ctermbg=237
-
-let g:neomake_error_sign = {'text': '⚑', 'texthl': 'neomakeErrorSign'}
-let g:neomake_warning_sign = {'text': '⚑', 'texthl': 'neomakeWarnSign'}
+let g:neomake_error_sign = {'text': '⚑'}
+let g:neomake_warning_sign = {'text': '⚑'}
 "}}}
 
 "markdown "{{{
@@ -608,126 +612,54 @@ endfunction
 autocmd BufEnter *.html call SetupHtmlSettings()
 "}}}
 
-"javaScript/nodejs "{{{
+"js/react/nodejs "{{{
 let g:jsx_ext_required = 0
+let g:javascript_plugin_flow = 1
 
 set wildignore+=*/node_modules
 set wildignore+=*/node_modules/**
 
-call deoplete#custom#set('ternjs', 'rank', 700)
-let js_sources = ['around', 'ternjs', 'omni', 'buffer']
-let g:deoplete#sources.js = js_sources
-let g:deoplete#sources.javascript = js_sources
-let g:deoplete#sources['javascript.jsx'] = js_sources
+"deoplete
+call deoplete#custom#set('flow', 'rank', 700)
+let flow_path = getcwd() . '/node_modules/.bin/flow'
+let g:deoplete#sources#flow#flow_bin = flow_path
 
-let js_omni_patterns = '[^. *\t]\.\w*'
-let g:deoplete#omni#input_patterns = {}
-let g:deoplete#omni#input_patterns.js = js_omni_patterns
-let g:deoplete#omni#input_patterns.javascript = js_omni_patterns
-let g:deoplete#omni#input_patterns['javascript.jsx'] = js_omni_patterns
+"neomake
+function! ProcessEslint(entry)
+    if a:entry.text =~ 'Warning'
+        let a:entry.type = 'W'
+    endif
+endfunction
 
-let eslint_exec = getcwd() . '/node_modules/eslint/bin/eslint.js'
 let g:neomake_javascript_enabled_makers = ['eslint']
+let eslint_exec = getcwd() . '/node_modules/.bin/eslint'
 let g:neomake_javascript_eslint_maker = {
-    \ 'exe': 'node',
-    \ 'args': [eslint_exec, '-f', 'compact'],
-    \ 'errorformat': '%E%f: line %l\, col %c\, Error - %m,'
-    \ }
+            \ 'exe': eslint_exec,
+            \ 'args': ['-f', 'compact'],
+            \ 'errorformat': '%f: line %l\, col %c\, %m',
+            \ 'postprocess': function('ProcessEslint')
+            \ }
 let g:neomake_jsx_enabled_makers = g:neomake_javascript_enabled_makers
 let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
 
 autocmd! BufRead *.js Neomake
 autocmd! BufWritePost *.js Neomake
-let g:neomake_logfile='/tmp/neomake.log'
+" let g:neomake_logfile='/tmp/neomake.log'
 
-function! InitJsSessing()
-    function! s:HighlightJs()
-        syn keyword javaScriptReserved default case
-    endfunction
-
-    " autocmd! BufEnter *.js call s:HighlightJs()
-    " autocmd! WinEnter *.py call s:HighlightJs()
-endfunction
-autocmd BufReadPost *.js call InitJsSessing()
-"}}}
-
-"python "{{{
-set wildignore+=*.pyc
-set wildignore+=*/__pycache__/**
-set wildignore+=*/__pycache__
-set wildignore+=*/.env/^[^g]*
-
-let g:jedi#force_py_version = 3
-let g:jedi#auto_initialization = 1
-let g:jedi#show_call_signatures = 1
-let g:jedi#popup_select_first = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#completions_enabled = 0
-let g:jedi#smart_auto_mappings = 0
-let g:jedi#popup_on_dot = 0
-
-let g:jedi#goto_command = "<c-p>g"
-let g:jedi#documentation_command = "<c-p>d"
-let g:jedi#usages_command = "<c-p>u"
-let g:jedi#rename_command = "<c-p>r"
-
-let g:deoplete#sources.python = ['around', 'jedi', 'tags', 'buffer']
-
-let g:python_inited = 0
-function! InitPythonSessing()
-    " buffer settings
-    setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-    setlocal nocindent
-
-    " global settings
-    if g:python_inited != 0
-        return
-    endif
-    let g:python_inited = 1
-
-    let g:neomake_python_enabled_makers = ['flake8']
-    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E126,E128', '--max-line-length=100'], }
-    autocmd! BufRead *.py Neomake
-
-    "enable all Python syntax highlighting features
-    let python_highlight_all = 1
-
-    "custom hl
-    highlight pythonSelf ctermfg=109
-    highlight pylintSuppress ctermfg=8
-
-    function! s:HighlightPython()
-        syn keyword pythonSelf self
-        syn match pythonSelf "[\w_]="
-        syn region pylintSuppress start='# pylint' end='$'
-        syn keyword pythonFunction str len print set dict list int float eval super
-    endfunction
-
-    autocmd! BufEnter *.py call s:HighlightPython()
-    autocmd! WinEnter *.py call s:HighlightPython()
-
-    " ctags
-    let l:mktags = "rm -f ".$VIMHOME."/tags".getcwd()."/tags && mkdir -p ".$VIMHOME."/tags".getcwd()"
-    call system(l:mktags)
-    exec 'set tags='.$VIMHOME.'/tags/'.getcwd().'/tags'
-
-    function! UpdatePythonCtags()
-        let l:cmd = "ctags -f ".$VIMHOME."/tags".getcwd()."/tags -R --exclude=.env".
-                    \ " --exclude=.git --languages=python ".getcwd()
-        call system(l:cmd)
-    endfunction
-    nnoremap <c-p>T :call UpdatePythonCtags()<Cr>
-    call UpdatePythonCtags()
-
-    function! PyBufWritePost()
-        Neomake
-        call UpdatePythonCtags()
-    endfunction
-    autocmd! BufWritePost *.py :call PyBufWritePost()
-
-endfunction
-autocmd BufReadPost *.py call InitPythonSessing()
-autocmd BufWinEnter *.py setlocal omnifunc=jedi#completions
+" hi
+if (has("termguicolors"))
+    hi xmlTagName guifg=#EC5f67
+    hi xmlTagN guifg=#EC5f67
+    hi xmlAttrib guifg=#C594C5
+    hi jsBrackets guifg=#5FB3B3
+    hi jsBraces guifg=#5FB3B3
+    hi jsParens guifg=#5FB3B3
+    hi jsFuncParens guifg=#5FB3B3
+    hi jsFuncCall guifg=#6699CC
+    hi jsObjectProp guifg=#EC5f67
+    hi jsGlobalObjects guifg=#fac863
+    hi jsStorageClass guifg=#C594C5
+endif
 "}}}
 
 " vim: set et fdm=marker sts=4 sw=4:

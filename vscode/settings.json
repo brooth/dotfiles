@@ -2,10 +2,9 @@
 {
     "editor.fontSize": 14,
     "editor.fontFamily": "ubuntu mono",
-    "window.zoomLevel": 0.0,
-    "editor.rulers": [
-        100
-    ],
+    "window.zoomLevel": 0.8,
+    "editor.rulers": [100],
+    "editor.wrappingColumn": 0,
     "editor.renderIndentGuides": false,
     "editor.lineNumbers": "relative",
     //Vim
@@ -22,6 +21,14 @@
             "before": [ "shift+8" ],
             "after": [],
             "command": "editor.action.addSelectionToNextFindMatch"
+        },
+        {
+            "before": [ "k" ],
+            "after": [ "g", "k" ]
+        },
+        {
+            "before": [ "j" ],
+            "after": [ "g", "j" ]
         },
         {
             "before": [ "Y" ],

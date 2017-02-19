@@ -45,8 +45,19 @@
     },
     // VIM
     {
+        "key": "ctrl+e",
+        "command": "extension.vim_ctrl+e",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+y",
+        "command": "extension.vim_ctrl+y",
+        "when": "editorTextFocus"
+    },
+    {
         "key": "ctrl+r",
-        "command": "extension.vim_ctrl+r"
+        "command": "extension.vim_ctrl+r",
+        "when": "editorTextFocus"
     },
     {
         "key": "ctrl+u",
