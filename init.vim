@@ -17,7 +17,7 @@
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
     "normal mode in terminal by Esc
-    tnoremap <Esc> <C-\><C-n>
+    " tnoremap <Esc> <C-\><C-n>
 else
     let $VIMHOME = "~/.vim"
 endif
@@ -59,7 +59,8 @@ Plug '~/Projects/meta-x.vim'
 
 "files
 Plug 'mbbill/undotree'
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 "git
 Plug 'tpope/vim-fugitive'
@@ -91,6 +92,7 @@ set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNO
 
 filetype plugin indent on
 
+let mapleader=" "
 set timeoutlen=1500
 set pastetoggle=<F12>
 set history=300
@@ -462,40 +464,6 @@ let g:deoplete#max_menu_width = 30
 let g:deoplete#sources = {}
 "}}}
 
-"ctrlp {{{
-let g:ctrlp_working_path_mode = ''
-let g:ctrlp_match_window = 'bottom,min:1,max:15,results:15'
-let g:ctrlp_mruf_relative = 1
-let g:ctrlp_mruf_max = 10
-
-"TODO wildignore
-let g:ctrlp_user_command = 'ag %s -i --nocolor --nogroup --hidden'.
-            \ ' --ignore .git'.
-            \ ' --ignore .svn'.
-            \ ' --ignore __pycache__'.
-            \ ' --ignore "**/*.pyc"'.
-            \ ' -g ""'
-
-let g:ctrlp_map = ''
-let g:ctrlp_prompt_mappings = {
-            \ 'PrtInsert()':          ['<c-r>'],
-            \ 'ToggleRegex()':        ['<c-q>'],
-            \ }
-
-nnoremap <silent> <c-n>f :CtrlP<cr>
-nnoremap <silent> <c-n>n :CtrlPMixed<cr>
-nmap <silent> <c-n><c-n> <c-n>n
-nnoremap <silent> <c-n>b :CtrlPBuffer<cr>
-nnoremap <silent> <c-n>t :CtrlPTag<cr>
-nnoremap <silent> <c-n>o :CtrlPBufTag<cr>
-nmap <silent> <c-n>O <c-n>o<c-r>w
-nnoremap <silent> <c-n>c :CtrlPChange<cr>
-nnoremap <silent> <c-n>c :CtrlPChange<cr>
-nnoremap <silent> <c-n>q :CtrlPQuickfix<cr>
-nnoremap <silent> <c-n>l :CtrlPLine<cr>
-nnoremap <silent> <c-n>d :vimgrep /TODO\\|FIXME/gj **/*.*<cr>:CtrlPQuickfix<cr>
-"}}}
-
 "ultisnips {{{
 " let g:UltiSnipsExpandTrigger="<Nop>"
 " let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -581,6 +549,18 @@ autocmd VimEnter * call s:ConfigAirlineSymbols()
 nnoremap <F4> :UndotreeToggle<cr> :UndotreeFocus<cr>
 inoremap <F4> <esc><f4>
 "}}}
+
+" fzf {{{
+let g:fzf_layout = { 'up': '~20%' }
+
+map <c-p> :Files<cr>
+nmap \ :BLines<cr>
+nmap <leader>L :Lines<cr>
+nmap <leader>m :Marks<cr>
+nmap <leader>T :Tags<cr>
+nmap <leader>t :BTags<cr>
+
+" }}}
 
 "neomake "{{{
 let g:neomake_error_sign = {'text': '⚑'}
