@@ -17,7 +17,8 @@
 if has('nvim')
     let $VIMHOME = "~/.config/nvim"
     "normal mode in terminal by Esc
-    " tnoremap <Esc> <C-\><C-n>
+    tnoremap <c-q> <C-\><C-n>
+    tnoremap <c-w> <C-\><C-n><c-w>
 else
     let $VIMHOME = "~/.vim"
 endif
@@ -43,6 +44,7 @@ Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'mhartington/oceanic-next'
 Plug 'luochen1990/rainbow'      "hi brackets diff colors
+Plug 'Yggdroot/indentLine'
 
 "utils
 Plug 'tpope/vim-repeat'
@@ -328,6 +330,9 @@ set colorcolumn=100
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
 vnoremap <tab> >gv
+
+let g:indentLine_color_term = 239
+let g:indentLine_color_gui = '#343D46'
 "}}}
 
 "lines/numbers/wrap {{{
@@ -342,8 +347,6 @@ set nowrap
 set scrolloff=5
 "horizontal scroll by 1 col
 set sidescroll=1
-"manual folding
-set foldmethod=manual
 
 "return to last edit position
 autocmd BufReadPost *
@@ -363,10 +366,21 @@ nnoremap <c-l>n :set nornu<cr>:set number<cr>
 nnoremap <c-l>h :set nonumber<cr>:set nornu<cr>
 nnoremap <c-l>w :set wrap!<cr>
 
+"folds
+set foldmethod=syntax
+set foldlevelstart=20
+set foldnestmax=2
+
 "fold file header (e.g. license javadoc)
 nnoremap zh mmggzf%`m
 "fold current statement
 nnoremap ze zf%
+
+augroup remember_folds
+  autocmd!
+  autocmd BufWinLeave *.* mkview
+  autocmd BufWinEnter *.* silent! loadview
+augroup END
 
 "multiple cursor
 let g:multi_cursor_start_key='<c-m>'
@@ -485,11 +499,33 @@ let g:deoplete#sources = {}
 "}}}
 
 "theme {{{
-if (has("termguicolors"))
-    set termguicolors
-endif
 " set background=dark
 colorscheme OceanicNext
+
+if (has("termguicolors"))
+    set termguicolors
+
+    hi LineNr guifg=#65737E guibg=#1E303B
+    hi CursorLineNr guifg=#EC5f67 guibg=#1E303B gui=none
+    hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
+
+    highlight GitGutterAdd guibg=#1E303B
+    highlight GitGutterChange guibg=#1E303B
+    highlight GitGutterDelete guibg=#1E303B
+    highlight GitGutterChangeDelete guibg=#1E303B
+
+    hi xmlTagName guifg=#EC5f67
+    hi xmlTagN guifg=#EC5f67
+    hi xmlAttrib guifg=#C594C5
+    hi jsBrackets guifg=#5FB3B3
+    hi jsBraces guifg=#5FB3B3
+    hi jsParens guifg=#5FB3B3
+    hi jsFuncParens guifg=#5FB3B3
+    hi jsFuncCall guifg=#6699CC
+    hi jsObjectProp guifg=#EC5f67
+    hi jsGlobalObjects guifg=#fac863
+    hi jsStorageClass guifg=#C594C5
+endif
 
 " highlight line in insert mode
 hi cursorline cterm=none ctermbg=238 ctermfg=none
@@ -497,8 +533,8 @@ autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
 set nocul
 
-"hl TODO in blue
-highlight Todo ctermfg=blue
+"hl TODO, FIXME in blue bold
+highlight Todo ctermfg=blue guibg=none guifg=#6699CC gui=bold cterm=bold
 
 "rainbow brackets
 let g:rainbow_active = 1
@@ -624,22 +660,9 @@ let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
 
 autocmd! BufRead *.js Neomake
 autocmd! BufWritePost *.js Neomake
-" let g:neomake_logfile='/tmp/neomake.log'
 
-" hi
-if (has("termguicolors"))
-    hi xmlTagName guifg=#EC5f67
-    hi xmlTagN guifg=#EC5f67
-    hi xmlAttrib guifg=#C594C5
-    hi jsBrackets guifg=#5FB3B3
-    hi jsBraces guifg=#5FB3B3
-    hi jsParens guifg=#5FB3B3
-    hi jsFuncParens guifg=#5FB3B3
-    hi jsFuncCall guifg=#6699CC
-    hi jsObjectProp guifg=#EC5f67
-    hi jsGlobalObjects guifg=#fac863
-    hi jsStorageClass guifg=#C594C5
-endif
+map <s-f9> :!adb shell input keyevent 82 &<cr><cr>
+" let g:neomake_logfile='/tmp/neomake.log'
 "}}}
 
 " vim: set et fdm=marker sts=4 sw=4:
