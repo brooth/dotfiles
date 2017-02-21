@@ -44,7 +44,7 @@ Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'mhartington/oceanic-next'
 Plug 'luochen1990/rainbow'      "hi brackets diff colors
-Plug 'Yggdroot/indentLine'
+" Plug 'Yggdroot/indentLine'
 
 "utils
 Plug 'tpope/vim-repeat'
@@ -74,6 +74,7 @@ Plug 'Shougo/deoplete.nvim'
 "dev
 " Plug 'SirVer/ultisnips'
 Plug 'neomake/neomake', {'for': ['python', 'javascript', 'javascript.jsx']}
+Plug 'metakirby5/codi.vim'
 
 "javascript, nodejs
 Plug 'pangloss/vim-javascript'
@@ -326,6 +327,8 @@ set expandtab
 
 "show vertical line
 set colorcolumn=100
+"no syntax after colorcolumn
+set synmaxcol=99
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
@@ -339,14 +342,15 @@ let g:indentLine_color_gui = '#343D46'
 set number
 "releative line numbers
 set rnu
-"show a visual line under the cursor's current line
-set cursorline
 "no wrapping by default
 set nowrap
+
 "keep 5 lines below and above cursor
 set scrolloff=5
 "horizontal scroll by 1 col
 set sidescroll=1
+"faster scrolling
+set lazyredraw
 
 "return to last edit position
 autocmd BufReadPost *
@@ -399,7 +403,7 @@ nnoremap <c-c>n :lnext<cr>
 nnoremap <c-c>p :lprevious<cr>
 
 "format all file
-nnoremap <c-c>= mCgg=G`cmC
+nnoremap <c-c>= mCgg=G`CmC
 
 "comment line
 map  gcl
@@ -590,11 +594,12 @@ inoremap <F4> <esc><f4>
 let g:fzf_layout = { 'up': '~20%' }
 
 map <c-p> :Files<cr>
-nmap \ :BLines<cr>
-nmap <leader>L :Lines<cr>
-nmap <leader>m :Marks<cr>
-nmap <leader>T :Tags<cr>
-nmap <leader>t :BTags<cr>
+nmap \ :Buffers<cr>
+nmap <c-n>L :Lines<cr>
+nmap <c-n>l :BLines<cr>
+nmap <c-n>m :Marks<cr>
+nmap <c-n>T :Tags<cr>
+nmap <c-n>t :BTags<cr>
 
 " }}}
 
@@ -635,6 +640,8 @@ let g:javascript_plugin_flow = 1
 set wildignore+=*/node_modules
 set wildignore+=*/node_modules/**
 
+syntax keyword jsConditional delete
+
 "deoplete
 call deoplete#custom#set('flow', 'rank', 700)
 let flow_path = getcwd() . '/node_modules/.bin/flow'
@@ -661,7 +668,7 @@ let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
 autocmd! BufRead *.js Neomake
 autocmd! BufWritePost *.js Neomake
 
-map <s-f9> :!adb shell input keyevent 82 &<cr><cr>
+map <m-0> :!adb shell input keyevent 82 &<cr><cr>
 " let g:neomake_logfile='/tmp/neomake.log'
 "}}}
 
