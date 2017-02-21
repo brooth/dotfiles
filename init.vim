@@ -44,7 +44,7 @@ Plug 'morhetz/gruvbox'
 Plug 'bling/vim-airline'
 Plug 'mhartington/oceanic-next'
 Plug 'luochen1990/rainbow'      "hi brackets diff colors
-" Plug 'Yggdroot/indentLine'
+Plug 'Yggdroot/indentLine'
 
 "utils
 Plug 'tpope/vim-repeat'
@@ -327,12 +327,16 @@ set expandtab
 
 "show vertical line
 set colorcolumn=100
-"no syntax after colorcolumn
-set synmaxcol=99
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
 vnoremap <tab> >gv
+
+" copy lines up/down
+nnoremap <c-k> yyP
+nnoremap <c-j> yyp
+vnoremap <c-k> yP
+vnoremap <c-j> mCy`Cp`CmC
 
 let g:indentLine_color_term = 239
 let g:indentLine_color_gui = '#343D46'
@@ -513,10 +517,10 @@ if (has("termguicolors"))
     hi CursorLineNr guifg=#EC5f67 guibg=#1E303B gui=none
     hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
 
-    highlight GitGutterAdd guibg=#1E303B
-    highlight GitGutterChange guibg=#1E303B
-    highlight GitGutterDelete guibg=#1E303B
-    highlight GitGutterChangeDelete guibg=#1E303B
+    hi GitGutterAdd guibg=#1E303B
+    hi GitGutterChange guibg=#1E303B
+    hi GitGutterDelete guibg=#1E303B
+    hi GitGutterChangeDelete guibg=#1E303B
 
     hi xmlTagName guifg=#EC5f67
     hi xmlTagN guifg=#EC5f67
@@ -529,6 +533,9 @@ if (has("termguicolors"))
     hi jsObjectProp guifg=#EC5f67
     hi jsGlobalObjects guifg=#fac863
     hi jsStorageClass guifg=#C594C5
+
+    hi NeomakeErrorSign guibg=#1E303B
+    hi NeomakeWarningSign guibg=#1E303B
 endif
 
 " highlight line in insert mode
