@@ -9,7 +9,7 @@ let g:plugins = {
             \   'steelsojka/deoplete-flow': {}
             \ }
 
-source ~/Projects/dotfiles/init.vim
+source ~/Projects/dotfiles/vimrc.vim
 
 "search/replace/subtitude "{{{
 call add(g:far#file_mask_favorits, ['**/*.html', '**/*.js'])

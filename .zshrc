@@ -24,8 +24,8 @@ setopt no_share_history
 alias g=~/gradle/bin/gradle
 
 alias vi='nvim -u ~/Projects/dotfiles/vimrc.vim'
-alias wvi='nvim -u ~/Projects/dotfiles/webvimrc.vim'
-alias pvi='nvim -u ~/Projects/dotfiles/pyvimrc.vim'
+alias wi='nvim -u ~/Projects/dotfiles/webvimrc.vim'
+alias pi='nvim -u ~/Projects/dotfiles/pyvimrc.vim'
 alias ack-grep=ack
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
