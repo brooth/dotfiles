@@ -37,55 +37,54 @@ autocmd VimEnter * call InitVimEnterSettings()
 "}}}
 
 "plugins {{{
+let g:plugins = exists('g:plugins') ? g:plugins : {}
+
+" appearance
+call extend(g:plugins, {
+            \   'morhetz/gruvbox': {},
+            \   'bling/vim-airline': {},
+            \   'mhartington/oceanic-next': {},
+            \   'luochen1990/rainbow': {},
+            \   'Yggdroot/indentLine': {},
+            \   })
+" tools
+call extend(g:plugins, {
+            \   'tpope/vim-repeat': {},
+            \   'tpope/vim-surround': {},
+            \   'tpope/vim-commentary': {},
+            \   'kshenoy/vim-signature': {},
+            \   'terryma/vim-expand-region': {},
+            \   'easymotion/vim-easymotion': {},
+            \   'vim-scripts/ReplaceWithRegister': {},
+            \   'terryma/vim-multiple-cursors': {},
+            \   })
+" my boys
+call extend(g:plugins, {
+            \   '~/Projects/far.vim': {},
+            \   '~/Projects/meta-x.vim': {},
+            \   })
+" files
+call extend(g:plugins, {
+            \   'mbbill/undotree': {},
+            \   'junegunn/fzf': {'dir': '~/.fzf', 'do': './install --all'},
+            \   'junegunn/fzf.vim': {},
+            \   })
+" git
+call extend(g:plugins, {
+            \   'tpope/vim-fugitive': {},
+            \   'airblade/vim-gitgutter': {},
+            \   })
+" dev
+call extend(g:plugins, {
+            \   'Shougo/deoplete.nvim': {},
+            \   'metakirby5/codi.vim': {},
+            \   'davinche/godown-vim': {},
+            \   })
+
 call plug#begin('$VIMHOME/plugged')
-
-"appearance
-Plug 'morhetz/gruvbox'
-Plug 'bling/vim-airline'
-Plug 'mhartington/oceanic-next'
-Plug 'luochen1990/rainbow'      "hi brackets diff colors
-Plug 'Yggdroot/indentLine'
-
-"utils
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
-Plug 'kshenoy/vim-signature'    "show marks
-Plug 'terryma/vim-expand-region'
-Plug 'easymotion/vim-easymotion'
-Plug 'vim-scripts/ReplaceWithRegister' "replace <motion> with register
-Plug 'terryma/vim-multiple-cursors'
-" Plug 'haya14busa/incsearch.vim' "wait cursor fix. implement in insane.vim?
-Plug '~/Projects/far.vim'
-Plug '~/Projects/meta-x.vim'
-
-"files
-Plug 'mbbill/undotree'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-
-"git
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-
-"completion
-Plug 'Shougo/deoplete.nvim'
-
-"dev
-" Plug 'SirVer/ultisnips'
-Plug 'neomake/neomake', {'for': ['python', 'javascript', 'javascript.jsx']}
-Plug 'metakirby5/codi.vim'
-
-"javascript, nodejs
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
-Plug 'othree/yajs'
-Plug 'steelsojka/deoplete-flow'
-" {'for': ['javascript', 'js', 'jsx', 'javascript.jsx']}
-
-"markdown
-Plug 'davinche/godown-vim', {'for': 'markdown'} "instant md preview
-
+    for plug in keys(g:plugins)
+        call plug#(plug, g:plugins[plug])
+    endfor
 call plug#end()
 "}}}
 
@@ -304,8 +303,7 @@ endif
 "far.vim
 let g:far#debug = 0
 let g:far#check_window_resize_period = 3000
-let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.py', '**/*.html',
-            \   '**/*.vim', '**/*.txt', '**/*.java', '**/*.gradle']
+let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.vim', '**/*.txt']
 "}}}
 
 "indent/tab/spaces "{{{
@@ -433,6 +431,13 @@ nnoremap <silent> <c-n>e :Explore<cr>
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
+if(&termguicolors)
+    hi GitGutterAdd guibg=#1E303B
+    hi GitGutterChange guibg=#1E303B
+    hi GitGutterDelete guibg=#1E303B
+    hi GitGutterChangeDelete guibg=#1E303B
+endif
+
 nnoremap <c-g>b :Gblame<cr>
 nnoremap <c-g>B :Gbrowse<cr>
 nnoremap <c-g>s :Gstatus<cr>
@@ -516,26 +521,6 @@ if (has("termguicolors"))
     hi LineNr guifg=#65737E guibg=#1E303B
     hi CursorLineNr guifg=#EC5f67 guibg=#1E303B gui=none
     hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
-
-    hi GitGutterAdd guibg=#1E303B
-    hi GitGutterChange guibg=#1E303B
-    hi GitGutterDelete guibg=#1E303B
-    hi GitGutterChangeDelete guibg=#1E303B
-
-    hi xmlTagName guifg=#EC5f67
-    hi xmlTagN guifg=#EC5f67
-    hi xmlAttrib guifg=#C594C5
-    hi jsBrackets guifg=#5FB3B3
-    hi jsBraces guifg=#5FB3B3
-    hi jsParens guifg=#5FB3B3
-    hi jsFuncParens guifg=#5FB3B3
-    hi jsFuncCall guifg=#6699CC
-    hi jsObjectProp guifg=#EC5f67
-    hi jsGlobalObjects guifg=#fac863
-    hi jsStorageClass guifg=#C594C5
-
-    hi NeomakeErrorSign guibg=#1E303B
-    hi NeomakeWarningSign guibg=#1E303B
 endif
 
 " highlight line in insert mode
@@ -613,70 +598,17 @@ nmap <c-n>t :BTags<cr>
 "neomake "{{{
 let g:neomake_error_sign = {'text': '⚑'}
 let g:neomake_warning_sign = {'text': '⚑'}
+
+if (&termguicolors)
+    hi NeomakeErrorSign guibg=#1E303B
+    hi NeomakeWarningSign guibg=#1E303B
+endif
+
 "}}}
 
 "markdown "{{{
 autocmd BufRead *.md set wrap lbr
 autocmd BufEnter *.md set syntax=markdown
-"}}}
-
-"html/templates "{{{
-let g:html_inited = 0
-function! SetupHtmlSettings()
-    set syntax=html
-    syntax keyword javaScriptConditional var
-
-    if g:html_inited != 0
-        return
-    endif
-    let g:html_inited = 1
-
-    " highlights
-    highlight htmlTagName ctermfg=208
-    highlight htmlTag ctermfg=109
-    highlight htmlArg ctermfg=109
-    highlight javaScript ctermfg=250
-endfunction
-autocmd BufEnter *.html call SetupHtmlSettings()
-"}}}
-
-"js/react/nodejs "{{{
-let g:jsx_ext_required = 0
-let g:javascript_plugin_flow = 1
-
-set wildignore+=*/node_modules
-set wildignore+=*/node_modules/**
-
-syntax keyword jsConditional delete
-
-"deoplete
-call deoplete#custom#set('flow', 'rank', 700)
-let flow_path = getcwd() . '/node_modules/.bin/flow'
-let g:deoplete#sources#flow#flow_bin = flow_path
-
-"neomake
-function! ProcessEslint(entry)
-    if a:entry.text =~ 'Warning'
-        let a:entry.type = 'W'
-    endif
-endfunction
-
-let g:neomake_javascript_enabled_makers = ['eslint']
-let eslint_exec = getcwd() . '/node_modules/.bin/eslint'
-let g:neomake_javascript_eslint_maker = {
-            \ 'exe': eslint_exec,
-            \ 'args': ['-f', 'compact'],
-            \ 'errorformat': '%f: line %l\, col %c\, %m',
-            \ 'postprocess': function('ProcessEslint')
-            \ }
-let g:neomake_jsx_enabled_makers = g:neomake_javascript_enabled_makers
-let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
-
-autocmd! BufRead *.js Neomake
-autocmd! BufWritePost *.js Neomake
-
-map <m-0> :!adb shell input keyevent 82 &<cr><cr>
-" let g:neomake_logfile='/tmp/neomake.log'
 "}}}
 
 " vim: set et fdm=marker sts=4 sw=4:
