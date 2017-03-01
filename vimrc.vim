@@ -431,13 +431,6 @@ nnoremap <silent> <c-n>e :Explore<cr>
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-if(&termguicolors)
-    hi GitGutterAdd guibg=#1E303B
-    hi GitGutterChange guibg=#1E303B
-    hi GitGutterDelete guibg=#1E303B
-    hi GitGutterChangeDelete guibg=#1E303B
-endif
-
 nnoremap <c-g>b :Gblame<cr>
 nnoremap <c-g>B :Gbrowse<cr>
 nnoremap <c-g>s :Gstatus<cr>
@@ -458,13 +451,20 @@ let g:gitgutter_sign_removed = '↩'
 let g:gitgutter_sign_modified = '↬'
 let g:gitgutter_sign_modified_removed = '↫'
 
-" function! s:ConfigGitGutter()
-"     highlight GitGutterAdd ctermfg=244 ctermbg=237
-"     highlight GitGutterChange ctermfg=244 ctermbg=237
-"     highlight GitGutterDelete ctermfg=244 ctermbg=237
-"     highlight GitGutterChangeDelete ctermfg=244 ctermbg=237
-" endfunction
-" autocmd VimEnter * call s:ConfigGitGutter()
+function! s:ConfigGitGutter()
+    if(&termguicolors)
+        hi GitGutterAdd guibg=#1E303B
+        hi GitGutterChange guibg=#1E303B
+        hi GitGutterDelete guibg=#1E303B
+        hi GitGutterChangeDelete guibg=#1E303B
+    else
+        hi GitGutterAdd ctermfg=244 ctermbg=237
+        hi GitGutterChange ctermfg=244 ctermbg=237
+        hi GitGutterDelete ctermfg=244 ctermbg=237
+        hi GitGutterChangeDelete ctermfg=244 ctermbg=237
+    endif
+endfunction
+autocmd VimEnter * call s:ConfigGitGutter()
 "}}}
 
 "completion/deoplete {{{

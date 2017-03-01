@@ -66,6 +66,7 @@ let g:neomake_jsz_eslint_maker = g:neomake_javascript_eslint_maker
 autocmd! BufRead *.js Neomake
 autocmd! BufWritePost *.js Neomake
 
+map <m-9> :!adb shell input keyevent 3 &<cr><cr>
 map <m-0> :!adb shell input keyevent 82 &<cr><cr>
 " let g:neomake_logfile='/tmp/neomake.log'
 "}}}
@@ -74,7 +75,7 @@ map <m-0> :!adb shell input keyevent 82 &<cr><cr>
 let g:html_inited = 0
 function! SetupHtmlSettings()
     set syntax=html
-    syntax keyword javaScriptConditional var
+    syntax keyword javaScriptConditional var,of
 
     if g:html_inited != 0
         return
