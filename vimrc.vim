@@ -195,7 +195,7 @@ nnoremap <silent><c-s>s :call SaveSession()<cr>
 nnoremap <silent><c-s>l :exec 'source '.g:initial_dir.'/.vimsession'<cr>
 
 nnoremap <silent><c-s>e :e ~/.config/nvim/init.vim<cr>
-nnoremap <silent><c-s>r :source ~/.config/nvim/init.vim<cr>
+nnoremap <silent><c-s>r :source ~/Projects/dotfiles/vimrc.vim<cr>
 nnoremap <c-s>t :source %<cr>
 "}}}
 
@@ -325,6 +325,7 @@ set expandtab
 
 "show vertical line
 set colorcolumn=100
+set synmaxcol=0
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
@@ -446,10 +447,10 @@ nnoremap <c-g>l :GitGutterLineHighlightsToggle<cr>
 nnoremap [h :GitGutterPrevHunk<cr>
 nnoremap ]h :GitGutterNextHunk<cr>
 
-let g:gitgutter_sign_added = '↪'
-let g:gitgutter_sign_removed = '↩'
-let g:gitgutter_sign_modified = '↬'
-let g:gitgutter_sign_modified_removed = '↫'
+let g:gitgutter_sign_added = '⤿'
+let g:gitgutter_sign_removed = '⤾'
+let g:gitgutter_sign_modified = '⤿'
+let g:gitgutter_sign_modified_removed = '⤾'
 
 function! s:ConfigGitGutter()
     if(&termguicolors)
@@ -596,8 +597,8 @@ nmap <c-n>t :BTags<cr>
 " }}}
 
 "neomake "{{{
-let g:neomake_error_sign = {'text': '⚑'}
-let g:neomake_warning_sign = {'text': '⚑'}
+let g:neomake_error_sign = {'text': '⏺'}
+let g:neomake_warning_sign = {'text': '⏺'}
 
 if (&termguicolors)
     hi NeomakeErrorSign guibg=#1E303B
