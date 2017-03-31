@@ -1,49 +1,19 @@
 // Place your settings in this file to overwrite the default settings
 {
+    "files.autoSave": "onFocusChange",
     "editor.fontSize": 14,
     "editor.fontFamily": "ubuntu mono",
-    "window.zoomLevel": 0.8,
+    "window.zoomLevel": 0,
     "editor.rulers": [100],
-    "editor.wrappingColumn": 0,
     "editor.renderIndentGuides": false,
     "editor.lineNumbers": "relative",
-    //Vim
-    "vim.useCtrlKeys": false,
-    "vim.useSystemClipboard": false,
-    "vim.autoindent": true,
-    "vim.hlsearch": true,
-    "vim.incsearch": true,
-    "vim.ignorecase": false,
-    "vim.smartcase": false,
-    "vim.scroll": 10,
-    "vim.otherModesKeyBindingsNonRecursive": [
-        {
-            "before": [ "shift+8" ],
-            "after": [],
-            "command": "editor.action.addSelectionToNextFindMatch"
-        },
-        {
-            "before": [ "k" ],
-            "after": [ "g", "k" ]
-        },
-        {
-            "before": [ "j" ],
-            "after": [ "g", "j" ]
-        },
-        {
-            "before": [ "Y" ],
-            "after": [ "y", "$" ]
-        },
-        {
-            "before": [ "g", "r", "w" ],
-            "after": [ "P", "l", "d", "w"]
-        },
-        {
-            "before": [ "g", "r", "$" ],
-            "after": [ "P", "l", "d", "$"]
-        }
-    ],
+    "editor.minimap.enabled": true,
+
     // Local History
-    "local-history.daysLimit": 1
+    "local-history.daysLimit": 1,
+    
+    // Autosavings
+    "workbench.colorTheme": "Gruvbox Dark (Medium Contrast)",
+    "workbench.iconTheme": "vscode-icons"
     //"local-history.path": "./.vscode" // Specify another location for .history folder (null: use workspaceRoot)
 }
