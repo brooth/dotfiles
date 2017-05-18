@@ -11,7 +11,13 @@
 
     // Local History
     "local-history.daysLimit": 1,
-    
+ 
+    "search.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/.history": true
+    },
+
     // Autosavings
     "workbench.colorTheme": "Gruvbox Dark (Medium Contrast)",
     "workbench.iconTheme": "vscode-icons"

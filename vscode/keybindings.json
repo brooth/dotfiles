@@ -1,10 +1,6 @@
 // Place your key bindings in this file to overwrite the defaults
 [
     {
-        "key": "f2",
-        "command": "workbench.action.files.save"
-    },
-    {
         "key": "shift+f6",
         "command": "editor.action.save",
         "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
@@ -100,5 +96,9 @@
         "key": "ctrl+w ctrl+c",
         "command": "workbench.action.closeAllEditors",
         "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+shift+alt+j",
+        "command": "editor.action.joinLines"
     }
 ]
