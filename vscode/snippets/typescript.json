@@ -1,0 +1,71 @@
+{
+    "reducer handler": {
+        "prefix": "_reducer-handler",
+        "body": [
+            "handlers[actions.${1}.TYPE] =",
+            "    (state: State, payload: actions.${1}.Payload): State => {",
+            "        return {",
+            "            ...state,${0}",
+            "        };",
+            "    };"
+        ]
+    },
+    "action declaration": {
+        "prefix": "_action-scheme",
+        "body": [
+            "export namespace ${1} {",
+            "    export const TYPE = '${2}__${1}';",
+            "    export type  Payload = ${3:null};",
+            "}"
+        ]
+    },
+    "async actions declaration": {
+        "prefix": "_async-actions-scheme",
+        "body": [
+            "export namespace ${1} {",
+            "    export const TYPE = '${2}__${1}';",
+            "    export type Payload = ${3:null};",
+            "}",
+            "export namespace ${1}__in_progress {",
+            "    export const TYPE = '${2}__${1}__in_progress';",
+            "    export type Payload = null;",
+            "}",
+            "export namespace ${1}__complete {",
+            "    export const TYPE = '${2}__${1}__complete';",
+            "    export type Payload = CompletePayload & {${0}};",
+            "}"
+        ]
+    },
+    "async action": {
+        "prefix": "_firebase-action",
+        "body": [
+            "import { Action as ReduxAction } from 'redux';",
+            "import { put } from 'redux-saga/effects';",
+            "import * as firebase from 'firebase';",
+            "",
+            "import { ACTIONS } from '..';",
+            "import C from '../../c';",
+            "",
+            "type Action = ReduxAction & {payload: ACTIONS.${1}.Payload};",
+            "export default function* execute(action: Action ): Generator {",
+            "    yield put({ type: ACTIONS.${1}__in_progress.TYPE });",
+            "",
+            "    const result: ACTIONS.${1}__complete.Payload =",
+            "        yield firebase.${2}",
+            "            .then((result: any): ACTIONS.${1}__complete.Payload => {",
+            "                return {",
+            "                    status: C.STATUSES.OK,${0}",
+            "                }",
+            "            })",
+            "            .catch((error: any): ACTIONS.${1}__complete.Payload => {",
+            "                return {",
+            "                    status: error.code == 'auth/network-request-failed' ?",
+            "                        C.ActionsStatuses.NETWORK_PROBLEMS : C.STATUSES.SERVER_ERROR,",
+            "                }",
+            "            });",
+            "",
+            "    yield put({ type: ACTIONS.${1}__complete.TYPE, payload: result });",
+            "}"
+        ]    
+    }
+}
