@@ -18,6 +18,16 @@
         "**/.history": true
     },
 
+    // todo prugin:
+    "todohighlight.isCaseSensitive": false,
+    "todohighlight.keywords": [
+        {
+            "text": "TODO:",
+            "color": "rgb(66, 165, 245)",
+            "backgroundColor": "rgba(0,0,0,0)"
+        }
+    ],
+    
     // Autosavings
     "workbench.colorTheme": "Gruvbox Dark (Medium Contrast)",
     "workbench.iconTheme": "vscode-icons"
