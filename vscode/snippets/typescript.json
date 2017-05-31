@@ -1,4 +1,27 @@
 {
+    "reducer": {
+        "prefix": "_reducer",
+        "body": [
+            "//import { ActionState } from '.';",
+            "//import actions from '../actions';",
+            "//import {  } from '../entities';",
+            "",
+            "",
+            "export interface State {",
+            "}",
+            "const initialState: State = {",
+            "}",
+            "",
+            "const handlers: { [key: string]: (state: State, payload: any) => State } = {};",
+            "",
+            "export default function profileReducer(state: State = initialState, action: any): State {",
+            "    const handler = handlers[action.type];",
+            "    if (handler)",
+            "        return handler(state, action.payload);",
+            "    return state;",
+            "}"
+        ]
+    },
     "reducer handler": {
         "prefix": "_reducer-handler",
         "body": [
@@ -43,29 +66,29 @@
             "import { put } from 'redux-saga/effects';",
             "import * as firebase from 'firebase';",
             "",
-            "import { ACTIONS } from '..';",
+            "import actions from '..';",
             "import C from '../../c';",
             "",
-            "type Action = ReduxAction & {payload: ACTIONS.${1}.Payload};",
+            "type Action = ReduxAction & {payload: actions.${1}.Payload};",
             "export default function* execute(action: Action ): Generator {",
-            "    yield put({ type: ACTIONS.${1}__in_progress.TYPE });",
+            "    yield put({ type: actions.${1}__in_progress.TYPE });",
             "",
-            "    const result: ACTIONS.${1}__complete.Payload =",
+            "    const result: actions.${1}__complete.Payload =",
             "        yield firebase.${2}",
-            "            .then((result: any): ACTIONS.${1}__complete.Payload => {",
+            "            .then((result: any): actions.${1}__complete.Payload => {",
             "                return {",
             "                    status: C.STATUSES.OK,${0}",
             "                }",
             "            })",
-            "            .catch((error: any): ACTIONS.${1}__complete.Payload => {",
+            "            .catch((error: any): actions.${1}__complete.Payload => {",
             "                return {",
             "                    status: error.code == 'auth/network-request-failed' ?",
-            "                        C.ActionsStatuses.NETWORK_PROBLEMS : C.STATUSES.SERVER_ERROR,",
+            "                        C.STATUSES.NETWORK_PROBLEMS : C.STATUSES.SERVER_ERROR,",
             "                }",
             "            });",
             "",
-            "    yield put({ type: ACTIONS.${1}__complete.TYPE, payload: result });",
+            "    yield put({ type: actions.${1}__complete.TYPE, payload: result });",
             "}"
-        ]    
+        ]
     }
 }

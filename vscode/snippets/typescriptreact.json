@@ -1,48 +1,91 @@
 {
-	"component template": {
-		"prefix": "comtempl",
+	"override componentWillMount()": {
+		"prefix": "_override_componentWillMount",
 		"body": [
-			"import * as React from 'react';",
-			"import { connect } from 'react-redux';",
-			"",
-			"import { IState as AppState } from '../../../reducers';",
-			"",
-			"import C from '../../../c';",
-			"import Component from '../../base';",
-			"",
-			"",
-			"interface State {",
-			"};",
-			"interface DispatchProps {",
-			"}",
-			"interface StateProps {",
-			"}",
-			"interface ComponentProps {",
-			"}",
-			"type Props = ComponentProps & StateProps & DispatchProps;",
-			"",
-			"",
-			"class ${1:Form} extends Component<Props, State> {",
-			"   state: State;",
-			"",
-			"   constructor(props: Props) {",
-			"       super(props);",
-			"",
-			"       this.state = {",
-			"       };",
-			"   }",
-			"",
-			"   render() {",
-			"      return ();",
-			"   }",
-			"}",
-			"",
-			"export default connect<StateProps, DispatchProps, ComponentProps>(",
-			"   (state: AppState): StateProps => ({",
-			"   }),",
-			"   (dispatch: any): DispatchProps => ({",
-			"   }))(${1:Form});"
-		],
-		"description": "TSX component template"
-	}
+			"componentWillMount(): void {",
+			"}"
+		]
+	},
+	"override componentDidMount()": {
+		"prefix": "_override_componentDidMount",
+		"body": [
+			"componentDidMount(): void {",
+			"}"
+		]
+	},
+	"override componentWillUnmount()": {
+		"prefix": "_override_componentWillUnmount",
+		"body": [
+			"componentWillUnmount(): void {",
+			"}"
+		]
+	},
+	"override componentWillReceiveProps()": {
+		"prefix": "_override_componentWillReceiveProps",
+		"body": [
+			"componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {",
+			"}"
+		]
+	},
+	"override componentWillUpdate()": {
+		"prefix": "_override_componentWillUpdate",
+		"body": [
+			"componentWillUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): void {",
+			"}"
+		]
+	},
+	"override componentDidUpdate()": {
+		"prefix": "_override_componentDidUpdate",
+		"body": [
+			"componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, prevContext: any): void {",
+			"}"
+		]
+	},
+    "component template": {
+        "prefix": "_component",
+        "body": [
+            "import * as React from 'react';",
+            "import { connect } from 'react-redux';",
+            "//import { } from 'reactstrap';",
+            "",
+            "import { State as AppState } from '../../../reducers';",
+            "//import actions from '../../../actions';",
+            "",
+            "import Component from '../../base';",
+            "",
+            "",
+            "interface State {",
+            "};",
+            "interface ComponentProps {",
+            "}",
+            "interface StateProps {",
+            "}",
+            "interface DispatchProps {",
+            "}",
+            "type Props = ComponentProps & StateProps & DispatchProps;",
+            "",
+            "",
+            "class ${1:Form} extends Component<Props, State> {",
+            "   state: State;",
+            "",
+            "   constructor(props: Props) {",
+            "       super(props);",
+            "",
+            "       this.state = {",
+            "       };",
+            "   }",
+            "",
+            "   render(): JSX.Element | null  {",
+            "      return ();",
+            "   }",
+            "}",
+            "",
+            "export default connect<StateProps, DispatchProps, ComponentProps>(",
+            "   (state: AppState): StateProps => ({",
+            "   }),",
+            "   (dispatch: any): DispatchProps => ({",
+            "   }))(${1:Form});"
+        ],
+        "description": "TSX component template"
+    }
 }
