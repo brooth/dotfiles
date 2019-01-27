@@ -1,0 +1,21 @@
+{
+    "telemetry.enableTelemetry": false,
+    "code-runner.enableAppInsights": false,
+    "workbench.colorTheme": "One Dark Bimbo",
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "onFocusChange",
+    "editor.fontFamily": "Monaco, 'Courier New', monospace",
+    "editor.fontSize": 13,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "files.exclude": {
+        ".history": true,
+        "**/node_modules": true
+    },
+    "editor.autoClosingBrackets": "beforeWhitespace",
+    "editor.autoClosingQuotes": "beforeWhitespace",
+    "vim.easymotion": true,
+    "vim.easymotionMarkerFontSize": "13",
+    "vim.easymotionMarkerFontFamily": "Monaco",
+    "explorer.autoReveal": false,
+    "explorer.confirmDelete": false
+}
