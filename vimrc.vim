@@ -47,7 +47,7 @@ Plug 'tpope/vim-commentary'
 
 " my boys
 Plug '~/Projects/far.vim'
-Plug '~/Projects/meta-x.vim'
+" Plug '~/Projects/meta-x.vim'
 
 " files
 Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --all'}
@@ -129,14 +129,15 @@ cnoremap <c-h> <left>
 cnoremap <c-l> <right>
 
 "insane.vim
-call mx#tools#setdefault('g:mx#favorits', [
-            \   {'word': 'find'},
-            \   {'word': 'so %'},
-            \   {'word': 'qall', 'short': 'qa'},
-            \   {'word': 'edit!'},
-            \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
-            \   ])
-"}}}
+"call mx#tools#setdefault('g:mx#favorits', [
+"            \   {'word': 'find'},
+"            \   {'word': 'so %'},
+"            \   {'word': 'so %'},
+"            \   {'word': 'qall', 'short': 'qa'},
+"            \   {'word': 'edit!'},
+"            \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
+"            \   ])
+""}}}
 
 "session/source {{{
 "do not store vimrc options in session

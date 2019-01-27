@@ -1,11 +1,11 @@
 #=============================================================
 #=========================== Settings ========================
 #=============================================================
+export ZSH=~/.oh-my-zsh
 export TERM="xterm-256color"
-ZSH_THEME="gentoo"
 
 source $ZSH/oh-my-zsh.sh
-source ~/.zshprc
+#source ~/.zshprc
 
 # History per pane
 setopt no_share_history
@@ -18,8 +18,6 @@ plugins=(docker git)
 #=============================================================
 #======================== Env Variables ======================
 #=============================================================
-export ZSH=~/.oh-my-zsh
-
 # Java & Android
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -71,3 +69,8 @@ alias da='docker attach'
 #======================== Misc ===============================
 #=============================================================
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+PROMPT='%{$fg_bold[blue]%}%(!.%1~.%~) %(!.%{$fg_bold[red]%}.%{$fg_bold[green]%}$(git_prompt_info)%_)%{$fg_bold[blue]%}$%{$reset_color%} '
+
+ZSH_THEME_GIT_PROMPT_PREFIX=""
+ZSH_THEME_GIT_PROMPT_SUFFIX=" "
