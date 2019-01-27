@@ -23,11 +23,6 @@ else
     let $VIMHOME = "~/.vim"
 endif
 
-"focus window of last created buffer
-function! JumpLastBufferWindow()
-    call win_gotoid(win_getid(bufwinnr(last_buffer_nr())))
-endfunction
-
 "g:initial_dir = path where vim started
 function! InitVimEnterSettings()
     let g:initial_dir = getcwd()
@@ -37,54 +32,33 @@ autocmd VimEnter * call InitVimEnterSettings()
 "}}}
 
 "plugins {{{
-let g:plugins = exists('g:plugins') ? g:plugins : {}
+call plug#begin()
 
 " appearance
-call extend(g:plugins, {
-            \   'morhetz/gruvbox': {},
-            \   'bling/vim-airline': {},
-            \   'mhartington/oceanic-next': {},
-            \   'luochen1990/rainbow': {},
-            \   'Yggdroot/indentLine': {},
-            \   })
-" tools
-call extend(g:plugins, {
-            \   'tpope/vim-repeat': {},
-            \   'tpope/vim-surround': {},
-            \   'tpope/vim-commentary': {},
-            \   'kshenoy/vim-signature': {},
-            \   'terryma/vim-expand-region': {},
-            \   'easymotion/vim-easymotion': {},
-            \   'vim-scripts/ReplaceWithRegister': {},
-            \   'terryma/vim-multiple-cursors': {},
-            \   })
-" my boys
-call extend(g:plugins, {
-            \   '~/Projects/far.vim': {},
-            \   '~/Projects/meta-x.vim': {},
-            \   })
-" files
-call extend(g:plugins, {
-            \   'mbbill/undotree': {},
-            \   'junegunn/fzf': {'dir': '~/.fzf', 'do': './install --all'},
-            \   'junegunn/fzf.vim': {},
-            \   })
-" git
-call extend(g:plugins, {
-            \   'tpope/vim-fugitive': {},
-            \   'airblade/vim-gitgutter': {},
-            \   })
-" dev
-call extend(g:plugins, {
-            \   'Shougo/deoplete.nvim': {},
-            \   'metakirby5/codi.vim': {},
-            \   'davinche/godown-vim': {},
-            \   })
+Plug 'morhetz/gruvbox'
+Plug 'bling/vim-airline'
+Plug 'mhartington/oceanic-next'
+Plug 'Yggdroot/indentLine'
 
-call plug#begin('$VIMHOME/plugged')
-    for plug in keys(g:plugins)
-        call plug#(plug, g:plugins[plug])
-    endfor
+" tools
+Plug 'tpope/vim-surround'
+Plug 'vim-scripts/ReplaceWithRegister'
+Plug 'tpope/vim-commentary'
+
+" my boys
+Plug '~/Projects/far.vim'
+Plug '~/Projects/meta-x.vim'
+
+" files
+Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --all'}
+Plug 'junegunn/fzf.vim'
+
+" git
+Plug 'airblade/vim-gitgutter'
+
+" complition
+Plug 'Shougo/deoplete.nvim'
+
 call plug#end()
 "}}}
 
@@ -127,14 +101,7 @@ inoremap <c-h> <left>
 inoremap <c-k> <up>
 inoremap <c-j> <down>
 inoremap <c-l> <right>
-
-"expand-region
-nnoremap ]e <Plug>(expand_region_expand)
-nnoremap [e <Plug>(expand_region_shrink)
-
-"no jump to exsiting pair, but insert
-let g:AutoPairsMultilineClose=0
-"}}}
+" }}}
 
 "abbreviations {{{
 iabbrev bgc brooth@gmail.com
@@ -324,8 +291,8 @@ set softtabstop=4
 set expandtab
 
 "show vertical line
-set colorcolumn=100
-set synmaxcol=0
+"set colorcolumn=100
+"set synmaxcol=0
 
 "indent text in visual mode with tab
 vnoremap <s-tab> <gv
@@ -372,8 +339,9 @@ nnoremap <c-l>r :set number<cr>:set rnu<cr>
 nnoremap <c-l>n :set nornu<cr>:set number<cr>
 nnoremap <c-l>h :set nonumber<cr>:set nornu<cr>
 nnoremap <c-l>w :set wrap!<cr>
+" }}}
 
-"folds
+"folds {{{
 set foldmethod=syntax
 set foldlevelstart=20
 set foldnestmax=2
@@ -388,12 +356,7 @@ augroup remember_folds
   autocmd BufWinLeave *.* mkview
   autocmd BufWinEnter *.* silent! loadview
 augroup END
-
-"multiple cursor
-let g:multi_cursor_start_key='<c-m>'
-let g:multi_cursor_start_word_key='<c-M>'
-let g:multi_cursor_next_key='<C-m>'
-"}}}
+" }}}
 
 "lint/correcting {{{
 "trailing
@@ -407,10 +370,6 @@ nnoremap <c-c>p :lprevious<cr>
 
 "format all file
 nnoremap <c-c>= mCgg=G`CmC
-
-"comment line
-map  gcl
-
 "}}}
 
 "files/types {{{
@@ -418,6 +377,7 @@ set wildignore+=*/bin/*
 set wildignore+=*/.git/*
 set wildignore+=*/.idea/*
 set wildignore+=*/build/*
+set wildignore+=*/node_modules/*
 
 autocmd BufRead,BufNewFile *.gradle set ft=groovy
 
@@ -432,20 +392,18 @@ nnoremap <silent> <c-n>e :Explore<cr>
 "no mappings by gitgutter
 let g:gitgutter_map_keys = 0
 
-nnoremap <c-g>b :Gblame<cr>
-nnoremap <c-g>B :Gbrowse<cr>
-nnoremap <c-g>s :Gstatus<cr>
-nnoremap <c-g>c :Gcommit<cr>
-nnoremap <c-g>d :Gvdiff<cr>
-nnoremap <c-g>P :Gpush<cr>
-nnoremap <c-g>L :Gpull<cr>
+"focus window of last created buffer
+function! JumpLastBufferWindow()
+    call win_gotoid(win_getid(bufwinnr(last_buffer_nr())))
+endfunction
+
 nnoremap <c-g>R :!git checkout <c-r>%<cr><cr>
 nnoremap <c-g>p :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
 nnoremap <c-g>r :GitGutterUndoHunk<cr>
 nnoremap <c-g>S :GitGutterStageHunk<cr>
 nnoremap <c-g>l :GitGutterLineHighlightsToggle<cr>
-nnoremap [h :GitGutterPrevHunk<cr>
-nnoremap ]h :GitGutterNextHunk<cr>
+nnoremap <c-g>k :GitGutterPrevHunk<cr>
+nnoremap <c-g>j :GitGutterNextHunk<cr>
 
 let g:gitgutter_sign_added = '⤿'
 let g:gitgutter_sign_removed = '⤾'
@@ -492,29 +450,9 @@ let g:deoplete#max_menu_width = 30
 let g:deoplete#sources = {}
 "}}}
 
-"ultisnips {{{
-" let g:UltiSnipsExpandTrigger="<Nop>"
-" let g:UltiSnipsJumpForwardTrigger="<tab>"
-" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-" let g:UltiSnipsListSnippets="<F6>"
-
-" let g:ulti_expand_or_jump_res = 0
-
-" "work nicely with deoplete. expand on cr
-" function! <SID>ExpandSnippetOrReturn()
-"     let snippet = UltiSnips#ExpandSnippetOrJump()
-"     if g:ulti_expand_or_jump_res > 0
-"         return snippet
-"     else
-"         return "\<C-Y>"
-"     endif
-" endfunction
-" inoremap <expr> <cr> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<cr>" : "\<cr>"
-"}}}
-
 "theme {{{
-" set background=dark
-colorscheme OceanicNext
+set background=dark
+colorscheme gruvbox
 
 if (has("termguicolors"))
     set termguicolors
@@ -532,23 +470,6 @@ set nocul
 
 "hl TODO, FIXME in blue bold
 highlight Todo ctermfg=blue guibg=none guifg=#6699CC gui=bold cterm=bold
-
-"rainbow brackets
-let g:rainbow_active = 1
-let g:rainbow_conf = {
-            \ 'guifgs': ['#AB7967', '#C594C5', '#6699CC', '#5FB3B3', '#99C794'],
-            \ 'ctermfgs': ['166', '3', 'magenta', 'lightblue', '9', '118'],
-            \ 'separately': {
-            \       'html': {}
-            \   }
-            \ }
-
-"easymotion
-let g:EasyMotion_do_mapping = 0
-let g:EasyMotion_keys = 'asdfghjljknmvcrtuiyopwqb'
-let g:EasyMotion_smartcase = 0
-
-nmap s <Plug>(easymotion-overwin-f)
 
 function! SyntaxUnderCursor()
     if !exists("*synstack")
@@ -578,11 +499,6 @@ endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
 "}}}
 
-"undo tree {{{
-nnoremap <F4> :UndotreeToggle<cr> :UndotreeFocus<cr>
-inoremap <F4> <esc><f4>
-"}}}
-
 " fzf {{{
 let g:fzf_layout = { 'up': '~20%' }
 
@@ -593,23 +509,6 @@ nmap <c-n>l :BLines<cr>
 nmap <c-n>m :Marks<cr>
 nmap <c-n>T :Tags<cr>
 nmap <c-n>t :BTags<cr>
-
 " }}}
-
-"neomake "{{{
-let g:neomake_error_sign = {'text': '⏺'}
-let g:neomake_warning_sign = {'text': '⏺'}
-
-if (&termguicolors)
-    hi NeomakeErrorSign guibg=#1E303B
-    hi NeomakeWarningSign guibg=#1E303B
-endif
-
-"}}}
-
-"markdown "{{{
-autocmd BufRead *.md set wrap lbr
-autocmd BufEnter *.md set syntax=markdown
-"}}}
 
 " vim: set et fdm=marker sts=4 sw=4:

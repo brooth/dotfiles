@@ -1,0 +1,48 @@
+{
+	"componentWillMount": {
+		"prefix": "cwm",
+		"body": [
+			"componentWillMount() {",
+			"\t$0",
+			"}"
+		]
+	},
+	"componentDidMount": {
+		"prefix": "cdm",
+		"body": [
+			"componentDidMount() {",
+			"\tsuper.componentDidMount()",
+			"\t$0",
+			"}"
+		]
+	},
+	"componentWillUpdate": {
+		"prefix": "cwu",
+		"body": [
+			"componentWillUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any) {",
+			"\tsuper.componentWillUpdate(nextProps, nextState, nextContext)",
+			"\t$0",
+			"}"
+		]
+	},
+	"shouldComponentUpdate": {
+		"prefix": "scu",
+		"body": [
+			"shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any) {",
+			"\tif($0) {",
+			"\t\treturn false",
+			"\t}",
+			"\treturn true",
+			"}"
+		]
+	},
+	"componentWillUnmount": {
+		"prefix": "cwum",
+		"body": [
+			"componentWillUnmount() {",
+			"\tsuper.componentWillUnmount()",
+			"\t$0",
+			"}"
+		]
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"header": {
+		"prefix": "head",
+		"body": [
+			"/*",
+			" * @author Oleg Khalidov <brooth@gmail.com>.",
+			" * -----------------------------------------------",
+			" * Freelance software development:",
+			" * Upwork: https://www.upwork.com/freelancers/~01d93e90d5b37c48d2",
+			" */",
+			""
+		]
+	},
+	"import": {
+		"prefix": "im",
+		"body": "import { $0 } from \"$1\";"
+	}
+}

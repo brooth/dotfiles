@@ -2,6 +2,15 @@
 "                misc settings
 "---------------------------------------------
 
+set visualbell
+set noerrorbells
+
+set relativenumber
+
+set smartcase
+set ignorecase
+set incsearch
+
 "disable ex mode
 map Q <Nop>
 
@@ -9,12 +18,7 @@ map Q <Nop>
 map Y y$
 
 "stay same position on insert mode exit
-inoremap <silent> <Esc> <Esc><Right>
-
-"F1 - Esc
-imap <F1> <Esc>
-nmap <F1> <Esc>
-vmap <F1> <Esc>
+"inoremap <silent> <Esc> <Esc><Right>
 
 "cursor movement in insert mode
 imap <c-h> <left>
@@ -26,14 +30,8 @@ imap <c-l> <right>
 vnoremap < <gv
 vnoremap > >gv
 
-" Select all text
-map <Space>a ggVG
-
 " Indent everything
 noremap <Space>= miggvG=`i
-
-" Enter the command-line mode
-noremap <CR> :
 
 "---------------------------------------------
 "           Emulated Vim Plugins
@@ -43,18 +41,22 @@ set surround
 "---------------------------------------------
 "             windows/tabs
 "---------------------------------------------
+nnoremap <c-w>k :action NextTab<CR>
+nnoremap <c-w>j :action PreviousTab<CR>
+nnoremap <c-w>q :close<CR>
+nnoremap <c-w><c-q> :action CloseAllEditors<CR>
 
 "---------------------------------------------
 "             IDE actions
 "---------------------------------------------
 "tabs
-nmap <A-j> :action VimMotionPreviousTab<CR>
-nmap <A-k> :action VimMotionNextTab<CR>
+"nmap <A-j> :action VimMotionPreviousTab<CR>
+"nmap <A-k> :action VimMotionNextTab<CR>
 
 nnoremap / :action Find<CR>
 nnoremap n :action FindNext<CR>
 nnoremap N :action FindPrevious<CR>
 
-nnoremap <F10> :action CloseContent<CR>
-nnoremap <Space>u :action RecentFiles<CR>
+"nnoremap <F10> :action CloseContent<CR>
+"nnoremap <Space>u :action RecentFiles<CR>
 

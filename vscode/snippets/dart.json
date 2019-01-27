@@ -1,0 +1,85 @@
+{
+	"header": {
+		"prefix": "head",
+		"body": [
+			"/*",
+			" * @author Oleg Khalidov <brooth@gmail.com>.",
+			" * -----------------------------------------------",
+			" * Freelance software development:",
+			" * Upwork: https://www.upwork.com/freelancers/~01d93e90d5b37c48d2",
+			" */",
+			""
+		]
+	},
+	"view model": {
+		"prefix": "view model",
+		"body": [
+			"class _ViewModel {",
+			"  final AppState _state;",
+			"  final Function _dispatch;",
+			"  ",
+			"  _ViewModel(Store<AppState> store)",
+			"    : _state = store.state,",
+			"      _dispatch = store.dispatch;",
+			"  ",
+			"  operator ==(o) {",
+			"    return o is _ViewModel;",
+			"  }",
+			"  ",
+			"  @override",
+			"  int get hashCode => 0;",
+			"}"
+		]
+	},
+	"has method": {
+		"prefix": "has method",
+		"body": [
+			"bool has$1() {",
+			"  final prev = _state.prevState?.$2State?.$3State;",
+			"  return prev != _state.$2State.$3State &&",
+			"    _state.$2State.$3State.is$4();",
+			"}"
+		]
+	},
+	"async action": {
+		"prefix": "async action",
+		"body": [
+			"class $1StateAction {",
+			"  final AsyncState<$2> state;",
+			"",
+			"  $1StateAction(this.state);",
+			"}",
+			"",
+			"class $1Action implements AsyncAction {",
+			"  $3",
+			"  @override",
+			"  ThunkAction<AppState> execute(api) => (store) async {",
+			"        print('$1Action.execute()');",
+			"",
+			"        store.dispatch($1StateAction(AsyncState.inProgress()));",
+			"        try {",
+			"          final data = await api.$4()",
+			"          store.dispatch($1StateAction(AsyncState.success(data)));",
+			"        } catch (error) {",
+			"          store.dispatch($1StateAction(AsyncState.failed(error)));",
+			"        }",
+			"      };",
+			"}"
+		]
+	},
+	"widget mixin": {
+		"prefix": "widget mixin",
+		"body": "with WidgetStateUtilsMixin"
+	},
+	"set state": {
+		"prefix": "ss",
+		"body": "setState(() => $0);"
+	},
+	"navigate": {
+		"prefix": "navigate",
+		"body": [
+			"Navigator.push(context, AppRouteTransitions",
+			"   .standard((_) => $1(ctx$0)))"
+		]
+	}
+}
