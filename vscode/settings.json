@@ -1,21 +1,117 @@
 {
+    //
+    // WORKBENCH
+    "window.title": "${rootPath}",
+    "workbench.tips.enabled": true,
     "telemetry.enableTelemetry": false,
-    "code-runner.enableAppInsights": false,
-    "workbench.colorTheme": "One Dark Bimbo",
+    "workbench.list.keyboardNavigation": "filter",
+    "workbench.colorTheme": "Gatito Theme",
     "workbench.iconTheme": "material-icon-theme",
+    "workbench.settings.editor": "json",
+    "workbench.statusBar.feedback.visible": false,
     "files.autoSave": "onFocusChange",
+    "files.exclude": {
+        "**/.flutter": true,
+        "**/*.lock": true
+    },
+    "files.watcherExclude": {
+        ".flutter": true,
+        ".history": true,
+    },
+    "search.exclude": {
+        ".history": true
+    },
+    //
+    // EDITOR
+    "editor.cursorSmoothCaretAnimation": false,
+    "editor.copyWithSyntaxHighlighting": false,
     "editor.fontFamily": "Monaco, 'Courier New', monospace",
     "editor.fontSize": 13,
     "editor.multiCursorModifier": "ctrlCmd",
-    "files.exclude": {
-        ".history": true,
-        "**/node_modules": true
-    },
     "editor.autoClosingBrackets": "beforeWhitespace",
     "editor.autoClosingQuotes": "beforeWhitespace",
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    //
+    // DEBUG
+    "debug.node.autoAttach": "on",
+    "debug.toolBarLocation": "docked",
+    //
+    // FILE EXPOLORER
+    "explorer.autoReveal": false,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    //
+    // DART & FLUTTER
+    "dart.analysisExcludedFolders": [
+        ".history",
+        ".flutter"
+    ],
+    "dart.flutterSdkPath": ".flutter",
+    //
+    // TYPESCRIPT
+    "tslint.exclude": ".history",
+    // 
+    // NODE & NPM
+    "npm.exclude": ".history",
+    // 
+    // GIT
+    "git.path": "/usr/bin/git",
+    //
+    // VIM
     "vim.easymotion": true,
     "vim.easymotionMarkerFontSize": "13",
     "vim.easymotionMarkerFontFamily": "Monaco",
-    "explorer.autoReveal": false,
-    "explorer.confirmDelete": false
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "["
+            ],
+            "commands": [
+                "editor.action.marker.prev",
+            ]
+        },
+        {
+            "before": [
+                "]"
+            ],
+            "commands": [
+                "editor.action.marker.next",
+            ]
+        },
+        {
+            "before": [
+                "u"
+            ],
+            "commands": [
+                "undo",
+            ]
+        },
+        {
+            "before": [
+                "ctrl+r"
+            ],
+            "commands": [
+                "redo",
+            ]
+        },
+        {
+            "before": [
+                "Y"
+            ],
+            "after": [
+                "y",
+                "$"
+            ],
+        }
+    ],
+    //
+    // MISC
+    "code-runner.enableAppInsights": false,
+    "local-history.saveDelay": 30,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "breadcrumbs.enabled": false,
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 }

@@ -73,7 +73,7 @@ set timeoutlen=1500
 set pastetoggle=<F12>
 set history=300
 "no mouse support
-set mouse = ""
+"set mouse=""
 "allow switching away from a changed buffer without saving.
 set hidden
 "Display what command is waiting for an operator
@@ -129,15 +129,15 @@ cnoremap <c-h> <left>
 cnoremap <c-l> <right>
 
 "insane.vim
-"call mx#tools#setdefault('g:mx#favorits', [
-"            \   {'word': 'find'},
-"            \   {'word': 'so %'},
-"            \   {'word': 'so %'},
-"            \   {'word': 'qall', 'short': 'qa'},
-"            \   {'word': 'edit!'},
-"            \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
-"            \   ])
-""}}}
+" call mx#tools#setdefault('g:mx#favorits', [
+"             \   {'word': 'find'},
+"             \   {'word': 'so %'},
+"             \   {'word': 'so %'},
+"             \   {'word': 'qall', 'short': 'qa'},
+"             \   {'word': 'edit!'},
+"             \   {'word': '%s//gc', 'caption': 'sub', 'cursor': 3},
+"             \   ])
+"}}}
 
 "session/source {{{
 "do not store vimrc options in session
@@ -230,16 +230,16 @@ function! DeleteLeftBuffers()
 endfun
 
 "Ctrl-B - Buffers
-nnoremap <silent><c-b>n :bnext<cr>
-nnoremap <silent><c-b>p :bprevious<cr>
-nnoremap <silent><c-b>d :bd %<cr>
-nnoremap <silent><c-b>w :call WipeBufferGoPrev()<cr>
-nnoremap <silent><c-b>b :call DeleteBackBuffers()<cr>
-nnoremap <silent><c-b>o :call DeleteOtherBuffers()<cr>
-nnoremap <silent><c-b>u :call DeleteUnmodifiedBuffers()<cr>
-nnoremap <silent><c-b>r :call DeleteRightBuffers()<cr>
-nnoremap <silent><c-b>l :call DeleteLeftBuffers()<cr>
-nnoremap <silent><c-b>e :e!<cr>
+nnoremap <silent><c-\>n :bnext<cr>
+nnoremap <silent><c-\>p :bprevious<cr>
+nnoremap <silent><c-\>d :bd %<cr>
+nnoremap <silent><c-\>w :call WipeBufferGoPrev()<cr>
+nnoremap <silent><c-\>b :call DeleteBackBuffers()<cr>
+nnoremap <silent><c-\>o :call DeleteOtherBuffers()<cr>
+nnoremap <silent><c-\>u :call DeleteUnmodifiedBuffers()<cr>
+nnoremap <silent><c-\>r :call DeleteRightBuffers()<cr>
+nnoremap <silent><c-\>l :call DeleteLeftBuffers()<cr>
+nnoremap <silent><c-\>e :e!<cr>
 
 "cmd & focus
 nnoremap <c-w><c-v> <c-w><c-v><c-w>l
@@ -269,7 +269,7 @@ if executable('ag')
 endif
 
 "far.vim
-let g:far#debug = 0
+let g:far#debug = 1
 let g:far#check_window_resize_period = 3000
 let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.vim', '**/*.txt']
 "}}}

@@ -5,8 +5,8 @@
 			"/*",
 			" * @author Oleg Khalidov <brooth@gmail.com>.",
 			" * -----------------------------------------------",
-			" * Freelance software development:",
-			" * Upwork: https://www.upwork.com/freelancers/~01d93e90d5b37c48d2",
+			" * Freelance Software Development:",
+			" * Upwork: https://www.upwork.com/fl/khalidovoleg",
 			" */",
 			""
 		]
@@ -34,34 +34,50 @@
 	"has method": {
 		"prefix": "has method",
 		"body": [
-			"bool has$1() {",
-			"  final prev = _state.prevState?.$2State?.$3State;",
-			"  return prev != _state.$2State.$3State &&",
-			"    _state.$2State.$3State.is$4();",
+			"bool get has$2$3 {",
+			"  final prev = _state.prevState?.$1State?.$2State;",
+			"  return prev != _state.$1State.$2State &&",
+			"    _state.$1State.$2State.is$3;",
+			"}"
+		]
+	},
+	"model action": {
+		"prefix": "model action",
+		"body": [
+			"void $1() {",
+			"  _dispatch(new $1());",
 			"}"
 		]
 	},
 	"async action": {
 		"prefix": "async action",
 		"body": [
-			"class $1StateAction {",
+			"class $1StateChanged {",
 			"  final AsyncState<$2> state;",
 			"",
-			"  $1StateAction(this.state);",
+			"  $1StateChanged(this.state);",
+			"",
+			"  @override",
+			"  String toString() =>",
+			"      '$runtimeType.' +",
+			"      '${state.status}'.substring('.${state.status.runtimeType}'.length);",
 			"}",
 			"",
-			"class $1Action implements AsyncAction {",
+			"class $1 implements AsyncAction {",
 			"  $3",
 			"  @override",
 			"  ThunkAction<AppState> execute(api) => (store) async {",
 			"        print('$1Action.execute()');",
 			"",
-			"        store.dispatch($1StateAction(AsyncState.inProgress()));",
+			"        final session = store.state.authState.signInState.value;",
+			"        if (session == null) return;",
+			"",
+			"        store.dispatch($1StateChanged(AsyncState.inProgress()));",
 			"        try {",
-			"          final data = await api.$4()",
-			"          store.dispatch($1StateAction(AsyncState.success(data)));",
+			"          final $6 = await api.$4($5);",
+			"          store.dispatch($1StateChanged(AsyncState.success($6)));",
 			"        } catch (error) {",
-			"          store.dispatch($1StateAction(AsyncState.failed(error)));",
+			"          store.dispatch($1StateChanged(AsyncState.failed(error)));",
 			"        }",
 			"      };",
 			"}"
