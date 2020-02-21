@@ -52,6 +52,8 @@ alias fl=./.flutter/bin/flutter
 alias fll=../.flutter/bin/flutter
 
 # Docker
+alias doc='docker-compose'
+alias dps='docker ps'
 alias dps='docker ps'
 alias dpsa='docker ps -a'
 alias di='docker images'
@@ -101,3 +103,4 @@ alias ga='git add'
 alias gd='git diff'
 alias gl='git pull'
 alias gc='git commit -v'
+alias gco='git checkout'
