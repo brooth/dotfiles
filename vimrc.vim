@@ -22,13 +22,6 @@ if has('nvim')
 else
     let $VIMHOME = "~/.vim"
 endif
-
-"g:initial_dir = path where vim started
-function! InitVimEnterSettings()
-    let g:initial_dir = getcwd()
-    exec 'set path='.g:initial_dir.','.g:initial_dir.'/**'
-endfunction
-autocmd VimEnter * call InitVimEnterSettings()
 "}}}
 
 "plugins {{{
@@ -41,25 +34,36 @@ Plug 'mhartington/oceanic-next'
 " paste and indent
 Plug 'sickill/vim-pasta'
 " show register content on " # <c-r>
-Plug 'junegunn/vim-peekaboo'
+
+" syntax
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 " tools
 Plug 'tpope/vim-surround'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'tpope/vim-commentary'
+Plug 'folke/which-key.nvim'
+
 "exchange arguments with g< g> gs
 Plug 'machakann/vim-swap'
 
 " configs
 Plug 'editorconfig/editorconfig-vim'
 
+" text editing
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+"multiple cursors
+Plug 'mg979/vim-visual-multi'
+
 " my boys
 Plug '~/Projects/far.vim'
 " Plug '~/Projects/meta-x.vim'
 
-" files
-Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --all'}
-Plug 'junegunn/fzf.vim'
+" navigation
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'justinmk/vim-sneak'
 
 " git
 Plug 'tpope/vim-fugitive'
@@ -86,6 +90,7 @@ set timeoutlen=1500
 set history=300
 set mouse=a "all mouse support
 set hidden
+set autochdir "sets pwd to the starting dic (change with :cd)
 set showcmd "display what command is waiting for an operator
 " set lazyredraw "redraw only when we need to. do not use, cause lagging
 set nolz "disable lazydraw
@@ -94,6 +99,18 @@ set signcolumn=yes:2 "show separate column for signs (gitgutter)
 set formatoptions-=cro "do not propogate comments on new lines
 set confirm "propmt for saving the file when quit instead of showing error
 "set exrc "load .vimrc in the current directory
+
+"g:initial_dir = path where vim started
+function! InitVimEnterSettings()
+    let g:initial_dir = getcwd()
+    exec 'set path='.g:initial_dir.','.g:initial_dir.'/**'
+endfunction
+autocmd VimEnter * call InitVimEnterSettings() 
+
+"select mode with mouse
+set selectmode=mouse
+"copy selected text (with mouse) to system clipboard
+snoremap y <c-g>"+y 
 
 "allow gf to open non-existent files
 map gf :edit <cfile><cr>
@@ -114,17 +131,6 @@ nnoremap V v$
 nnoremap vv V
 "select pasted text
 nnoremap <expr> vp '`[' . strpart(getregtype(), 0, 1) . '`]'
-
-"stay same position on insert mode exit
-inoremap <silent> <Esc> <Esc>`^
-"escape to normal mode
-imap jj <esc>
-imap kk <esc>
-imap ll <esc>
-imap hh <esc>
-"insert the char in the end and quit from insert mode
-imap ;; <Esc>A;<Esc>
-imap ,, <Esc>A,<Esc>
 
 "vi mode moving in insert mode
 inoremap <c-h> <left>
@@ -157,35 +163,29 @@ cnoremap <m-b> <s-left>
 cnoremap <m-f> <s-right>
 "}}}
 
-"registers/clipboard {{{
-let g:peekaboo_window="call CreateCenteredFloatingWindow()"
-
-function! CreateCenteredFloatingWindow()
-    let width = float2nr(&columns * 0.6)
-    let height = float2nr(&lines * 0.5)
-    let top = ((&lines - height) / 2) - 1
-    let left = (&columns - width) / 2
-    let opts = {'relative': 'editor', 'row': top, 'col': left, 'width': width, 'height': height, 'style': 'minimal'}
-    let top = "╔" . repeat("═", width - 2) . "╗"
-    let mid = "║" . repeat(" ", width - 2) . "║"
-    let bot = "╚" . repeat("═", width - 2) . "╝"
-    let lines = [top] + repeat([mid], height - 2) + [bot]
-    let s:buf = nvim_create_buf(v:false, v:true)
-    call nvim_buf_set_lines(s:buf, 0, -1, v:true, lines)
-    call nvim_open_win(s:buf, v:true, opts)
-    set winhl=Normal:Floating
-    let opts.row += 1
-    let opts.height -= 2
-    let opts.col += 2
-    let opts.width -= 4
-    call nvim_open_win(nvim_create_buf(v:false, v:true), v:true, opts)
-    au BufWipeout <buffer> exe 'bw '.s:buf
-endfunction
-
-"select mode with mouse
-set selectmode=mouse
-"copy selected text (with mouse) to system clipboard
-snoremap y <c-g>"+y
+" tools {{{
+lua << EOF
+require("which-key").setup {
+    plugins = {
+        marks = true,
+        registers = true,
+        spelling = {
+            enabled = false,
+        },
+    },
+    key_labels = {
+        -- not working
+        ["<C-W><C-B>"] = "Delete Back Buffers",
+    },
+    window = {
+        border = "none", -- none, single, double, shadow
+        position = "bottom", -- bottom, top
+        margin = { 0, 0, 0, 0 }, -- extra window margin [top, right, bottom, left]
+        padding = { 1, 1, 1, 1 }, -- extra window padding [top, right, bottom, left]
+        winblend = 0
+    },
+}
+EOF
 "}}}
 
 "session/source {{{
@@ -223,7 +223,7 @@ nnoremap <silent><c-s>t :source %<cr>
 "buffers/windows/tabs {{{
 "functions {{{
 "kill current buffer and goto previous
-function! WipeBufferGoPrev()
+function! DeleteBufferGoPrev()
     let buf_num = bufnr('%')
     exe 'bprevious'
     exe 'bd! '.buf_num
@@ -285,19 +285,17 @@ endfun
 "}}}
 
 "Buffers
-nnoremap <silent><c-w>n :bnext<cr>
-nnoremap <silent><c-w>p :bprevious<cr>
-nnoremap <silent><c-w>b :buffers<CR>:buffer 
-nnoremap <silent><c-w>e :e!<cr>
+nnoremap <silent><tab> :bnext<cr>
+nnoremap <silent><s-tab> :bprevious<cr>
 nnoremap <silent><c-w><c-d> :bd %<cr>
-nnoremap <silent><c-w><c-w> :call WipeBufferGoPrev()<cr>
+nnoremap <silent><c-w><c-p> :call DeleteBufferGoPrev()<cr>
 nnoremap <silent><c-w><c-b> :call DeleteBackBuffers()<cr>
 nnoremap <silent><c-w><c-o> :call DeleteOtherBuffers()<cr>
 nnoremap <silent><c-w><c-u> :call DeleteUnmodifiedBuffers()<cr>
 nnoremap <silent><c-w><c-r> :call DeleteRightBuffers()<cr>
 nnoremap <silent><c-w><c-l> :call DeleteLeftBuffers()<cr>
 
-"Windows, split/swap and move the cursor to new/swapped pane
+"Panes, split/swap and move the cursor to new/swapped pane
 nnoremap <c-w>V <c-w><c-v><c-w>l
 nnoremap <c-w>S <c-w><c-s><c-w>j
 nnoremap <c-w>r <c-w><c-r><c-w><c-w>
@@ -368,21 +366,46 @@ nnoremap <leade>lw :set wrap!<cr>
 " }}}
 
 "folds {{{
-set foldmethod=syntax
-set foldlevelstart=20
-set foldnestmax=2
-
-"fold file header (e.g. license javadoc)
-nnoremap zh mmggzf%`m
-"fold current statement
-nnoremap ze zf%
+"set foldlevelstart=20 ???
+set foldnestmax=3
 
 augroup remember_folds
     autocmd!
     autocmd BufWinLeave *.* mkview
     autocmd BufWinEnter *.* silent! loadview
 augroup END
-" }}}
+
+" TODO: check filetype is supported by treesitter
+autocmd BufEnter * if !&readonly && &foldmethod == 'manual' |
+  \ set foldmethod=expr |
+  \ set foldexpr=nvim_treesitter#foldexpr() |
+  \ endif
+
+function! CloseFolds(level)
+    let n = 0
+    let lines = line('$')
+    while (n <= lines)
+        if a:level == foldlevel(n)
+            exec ''. n . 'foldc'
+            let end = foldclosedend(n)
+            if end != -1
+                let n = end
+            endif
+        endif
+        let n = n + 1
+    endwhile
+endfun
+function! OpenFolds(level)
+    for n in range(0, line('$'))
+        if a:level == foldlevel(n) && foldclosed(n) == n
+            exec ''. n . 'foldo'
+        endif
+    endfor
+endfunc
+
+nnoremap <silent> zlc :call CloseFolds(v:count)<cr>
+nnoremap <silent> zlo :call OpenFolds(v:count)<cr>
+"}}}
 
 "lint/correcting {{{
 "trailing
@@ -407,12 +430,141 @@ set wildignore+=*/node_modules/*
 set wildignore+=*/.history/*
 "}}}
 
+" syntax hightlight "{{{
+
+"hl TODO, FIXME in blue bold
+highlight Todo ctermfg=blue guibg=none guifg=#6699CC gui=bold cterm=bold
+
+function! SyntaxUnderCursor()
+    if !exists("*synstack")
+        return
+    endif
+    echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
+
+lua <<EOF
+require('nvim-treesitter.configs').setup {
+  highlight = {
+    enable = true
+  }
+}
+EOF
+"}}}
+
 "navigation "{{{
+let g:sneak#label = 1
+
 "Netrw
 let g:netrw_banner = 0
 let g:netrw_listsjyle = 1
 
-nnoremap <silent> <c-n>e :Explore<cr>
+nnoremap <silent> <c-w>e :Explore<cr>
+
+" Telescope
+lua << EOF
+local actions = require("telescope.actions")
+local borderchars = {"═", "║", "─", "║", "╔", "╗", "╝", "╚"}
+
+-- displays stats (1/4) on the propmt
+function status_stats(self)
+  local xx = (self.stats.processed or 0) - (self.stats.filtered or 0)
+  local yy = self.stats.processed or 0
+  if xx == 0 and yy == 0 then
+    return ""
+  end
+  return string.format(" %s/%s", xx, yy)
+end
+
+require('telescope').setup {
+  defaults = {
+    layout_strategy = 'vertical',
+    layout_config = {
+      vertical = { 
+        width = 0.5, 
+        height = 0.5,
+        anchor = 'N',
+      },
+    },
+    border = true,
+    borderchars = borderchars,
+    get_status_text = status_stats,
+    prompt_prefix = ' ',
+    selection_caret = ' ',
+    entry_prefix = ' ',
+    color_devicons = false,
+    disable_devicons = true,
+    file_sorter = require("telescope.sorters").get_fuzzy_file,
+    file_ignore_patterns = {
+      "node_modules",
+      ".git",
+      ".cache",
+      ".history",
+    },
+    set_env = {["COLORTERM"] = "truecolor"}, -- default = nil,
+    mappings = {
+      i = {
+        ["<esc>"] = actions.close,
+      },
+      n = {
+        ["<esc>"] = actions.delete_buffer,
+      },
+    },
+  },
+  pickers = {
+    find_files = {
+      hidden = true,
+      prompt_title = "",
+      results_title = "",
+      preview_title = "",
+      previewer = false,
+      dir_icon = '📦',
+      selection_caret = ' ',
+      entry_prefix = ' ',
+      cwd = vim.fn.getcwd(),
+    }, 
+    file_browser = {
+      hidden = true,
+      prompt_title = "",
+      results_title = "",
+      preview_title = "",
+      previewer = false,
+      dir_icon = '📦',
+      wd = vim.fn.getcwd(),
+    }, 
+    buffers = {
+      layout_strategy = 'vertical',
+      theme = 'dropdown',
+      previewer = false,
+      prompt_title = "",
+      results_title = "",
+      preview_title = "",
+      borderchars = borderchars,
+      ignore_current_buffer = true,
+      sort_mru = true,
+      selection_caret = ' 📜 ',
+      entry_prefix = ' 📜 ',
+    },     
+    oldfiles = {
+      theme = 'dropdown',
+      previewer = false,
+      prompt_title = "",
+      results_title = "",
+      preview_title = "",
+      borderchars = borderchars
+    },
+  },
+}
+EOF
+ 
+nnoremap <c-p><c-p> <cmd>Telescope find_files<cr>
+nnoremap <c-p>b <cmd>Telescope file_browser<cr>
+nnoremap <c-p>p <cmd>Telescope buffers<cr>
+nnoremap <c-p>g <cmd>Telescope live_grep<cr>
+nnoremap <c-p>t <cmd>Telescope help_tags<cr>
+nnoremap <c-p>h <cmd>Telescope oldfiles<cr>
+nnoremap <c-p>c <cmd>Telescope command_history<cr>
+nnoremap <c-p>s <cmd>Telescope spell_suggest<cr>
+nnoremap <c-p>d <cmd>Telescope diagnostics<cr>
 "}}}
 
 "Ctrl+g - Git "{{{
@@ -469,16 +621,6 @@ hi cursorline cterm=none ctermbg=238 ctermfg=none
 autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
 set nocul
-
-"hl TODO, FIXME in blue bold
-highlight Todo ctermfg=blue guibg=none guifg=#6699CC gui=bold cterm=bold
-
-function! SyntaxUnderCursor()
-    if !exists("*synstack")
-        return
-    endif
-    echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-endfunc
 "}}}
 
 "airline {{{
@@ -500,18 +642,6 @@ function! s:ConfigAirlineSymbols()
 endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
 "}}}
-
-" fzf {{{
-let g:fzf_layout = { 'up': '~20%' }
-
-map <c-p> :Files<cr>
-nmap \ :Buffers<cr>
-nmap <c-n>L :Lines<cr>
-nmap <c-n>l :BLines<cr>
-nmap <c-n>m :Marks<cr>
-nmap <c-n>T :Tags<cr>
-nmap <c-n>t :BTags<cr>
-" }}}
 
 "completion {{{
 set completeopt-=preview "disable preview popup buffer
@@ -643,7 +773,7 @@ command! -nargs=? Fold :call CocAction('fold', <f-args>)
 command! -nargs=0 OR :call CocActionAsync('runCommand', 'editor.action.organizeImport')
 
 "" Add (Neo)Vim's native statusline support.
-"" NOTE: Please see `:h coc-status` for integrations with external plugins that
+"" NOTE: Please sez `:h coc-status` for integrations with external plugins that
 "" provide custom statusline: lightline.vim, vim-airline.
 "set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
