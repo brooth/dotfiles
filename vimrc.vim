@@ -27,25 +27,21 @@ endif
 "plugins {{{
 call plug#begin()
 
-" appearance
-Plug 'morhetz/gruvbox'
-Plug 'bling/vim-airline'
-Plug 'mhartington/oceanic-next'
-" paste and indent
-Plug 'sickill/vim-pasta'
-" show register content on " # <c-r>
-
 " syntax
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" theme
+Plug 'bling/vim-airline'
+Plug 'mhartington/oceanic-next'
+Plug 'ryanoasis/vim-devicons'
 
 " tools
 Plug 'tpope/vim-surround'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'tpope/vim-commentary'
 Plug 'folke/which-key.nvim'
-
-"exchange arguments with g< g> gs
-Plug 'machakann/vim-swap'
+Plug 'sunjon/Shade.nvim' "dim inactive panes
+Plug 'machakann/vim-swap' "exchange arguments with g< g> gs
 
 " configs
 Plug 'editorconfig/editorconfig-vim'
@@ -53,8 +49,7 @@ Plug 'editorconfig/editorconfig-vim'
 " text editing
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-"multiple cursors
-Plug 'mg979/vim-visual-multi'
+Plug 'mg979/vim-visual-multi' "multiple cursors
 
 " my boys
 Plug '~/Projects/far.vim'
@@ -63,7 +58,7 @@ Plug '~/Projects/far.vim'
 " navigation
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-Plug 'justinmk/vim-sneak'
+Plug 'phaazon/hop.nvim'
 
 " git
 Plug 'tpope/vim-fugitive'
@@ -186,6 +181,19 @@ require("which-key").setup {
     },
 }
 EOF
+
+lua << EOF
+require('shade').setup({
+  overlay_opacity = 50,
+  opacity_step = 1,
+  keys = {
+    brightness_up    = '<C-Up>',
+    brightness_down  = '<C-Down>',
+    toggle           = '<Leader>s',
+  }
+})
+EOF
+
 "}}}
 
 "session/source {{{
@@ -311,7 +319,7 @@ nnoremap <F10> :q<cr>
 "search/replace/subtitude "{{{
 set smartcase
 set ignorecase
-set incsearch
+"set incsearch "search while typing, realy annoying
 
 "far.vim
 let g:far#debug = 1
@@ -452,18 +460,23 @@ EOF
 "}}}
 
 "navigation "{{{
-let g:sneak#label = 1
-
 "Netrw
 let g:netrw_banner = 0
 let g:netrw_listsjyle = 1
 
 nnoremap <silent> <c-w>e :Explore<cr>
 
+"hop
+lua << EOF
+    require('hop').setup()
+EOF
+
+nnoremap s <cmd> HopChar1<cr>
+
 " Telescope
 lua << EOF
 local actions = require("telescope.actions")
-local borderchars = {"═", "║", "─", "║", "╔", "╗", "╝", "╚"}
+local borderchars = {"═", "║", "═", "║", "╔", "╗", "╝", "╚"}
 
 -- displays stats (1/4) on the propmt
 function status_stats(self)
@@ -472,7 +485,7 @@ function status_stats(self)
   if xx == 0 and yy == 0 then
     return ""
   end
-  return string.format(" %s/%s", xx, yy)
+  return string.format(" %s/%s ", xx, yy)
 end
 
 require('telescope').setup {
@@ -491,8 +504,8 @@ require('telescope').setup {
     prompt_prefix = ' ',
     selection_caret = ' ',
     entry_prefix = ' ',
-    color_devicons = false,
-    disable_devicons = true,
+    color_devicons = true,
+    disable_devicons = false,
     file_sorter = require("telescope.sorters").get_fuzzy_file,
     file_ignore_patterns = {
       "node_modules",
@@ -545,6 +558,7 @@ require('telescope').setup {
       entry_prefix = ' 📜 ',
     },     
     oldfiles = {
+      layout_strategy = 'vertical',
       theme = 'dropdown',
       previewer = false,
       prompt_title = "",
@@ -605,9 +619,6 @@ autocmd VimEnter * call s:ConfigGitGutter()
 "}}}
 
 "theme {{{
-set background=dark
-colorscheme gruvbox
-
 if (has("termguicolors"))
     set termguicolors
     hi LineNr guifg=#65737E guibg=#1E303B
@@ -615,6 +626,10 @@ if (has("termguicolors"))
     hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
     hi SignColumn ctermfg=243 guifg=#65737E guibg=#1E303B "signcolumn same color as numbers
 endif
+
+set background=dark
+syntax enable
+colorscheme OceanicNext
 
 " highlight line in insert mode
 hi cursorline cterm=none ctermbg=238 ctermfg=none
@@ -634,7 +649,7 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#buffer_nr_format = '%s '
 
 "window number instead of mode
-let g:airline_section_a="%{winnr().':'.bufnr('%')}"
+let g:airline_section_a="%{bufnr('%')}"
 
 function! s:ConfigAirlineSymbols()
     let g:airline_symbols.maxlinenr = ''
