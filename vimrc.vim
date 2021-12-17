@@ -40,7 +40,6 @@ Plug 'tpope/vim-surround'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'tpope/vim-commentary'
 Plug 'folke/which-key.nvim'
-Plug 'sunjon/Shade.nvim' "dim inactive panes
 Plug 'machakann/vim-swap' "exchange arguments with g< g> gs
 
 " configs
@@ -49,7 +48,6 @@ Plug 'editorconfig/editorconfig-vim'
 " text editing
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'mg979/vim-visual-multi' "multiple cursors
 
 " my boys
 Plug '~/Projects/far.vim'
@@ -59,13 +57,16 @@ Plug '~/Projects/far.vim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'phaazon/hop.nvim'
+Plug 'kyazdani42/nvim-tree.lua'
+Plug 'kyazdani42/nvim-web-devicons'
 
 " git
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
-" complition
+" dev
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'mfussenegger/nvim-dap'
 
 "performace and fixes
 Plug 'antoinemadec/FixCursorHold.nvim'
@@ -87,7 +88,7 @@ set mouse=a "all mouse support
 set hidden
 set autochdir "sets pwd to the starting dic (change with :cd)
 set showcmd "display what command is waiting for an operator
-" set lazyredraw "redraw only when we need to. do not use, cause lagging
+"set lazyredraw "redraw only when we need to. do not use, cause lagging
 set nolz "disable lazydraw
 set updatetime=750 "some plugins relay on that, finetune for best performance
 set signcolumn=yes:2 "show separate column for signs (gitgutter)
@@ -181,19 +182,6 @@ require("which-key").setup {
     },
 }
 EOF
-
-lua << EOF
-require('shade').setup({
-  overlay_opacity = 50,
-  opacity_step = 1,
-  keys = {
-    brightness_up    = '<C-Up>',
-    brightness_down  = '<C-Down>',
-    toggle           = '<Leader>s',
-  }
-})
-EOF
-
 "}}}
 
 "session/source {{{
@@ -238,7 +226,7 @@ function! DeleteBufferGoPrev()
 endfunction
 
 "kill background buffers
-function! DeleteBackBuffers()
+function! ClearBackBuffers()
     let n = bufnr('$')
     while n > 0
         if buflisted(n) && bufwinnr(n) < 0 && !getbufvar(n, '&mod')
@@ -293,11 +281,11 @@ endfun
 "}}}
 
 "Buffers
-nnoremap <silent><tab> :bnext<cr>
-nnoremap <silent><s-tab> :bprevious<cr>
+nnoremap <silent><c-w>] :bnext<cr>
+nnoremap <silent><c-w>[ :bprevious<cr>
 nnoremap <silent><c-w><c-d> :bd %<cr>
-nnoremap <silent><c-w><c-p> :call DeleteBufferGoPrev()<cr>
-nnoremap <silent><c-w><c-b> :call DeleteBackBuffers()<cr>
+nnoremap <silent><c-w><c-q> :call DeleteBufferGoPrev()<cr>
+nnoremap <silent><c-w><c-c> :call ClearBackBuffers()<cr>
 nnoremap <silent><c-w><c-o> :call DeleteOtherBuffers()<cr>
 nnoremap <silent><c-w><c-u> :call DeleteUnmodifiedBuffers()<cr>
 nnoremap <silent><c-w><c-r> :call DeleteRightBuffers()<cr>
@@ -321,6 +309,8 @@ set smartcase
 set ignorecase
 "set incsearch "search while typing, realy annoying
 
+xnoremap <c-t> y/<c-r>"<cr>
+
 "far.vim
 let g:far#debug = 1
 let g:far#check_window_resize_period = 3000
@@ -328,7 +318,7 @@ let g:far#file_mask_favorits = ['%', '**/*.*', '**/*.dart', '**/*.ts', '**/*.js'
 "}}}
 
 "indent/tab/spaces "{{{
-set virtualedit=all "move curson over empty space
+"set virtualedit=all "move curson over empty space
 set nostartofline "keep cursor position while C-u/C-d/gg/etc
 
 set autoindent "indent when moving to the next line while writing code
@@ -361,10 +351,10 @@ set sidescroll=1 "horizontal scroll by 1 col
 set sidescrolloff=5  "keep 5 lines left and right from the cursor
 
 "go between wrapped lines
-map j gj
-map k gk
-map <Down> gj
-map <Up> gk
+" map <silent> j gj
+" map <silent> k gk
+" map <Down> gj
+" map <Up> gk
 
 "leader-l - Lines
 nnoremap <leade>lr :set number<cr>:set rnu<cr>
@@ -440,8 +430,13 @@ set wildignore+=*/.history/*
 
 " syntax hightlight "{{{
 
-"hl TODO, FIXME in blue bold
-highlight Todo ctermfg=blue guibg=none guifg=#6699CC gui=bold cterm=bold
+"hl TODO:, FIXME: in blue bold
+augroup vimrc_todo
+    au!
+    au Syntax * syn match MyTodo /\v<(FIXME|NOTE|TODO):/
+          \ containedin=.*Comment
+augroup END
+hi def link MyTodo Todo
 
 function! SyntaxUnderCursor()
     if !exists("*synstack")
@@ -533,7 +528,7 @@ require('telescope').setup {
       dir_icon = '📦',
       selection_caret = ' ',
       entry_prefix = ' ',
-      cwd = vim.fn.getcwd(),
+      cwd = vim.g.initial_dir,
     }, 
     file_browser = {
       hidden = true,
@@ -579,6 +574,143 @@ nnoremap <c-p>h <cmd>Telescope oldfiles<cr>
 nnoremap <c-p>c <cmd>Telescope command_history<cr>
 nnoremap <c-p>s <cmd>Telescope spell_suggest<cr>
 nnoremap <c-p>d <cmd>Telescope diagnostics<cr>
+
+"NvimTree
+let g:nvim_tree_icons = {
+    \ 'default': '',
+    \ 'symlink': '',
+    \ 'git': {
+    \   'unstaged': "",
+    \   'staged': "",
+    \   'unmerged': "",
+    \   'renamed': "➜",
+    \   'untracked': "",
+    \   'deleted': "",
+    \   'ignored': ""
+    \   },
+    \ 'folder': {
+    \   'arrow_open': "-",
+    \   'arrow_closed': "+",
+    \   'default': "",
+    \   'open': "",
+    \   'empty': "",
+    \   'empty_open': "",
+    \   'symlink': "",
+    \   'symlink_open': "",
+    \   }
+    \ }
+
+lua << EOF
+local tree_cb = require('nvim-tree.config').nvim_tree_callback
+
+require('nvim-tree').setup {
+  disable_netrw       = true,
+  hijack_netrw        = true,
+  open_on_setup       = false,
+  ignore_ft_on_setup  = {},
+  auto_close          = false,
+  open_on_tab         = false,
+  hijack_cursor       = false,
+  update_cwd          = false,
+  update_to_buf_dir   = {
+    enable = true,
+    auto_open = true,
+  },
+  diagnostics = {
+    enable = false,
+    icons = {
+      hint = "h",
+      info = "i",
+      warning = "w",
+      error = "r",
+    }
+  },
+  update_focused_file = {
+    enable      = false,
+    update_cwd  = false,
+    ignore_list = {}
+  },
+  system_open = {
+    cmd  = nil,
+    args = {}
+  },
+  filters = {
+    dotfiles = false,
+    custom = {}
+  },
+  git = {
+    enable = true,
+    ignore = true,
+    timeout = 500,
+  },
+  view = {
+    width = 50,
+    height = 30,
+    hide_root_folder = false,
+    side = 'left',
+    auto_resize = true,
+    mappings = {
+      custom_only = false,
+      list = {
+        { key = {"zo"}, cb = tree_cb("open") },
+        { key = {"zc"}, cb = tree_cb("close_node") },
+      }
+    },
+    number = false,
+    relativenumber = false,
+    signcolumn = "yes"
+  },
+  trash = {
+    cmd = "trash",
+    require_confirm = true
+  }
+}
+--{ key = {"<CR>", "o", "<2-LeftMouse>"}, cb = tree_cb("edit") },
+--{ key = {"<2-RightMouse>", "<C-]>"},    cb = tree_cb("cd") },
+--{ key = "<C-v>",                        cb = tree_cb("vsplit") },
+--{ key = "<C-x>",                        cb = tree_cb("split") },
+--{ key = "<C-t>",                        cb = tree_cb("tabnew") },
+--{ key = "<",                            cb = tree_cb("prev_sibling") },
+--{ key = ">",                            cb = tree_cb("next_sibling") },
+--{ key = "P",                            cb = tree_cb("parent_node") },
+--{ key = "<BS>",                         cb = tree_cb("close_node") },
+--{ key = "<S-CR>",                       cb = tree_cb("close_node") },
+--{ key = "<Tab>",                        cb = tree_cb("preview") },
+--{ key = "K",                            cb = tree_cb("first_sibling") },
+--{ key = "J",                            cb = tree_cb("last_sibling") },
+--{ key = "I",                            cb = tree_cb("toggle_ignored") },
+--{ key = "H",                            cb = tree_cb("toggle_dotfiles") },
+--{ key = "R",                            cb = tree_cb("refresh") },
+--{ key = "a",                            cb = tree_cb("create") },
+--{ key = "d",                            cb = tree_cb("remove") },
+--{ key = "D",                            cb = tree_cb("trash") },
+--{ key = "r",                            cb = tree_cb("rename") },
+--{ key = "<C-r>",                        cb = tree_cb("full_rename") },
+--{ key = "x",                            cb = tree_cb("cut") },
+--{ key = "c",                            cb = tree_cb("copy") },
+--{ key = "p",                            cb = tree_cb("paste") },
+--{ key = "y",                            cb = tree_cb("copy_name") },
+--{ key = "Y",                            cb = tree_cb("copy_path") },
+--{ key = "gy",                           cb = tree_cb("copy_absolute_path") },
+--{ key = "[c",                           cb = tree_cb("prev_git_item") },
+--{ key = "]c",                           cb = tree_cb("next_git_item") },
+--{ key = "-",                            cb = tree_cb("dir_up") },
+--{ key = "s",                            cb = tree_cb("system_open") },
+--{ key = "q",                            cb = tree_cb("close") },
+--{ key = "g?",                           cb = tree_cb("toggle_help") },
+EOF
+
+function! ToogleNvimTreeSmart()
+    if &filetype == 'NvimTree'
+        exec ':NvimTreeClose'
+    elseif &filetype == ''
+        exec ':NvimTreeOpen'
+    else 
+        exec ':NvimTreeFindFile'
+    endif
+endfunction
+
+nnoremap <silent> <C-n> :call ToogleNvimTreeSmart()<CR>
 "}}}
 
 "Ctrl+g - Git "{{{
@@ -658,7 +790,7 @@ endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
 "}}}
 
-"completion {{{
+"dev {{{
 set completeopt-=preview "disable preview popup buffer
 
 " set nobackup
@@ -692,31 +824,32 @@ function! s:check_back_space() abort
     return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-"" Use <s-space> to trigger completion.
-"if has('nvim')
-"    inoremap <silent><expr> <s-space> coc#refresh()
-"else
-"    inoremap <silent><expr> <s-@> coc#refresh()
-"endif
-
 " Make <CR> auto-select the first completion item and notify coc.nvim to
 " format on enter, <cr> could be remapped by other vim plugin
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 "navigate diagnostics
-nmap <silent><c-k>p <Plug>(coc-diagnostic-prev)
-nmap <silent><c-k>n <Plug>(coc-diagnostic-next)
+nmap <silent>[[ <Plug>(coc-diagnostic-prev)
+nmap <silent>]] <Plug>(coc-diagnostic-next)
+nmap <silent> <c-k><c-k> :CocFix<cr>
+nmap <silent> <c-k>k  <Plug>(coc-fix-current)
 "goto code navigation.
-nmap <silent> <c-k><c-d> <Plug>(coc-definition)
-nmap <silent> <c-k><c-y> <Plug>(coc-type-definition)
-nmap <silent> <c-k><c-i> <Plug>(coc-implementation)
-nmap <silent> <c-k><c-r> <Plug>(coc-references)
+nmap <silent> <c-]> <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+" nmap <silent> <c-k><c-d> <Plug>(coc-type-definition)
+" nmap <silent> <c-k><c-i> <Plug>(coc-implementation)
+" nmap <silent> <c-k><c-r> <Plug>(coc-references)
+
+"commands
+nmap <silent> <c-k><c-f> :call CocActionAsync('runCommand', 'editor.action.format')<cr>
+nmap <silent> <c-k><c-o> :call CocActionAsync('runCommand', 'editor.action.organizeImport')<cr>
 "renaming.
 nmap <c-k>r <Plug>(coc-rename)
 
 "show documentation in preview window.
-nnoremap <silent> <c-k><c-d> :call <SID>show_documentation()<CR>
 function! s:show_documentation()
     if (index(['vim','help'], &filetype) >= 0)
         execute 'h '.expand('<cword>')
@@ -726,13 +859,28 @@ function! s:show_documentation()
         execute '!' . &keywordprg . " " . expand('<cword>')
     endif
 endfunction
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+" show parameters hint
+inoremap <c-p> <c-\><c-o>:call CocActionAsync('showSignatureHelp')<cr>
 
 "highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 "formatting
-xmap <c-k>= <Plug>(coc-format-selected)
+xmap = <Plug>(coc-format-selected)
 nmap <c-k>= <Plug>(coc-format-selected)
+nmap == vv<c-k>=
+
+" snippets
+nnoremap <c-k>se :CocCommand snippets.editSnippets<cr>
+nnoremap <c-k>sf :CocCommand snippets.openSnippetFiles<cr>
+
+
+"TODO: review
+
+
+"add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call CocAction('fold', <f-args>)
 
 augroup mygroup
     autocmd!
@@ -749,8 +897,6 @@ nmap <c-k>a <Plug>(coc-codeaction-selected)
 
 "remap keys for applying codeAction to the current buffer.
 nmap <c-k>ac <Plug>(coc-codeaction)
-"apply AutoFix to problem on the current line.
-nmap <c-k><c-f> <Plug>(coc-fix-current)
 
 "" Map function and class text objects
 "" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -778,14 +924,6 @@ nmap <c-k><c-f> <Plug>(coc-fix-current)
 "nmap <silent> <C-s> <Plug>(coc-range-select)
 "xmap <silent> <C-s> <Plug>(coc-range-select)
 
-"add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
-
-"add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call CocAction('fold', <f-args>)
-
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR :call CocActionAsync('runCommand', 'editor.action.organizeImport')
 
 "" Add (Neo)Vim's native statusline support.
 "" NOTE: Please sez `:h coc-status` for integrations with external plugins that
@@ -809,6 +947,55 @@ command! -nargs=0 OR :call CocActionAsync('runCommand', 'editor.action.organizeI
 "nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 "" Resume latest coc list.
 "nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+
+" dap (debugger)
+nnoremap <silent> <c-i><c-i> :lua require'dap'.continue()<CR>
+nnoremap <silent> <c-i><c-j> :lua require'dap'.step_over()<CR>
+nnoremap <silent> <c-i><c-]> :lua require'dap'.step_into()<CR>
+nnoremap <silent> <c-i><c-o> :lua require'dap'.step_out()<CR>
+nnoremap <silent> <c-i>B :lua require'dap'.list_breakpoints()<CR>
+nnoremap <silent> <c-i>bb :lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <c-i>bc :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
+nnoremap <silent> <c-i>bl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
+nnoremap <silent> <c-i><c-r> :lua require'dap'.repl.open()<CR><c-w>ji
+nnoremap <silent> <c-i>y :lua require'dap'.run_last()<CR>
+nnoremap <silent> <c-i><c-h> :lua require('dap.ui.widgets').hover()<CR>
+nnoremap <silent> <c-i><c-s> :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.scopes).open()<CR>
+nnoremap <silent> <c-i><c-f> :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.frames).open()<CR>
+
+lua << EOF
+local dap = require('dap')
+dap.set_log_level('TRACE');
+
+dap.adapters.node2 = {
+  type = 'executable',
+  command = 'node',
+  args = {os.getenv('HOME') .. '/.config/nvim/vimspector-config/gadgets/macos/download/vscode-node-debug2/out/src/nodeDebug.js'},
+}
+dap.configurations.typescript = {
+    {
+    name = 'Attach to process',
+    type = 'node2',
+    request = 'attach',
+    processId = require'dap.utils'.pick_process,
+  },{
+    name = 'Attach to inspector',
+    type = 'node2',
+    request = 'attach',
+    protocol = 'inspector',
+    stopOnEntry = true,
+    sourceMaps = true,
+    console = 'integratedTerminal',
+    cwd= vim.fn.getcwd(),
+  },
+}
+EOF
+
+sign define DapBreakpoint text= texthl=WarningMsg
+sign define DapBreakpointRejected text= texthl=LineNr
+sign define DapBreakpointCondition text= texthl=WarningMsg
+sign define DapLogPoint text= texthl=WarningMsg
+sign define DapStopped text= texthl=WarningMsg
 ""}}}
 
 " vim: set et fdm=marker sts=4 sw=4:
