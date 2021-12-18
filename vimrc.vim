@@ -80,7 +80,7 @@ set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNO
 
 filetype plugin indent on
 
-let mapleader=";"
+let mapleader="<space>"
 set timeoutlen=1500
 " set pastetoggle=<F12>
 set history=300
@@ -112,8 +112,25 @@ snoremap y <c-g>"+y
 map gf :edit <cfile><cr>
 
 "cancel hightlight on Esc
-nnoremap <esc> :noh<cr><esc>
-inoremap <esc> <esc>:noh<cr><esc>
+function! SmartEscape()
+    "FIXME does not cancel hightlighting
+    exec 'noh'
+    "close help || git hunks || quickfix || cmdline history
+    if &filetype == 'help' || &filetype == 'diff'
+                \  || &filetype == 'qf' || &filetype == 'vim'
+        exec 'close'
+    endif
+    "close flaating windows
+    for win in nvim_list_wins()
+        let wconfig = nvim_win_get_config(win)
+        if (wconfig.relative == 'win')
+            call nvim_win_close(win, 0)
+        endif
+    endfor
+endfunction
+
+nnoremap <silent> <esc> :noh<cr>:call SmartEscape()<cr>
+inoremap <silent> <esc> <esc>:noh<cr>
 
 "disable ex mode
 nnoremap Q <Nop>
@@ -126,7 +143,10 @@ nnoremap V v$
 "highlight all line with vv
 nnoremap vv V
 "select pasted text
-nnoremap <expr> vp '`[' . strpart(getregtype(), 0, 1) . '`]'
+nnoremap <expr> gvp '`[' . strpart(getregtype(), 0, 1) . '`]'
+"paste and select pasted text
+nnoremap vp pgvp
+nnoremap vP Pgvp
 
 "vi mode moving in insert mode
 inoremap <c-h> <left>
@@ -357,10 +377,10 @@ set sidescrolloff=5  "keep 5 lines left and right from the cursor
 " map <Up> gk
 
 "leader-l - Lines
-nnoremap <leade>lr :set number<cr>:set rnu<cr>
-nnoremap <leade>ln :set nornu<cr>:set number<cr>
-nnoremap <leade>lh :set nonumber<cr>:set nornu<cr>
-nnoremap <leade>lw :set wrap!<cr>
+nnoremap <leader>lr :set number<cr>:set rnu<cr>
+nnoremap <leader>ln :set nornu<cr>:set number<cr>
+nnoremap <leader>lh :set nonumber<cr>:set nornu<cr>
+nnoremap <leader>lw :set wrap!<cr>
 " }}}
 
 "folds {{{
@@ -411,12 +431,12 @@ nnoremap <c-c>t :%s/\s\+$//e<cr>:nohl<cr>
 "mixed indent
 nnoremap <c-c>i :retab<cr>
 "goto next, prev. open error
+nnoremap ]] :lnext<cr>
+nnoremap [[ :lprevious<cr>
 nnoremap <c-c>l :lopen<cr>
-nnoremap <c-c>j :lnext<cr>
-nnoremap <c-c>k :lprevious<cr>
 
 "format all file
-nnoremap <c-c>= mCgg=G`CmC
+nnoremap =- mCgg=G`CmC
 "}}}
 
 "files/types {{{
@@ -428,7 +448,7 @@ set wildignore+=*/node_modules/*
 set wildignore+=*/.history/*
 "}}}
 
-" syntax hightlight "{{{
+"syntax hightlight "{{{
 
 "hl TODO:, FIXME: in blue bold
 augroup vimrc_todo
@@ -468,7 +488,7 @@ EOF
 
 nnoremap s <cmd> HopChar1<cr>
 
-" Telescope
+" Telescope {{{
 lua << EOF
 local actions = require("telescope.actions")
 local borderchars = {"═", "║", "═", "║", "╔", "╗", "╝", "╚"}
@@ -574,8 +594,9 @@ nnoremap <c-p>h <cmd>Telescope oldfiles<cr>
 nnoremap <c-p>c <cmd>Telescope command_history<cr>
 nnoremap <c-p>s <cmd>Telescope spell_suggest<cr>
 nnoremap <c-p>d <cmd>Telescope diagnostics<cr>
+"}}}
 
-"NvimTree
+"NvimTree {{{
 let g:nvim_tree_icons = {
     \ 'default': '',
     \ 'symlink': '',
@@ -712,22 +733,23 @@ endfunction
 
 nnoremap <silent> <C-n> :call ToogleNvimTreeSmart()<CR>
 "}}}
+"}}}
 
-"Ctrl+g - Git "{{{
+"Ctrl+g - Git {{{
 let g:gitgutter_map_keys = 0 "no mappings by gitgutter
 
-"focus window of last created buffer
-function! JumpLastBufferWindow()
-    call win_gotoid(win_getid(bufwinnr(last_buffer_nr())))
-endfunction
+" fugitive
+nnoremap <c-g><c-g>:Git commit<cr>
+nnoremap <c-g>c :Git commit<cr>
 
+" git gutter
 nnoremap <c-g>R :!git checkout <c-r>%<cr><cr>
 nnoremap <c-g>p :GitGutterPreviewHunk<cr>:call JumpLastBufferWindow()<cr>
 nnoremap <c-g>r :GitGutterUndoHunk<cr>
 nnoremap <c-g>S :GitGutterStageHunk<cr>
-nnoremap <c-g>l :GitGutterLineHighlightsToggle<cr>
-nnoremap <c-g>k :GitGutterPrevHunk<cr>
-nnoremap <c-g>j :GitGutterNextHunk<cr>
+nnoremap <c-g>d :GitGutterLineHighlightsToggle<cr>
+nnoremap <c-g>[ :GitGutterPrevHunk<cr>
+nnoremap <c-g>] :GitGutterNextHunk<cr>
 
 let g:gitgutter_sign_added = '+'
 let g:gitgutter_sign_removed = '-'
@@ -790,13 +812,13 @@ endfunction
 autocmd VimEnter * call s:ConfigAirlineSymbols()
 "}}}
 
-"dev {{{
+"dev (coc) {{{
 set completeopt-=preview "disable preview popup buffer
 
-" set nobackup
-" set nowritebackup
-" set cmdheight=1
-" set shortmess+=c
+"set nobackup
+"set nowritebackup
+"set cmdheight=2
+set shortmess+=c "???
 
 let g:coc_global_extensions = [
     \ 'coc-css',
@@ -829,25 +851,46 @@ endfunction
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
             \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-"navigate diagnostics
-nmap <silent>[[ <Plug>(coc-diagnostic-prev)
-nmap <silent>]] <Plug>(coc-diagnostic-next)
-nmap <silent> <c-k><c-k> :CocFix<cr>
-nmap <silent> <c-k>k  <Plug>(coc-fix-current)
-"goto code navigation.
-nmap <silent> <c-]> <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" nmap <silent> <c-k><c-d> <Plug>(coc-type-definition)
-" nmap <silent> <c-k><c-i> <Plug>(coc-implementation)
-" nmap <silent> <c-k><c-r> <Plug>(coc-references)
+function! InitDevMappings()
+    if !exists('g:dev_mappings') && len(g:coc_status) > 4
+                \ && g:coc_status[2:4] ==# 'TSC'
+        echom 'init dev mappings'
+        "navigate/fix diagnostics
+        nmap <silent> <expr> <leader>dl CocDiagnostics
+        nmap <silent> [[ <Plug>(coc-diagnostic-prev)
+        nmap <silent> ]] <Plug>(coc-diagnostic-next)
+        nmap <silent> ]e <Plug>(coc-diagnostic-next-error)
+        nmap <silent> [e <Plug>(coc-diagnostic-prev-error)
+        nmap <silent> <leader>df <Plug>(coc-fix-current)
+        nmap <silent> <leader>dd :CocFix<cr>
 
-"commands
-nmap <silent> <c-k><c-f> :call CocActionAsync('runCommand', 'editor.action.format')<cr>
-nmap <silent> <c-k><c-o> :call CocActionAsync('runCommand', 'editor.action.organizeImport')<cr>
-"renaming.
-nmap <c-k>r <Plug>(coc-rename)
+        "goto code navigation.
+        nmap <silent> <c-]> <Plug>(coc-definition)
+        nmap <silent> <leader>gd <Plug>(coc-type-definition)
+        nmap <silent> <leader>gi <Plug>(coc-implementation)
+        nmap <silent> <leader>gr <Plug>(coc-references)
+
+        "formatting
+        nmap <silent> <leader>ff :call CocActionAsync('runCommand', 'editor.action.format')<cr>
+        nmap <silent> <leader>fi :call CocActionAsync('runCommand', 'editor.action.organizeImport')<cr> 
+        xmap = <Plug>(coc-format-selected)
+        nmap == vv=
+
+        "refactor/renaming.
+        nmap <leader>rr <Plug>(coc-rename)
+
+        " show parameters hint
+        inoremap <c-p> <c-\><c-o>:call CocActionAsync('showSignatureHelp')<cr>
+
+        " snippets
+        nnoremap <leader>se :CocCommand snippets.editSnippets<cr>
+        nnoremap <leader>sf :CocCommand snippets.openSnippetFiles<cr>
+
+        let g:dev_mappings = 1
+    endif
+endfunction 
+
+autocmd User CocStatusChange call InitDevMappings()
 
 "show documentation in preview window.
 function! s:show_documentation()
@@ -860,25 +903,13 @@ function! s:show_documentation()
     endif
 endfunction
 nnoremap <silent> K :call <SID>show_documentation()<CR>
-" show parameters hint
-inoremap <c-p> <c-\><c-o>:call CocActionAsync('showSignatureHelp')<cr>
 
 "highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-"formatting
-xmap = <Plug>(coc-format-selected)
-nmap <c-k>= <Plug>(coc-format-selected)
-nmap == vv<c-k>=
-
-" snippets
-nnoremap <c-k>se :CocCommand snippets.editSnippets<cr>
-nnoremap <c-k>sf :CocCommand snippets.openSnippetFiles<cr>
-
-
-"TODO: review
-
-
+"TODO: review {{{
+"
+"
 "add `:Fold` command to fold current buffer.
 command! -nargs=? Fold :call CocAction('fold', <f-args>)
 
@@ -891,12 +922,12 @@ augroup mygroup
 augroup end
 
 "applying codeAction to the selected region.
-"Example: `<c-k>aap` for current paragraph
-xmap <c-k>a <Plug>(coc-codeaction-selected)
-nmap <c-k>a <Plug>(coc-codeaction-selected)
+"Example: `,aap` for current paragraph
+xmap ,a <Plug>(coc-codeaction-selected)
+nmap ,a <Plug>(coc-codeaction-selected)
 
 "remap keys for applying codeAction to the current buffer.
-nmap <c-k>ac <Plug>(coc-codeaction)
+nmap ,ac <Plug>(coc-codeaction)
 
 "" Map function and class text objects
 "" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -947,21 +978,23 @@ nmap <c-k>ac <Plug>(coc-codeaction)
 "nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 "" Resume latest coc list.
 "nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+"}}}
+"}}}
 
-" dap (debugger)
-nnoremap <silent> <c-i><c-i> :lua require'dap'.continue()<CR>
-nnoremap <silent> <c-i><c-j> :lua require'dap'.step_over()<CR>
-nnoremap <silent> <c-i><c-]> :lua require'dap'.step_into()<CR>
-nnoremap <silent> <c-i><c-o> :lua require'dap'.step_out()<CR>
-nnoremap <silent> <c-i>B :lua require'dap'.list_breakpoints()<CR>
-nnoremap <silent> <c-i>bb :lua require'dap'.toggle_breakpoint()<CR>
-nnoremap <silent> <c-i>bc :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
-nnoremap <silent> <c-i>bl :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
-nnoremap <silent> <c-i><c-r> :lua require'dap'.repl.open()<CR><c-w>ji
-nnoremap <silent> <c-i>y :lua require'dap'.run_last()<CR>
-nnoremap <silent> <c-i><c-h> :lua require('dap.ui.widgets').hover()<CR>
-nnoremap <silent> <c-i><c-s> :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.scopes).open()<CR>
-nnoremap <silent> <c-i><c-f> :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.frames).open()<CR>
+" debugger/inspector <leader>i {{{
+nnoremap <silent> <leader>ii :lua require'dap'.continue()<CR>
+nnoremap <silent> <leader>ij :lua require'dap'.step_over()<CR>
+nnoremap <silent> <leader>i<c-]> :lua require'dap'.step_into()<CR>
+nnoremap <silent> <leader>i<c-o> :lua require'dap'.step_out()<CR>
+nnoremap <silent> <leader>iB :lua require'dap'.list_breakpoints()<CR>
+nnoremap <silent> <leader>ib :lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <leader>ic :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
+nnoremap <silent> <leader>il :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
+nnoremap <silent> <leader>ir :lua require'dap'.repl.open()<CR><c-w>ji
+nnoremap <silent> <leader>iy :lua require'dap'.run_last()<CR>
+nnoremap <silent> <leader>ih :lua require('dap.ui.widgets').hover()<CR>
+nnoremap <silent> <leader>is :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.scopes).open()<CR>
+nnoremap <silent> <leader>if :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.frames).open()<CR>
 
 lua << EOF
 local dap = require('dap')
@@ -973,12 +1006,7 @@ dap.adapters.node2 = {
   args = {os.getenv('HOME') .. '/.config/nvim/vimspector-config/gadgets/macos/download/vscode-node-debug2/out/src/nodeDebug.js'},
 }
 dap.configurations.typescript = {
-    {
-    name = 'Attach to process',
-    type = 'node2',
-    request = 'attach',
-    processId = require'dap.utils'.pick_process,
-  },{
+  {
     name = 'Attach to inspector',
     type = 'node2',
     request = 'attach',
@@ -996,6 +1024,6 @@ sign define DapBreakpointRejected text= texthl=LineNr
 sign define DapBreakpointCondition text= texthl=WarningMsg
 sign define DapLogPoint text= texthl=WarningMsg
 sign define DapStopped text= texthl=WarningMsg
-""}}}
+"}}}
 
 " vim: set et fdm=marker sts=4 sw=4:
