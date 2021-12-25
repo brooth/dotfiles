@@ -59,6 +59,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'phaazon/hop.nvim'
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'kyazdani42/nvim-web-devicons'
+Plug 'pechorin/any-jump.vim'
 
 " git
 Plug 'tpope/vim-fugitive'
@@ -75,18 +76,19 @@ call plug#end()
 "}}}
 
 "misc {{{
-set encoding=utf-8
-set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+let mapleader=" "
 
 filetype plugin indent on
 
-let mapleader="<space>"
+set encoding=utf-8
+set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+set autowriteall "auto save buffers
 set timeoutlen=1500
 " set pastetoggle=<F12>
 set history=300
 set mouse=a "all mouse support
 set hidden
-set autochdir "sets pwd to the starting dic (change with :cd)
+set noautochdir "do not change cwd when open files (change with :cd)
 set showcmd "display what command is waiting for an operator
 "set lazyredraw "redraw only when we need to. do not use, cause lagging
 set nolz "disable lazydraw
@@ -115,9 +117,12 @@ map gf :edit <cfile><cr>
 function! SmartEscape()
     "FIXME does not cancel hightlighting
     exec 'noh'
-    "close help || git hunks || quickfix || cmdline history
+    "close help || git hunks || quickfix...
     if &filetype == 'help' || &filetype == 'diff'
-                \  || &filetype == 'qf' || &filetype == 'vim'
+                \ || &filetype == 'qf' 
+                \ || &filetype == 'dap-repl'
+                \ || &filetype == 'fugitive'
+                \ || &filetype == 'gitcommit'
         exec 'close'
     endif
     "close flaating windows
@@ -155,7 +160,7 @@ inoremap <c-j> <down>
 inoremap <c-l> <right>
 
 "Open the current file in the default program
-nmap <leader>x :!open %<cr><cr>
+nmap <c-x>o :!open %<cr><cr>
 "}}}
 
 "abbreviations {{{
@@ -238,14 +243,14 @@ nnoremap <silent><c-s>t :source %<cr>
 
 "buffers/windows/tabs {{{
 "functions {{{
-"kill current buffer and goto previous
-function! DeleteBufferGoPrev()
-    let buf_num = bufnr('%')
-    exe 'bprevious'
-    exe 'bd! '.buf_num
+function! DeleteBufferGoPrev(save)
+    if a:save
+        exec 'write'
+    endif
+    exe 'bp|bd! #'
 endfunction
 
-"kill background buffers
+" background buffer has no window (invisible)
 function! ClearBackBuffers()
     let n = bufnr('$')
     while n > 0
@@ -261,6 +266,7 @@ function! DeleteOtherBuffers()
     let cb = bufnr('%')
     while n > 0
         if n != cb && buflisted(n) && !getbufvar(n, '&mod')
+                    \ && getbufvar(n, '&filetype') != 'NVimTree'
             exe 'bd ' . n
         endif
         let n -= 1
@@ -272,6 +278,7 @@ function! DeleteUnmodifiedBuffers()
     let n = bufnr('$')
     while n > 0
         if buflisted(n) && !getbufvar(n, '&mod')
+                    \ && getbufvar(n, '&filetype') != 'NVimTree'
             exe 'bd ' . n
         endif
         let n -= 1
@@ -288,32 +295,22 @@ function! DeleteRightBuffers()
         let n += 1
     endwhile
 endfun
-
-function! DeleteLeftBuffers()
-    let n = bufnr('%') - 1
-    while n > 0
-        if buflisted(n) && !getbufvar(n, '&mod')
-            exe 'bd ' . n
-        endif
-        let n -= 1
-    endwhile
-endfun
 "}}}
 
 "Buffers
 nnoremap <silent><c-w>] :bnext<cr>
 nnoremap <silent><c-w>[ :bprevious<cr>
 nnoremap <silent><c-w><c-d> :bd %<cr>
-nnoremap <silent><c-w><c-q> :call DeleteBufferGoPrev()<cr>
+nnoremap <silent><c-w><c-q> :call DeleteBufferGoPrev(&modified)<cr>
+nnoremap <silent><c-w><c-k> :call DeleteBufferGoPrev(0)<cr>
 nnoremap <silent><c-w><c-c> :call ClearBackBuffers()<cr>
 nnoremap <silent><c-w><c-o> :call DeleteOtherBuffers()<cr>
 nnoremap <silent><c-w><c-u> :call DeleteUnmodifiedBuffers()<cr>
 nnoremap <silent><c-w><c-r> :call DeleteRightBuffers()<cr>
-nnoremap <silent><c-w><c-l> :call DeleteLeftBuffers()<cr>
 
 "Panes, split/swap and move the cursor to new/swapped pane
-nnoremap <c-w>V <c-w><c-v><c-w>l
-nnoremap <c-w>S <c-w><c-s><c-w>j
+nnoremap <c-w><c-v> <c-w><c-v><c-w>l
+nnoremap <c-w><c-s> <c-w><c-s><c-w>j
 nnoremap <c-w>r <c-w><c-r><c-w><c-w>
 
 "save current buffer with F2
@@ -330,6 +327,7 @@ set ignorecase
 "set incsearch "search while typing, realy annoying
 
 xnoremap <c-t> y/<c-r>"<cr>
+xnoremap <c-s> y:%s/<c-r>"//ge<left><left><left>
 
 "far.vim
 let g:far#debug = 1
@@ -475,18 +473,18 @@ EOF
 "}}}
 
 "navigation "{{{
-"Netrw
-let g:netrw_banner = 0
-let g:netrw_listsjyle = 1
-
-nnoremap <silent> <c-w>e :Explore<cr>
-
 "hop
 lua << EOF
     require('hop').setup()
 EOF
 
 nnoremap s <cmd> HopChar1<cr>
+
+" AnyJump
+nnoremap <c-j><c-j> :AnyJump<CR>
+xnoremap <c-j><c-j> :AnyJumpVisual<CR>
+nnoremap [j :AnyJumpBack<CR>
+nnoremap ]j :AnyJumpLastResults<CR>
 
 " Telescope {{{
 lua << EOF
@@ -548,7 +546,8 @@ require('telescope').setup {
       dir_icon = '📦',
       selection_caret = ' ',
       entry_prefix = ' ',
-      cwd = vim.g.initial_dir,
+      -- cwd = vim.g.initial_dir,
+      cwd = vim.fn.getcwd(),
     }, 
     file_browser = {
       hidden = true,
@@ -557,7 +556,7 @@ require('telescope').setup {
       preview_title = "",
       previewer = false,
       dir_icon = '📦',
-      wd = vim.fn.getcwd(),
+      cwd = vim.fn.getcwd(),
     }, 
     buffers = {
       layout_strategy = 'vertical',
@@ -725,22 +724,24 @@ function! ToogleNvimTreeSmart()
     if &filetype == 'NvimTree'
         exec ':NvimTreeClose'
     elseif &filetype == ''
-        exec ':NvimTreeOpen'
+        exec ':NvimTreeFocus'
     else 
         exec ':NvimTreeFindFile'
     endif
 endfunction
 
-nnoremap <silent> <C-n> :call ToogleNvimTreeSmart()<CR>
+nnoremap <silent> <c-n><c-n> :call ToogleNvimTreeSmart()<CR>
+nnoremap <silent> <c-n>q :NvimTreeClose<CR>
 "}}}
 "}}}
 
-"Ctrl+g - Git {{{
+"git <c-g> {{{
 let g:gitgutter_map_keys = 0 "no mappings by gitgutter
 
 " fugitive
-nnoremap <c-g><c-g>:Git commit<cr>
-nnoremap <c-g>c :Git commit<cr>
+nnoremap <c-g><c-g> :Git<cr>
+nnoremap <c-g><c-c> :Git commit<cr>
+nnoremap <c-g><c-p> :Git push<cr>
 
 " git gutter
 nnoremap <c-g>R :!git checkout <c-r>%<cr><cr>
@@ -855,36 +856,38 @@ function! InitDevMappings()
     if !exists('g:dev_mappings') && len(g:coc_status) > 4
                 \ && g:coc_status[2:4] ==# 'TSC'
         echom 'init dev mappings'
+
         "navigate/fix diagnostics
-        nmap <silent> <expr> <leader>dl CocDiagnostics
         nmap <silent> [[ <Plug>(coc-diagnostic-prev)
         nmap <silent> ]] <Plug>(coc-diagnostic-next)
         nmap <silent> ]e <Plug>(coc-diagnostic-next-error)
         nmap <silent> [e <Plug>(coc-diagnostic-prev-error)
-        nmap <silent> <leader>df <Plug>(coc-fix-current)
-        nmap <silent> <leader>dd :CocFix<cr>
+        nmap <silent> <c-k>d :CocDiagnostics<cr>
+        nmap <silent> <c-k><c-k> <Plug>(coc-fix-current)
+        nmap <silent> <c-k>k :CocFix<cr>
 
         "goto code navigation.
         nmap <silent> <c-]> <Plug>(coc-definition)
-        nmap <silent> <leader>gd <Plug>(coc-type-definition)
-        nmap <silent> <leader>gi <Plug>(coc-implementation)
-        nmap <silent> <leader>gr <Plug>(coc-references)
+        nmap <silent> <c-j>d <Plug>(coc-type-definition)
+        nmap <silent> <c-j>i <Plug>(coc-implementation)
+        nmap <silent> <c-j>r <Plug>(coc-references)
 
         "formatting
-        nmap <silent> <leader>ff :call CocActionAsync('runCommand', 'editor.action.format')<cr>
-        nmap <silent> <leader>fi :call CocActionAsync('runCommand', 'editor.action.organizeImport')<cr> 
+        nnoremap <silent> <c-k>f :call CocActionAsync('runCommand', 'editor.action.format')<cr>
+        nnoremap <c-k>o :call CocAction('runCommand', 'editor.action.organizeImport')<cr>
+                    \ :call CocAction('runCommand', 'editor.action.format')<cr>
         xmap = <Plug>(coc-format-selected)
         nmap == vv=
 
         "refactor/renaming.
-        nmap <leader>rr <Plug>(coc-rename)
+        nmap <c-k>r <Plug>(coc-rename)
 
         " show parameters hint
         inoremap <c-p> <c-\><c-o>:call CocActionAsync('showSignatureHelp')<cr>
 
         " snippets
-        nnoremap <leader>se :CocCommand snippets.editSnippets<cr>
-        nnoremap <leader>sf :CocCommand snippets.openSnippetFiles<cr>
+        nmap <c-k>s :CocCommand snippets.editSnippets<cr>
+        nmap <c-k>S :CocCommand snippets.openSnippetFiles<cr>
 
         let g:dev_mappings = 1
     endif
@@ -981,20 +984,20 @@ nmap ,ac <Plug>(coc-codeaction)
 "}}}
 "}}}
 
-" debugger/inspector <leader>i {{{
-nnoremap <silent> <leader>ii :lua require'dap'.continue()<CR>
-nnoremap <silent> <leader>ij :lua require'dap'.step_over()<CR>
-nnoremap <silent> <leader>i<c-]> :lua require'dap'.step_into()<CR>
-nnoremap <silent> <leader>i<c-o> :lua require'dap'.step_out()<CR>
-nnoremap <silent> <leader>iB :lua require'dap'.list_breakpoints()<CR>
-nnoremap <silent> <leader>ib :lua require'dap'.toggle_breakpoint()<CR>
-nnoremap <silent> <leader>ic :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
-nnoremap <silent> <leader>il :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
-nnoremap <silent> <leader>ir :lua require'dap'.repl.open()<CR><c-w>ji
-nnoremap <silent> <leader>iy :lua require'dap'.run_last()<CR>
-nnoremap <silent> <leader>ih :lua require('dap.ui.widgets').hover()<CR>
-nnoremap <silent> <leader>is :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.scopes).open()<CR>
-nnoremap <silent> <leader>if :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.frames).open()<CR>
+" debugger/inspector <c-i> {{{
+nnoremap <silent> <c-i><c-i> :lua require'dap'.continue()<CR>
+nnoremap <silent> <c-i>j :lua require'dap'.step_over()<CR>
+nnoremap <silent> <c-i><c-]> :lua require'dap'.step_into()<CR>
+nnoremap <silent> <c-i><c-o> :lua require'dap'.step_out()<CR>
+nnoremap <silent> <c-i>B :lua require'dap'.list_breakpoints()<CR>
+nnoremap <silent> <c-i>b :lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <c-i>c :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
+nnoremap <silent> <c-i>l :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
+nnoremap <silent> <c-i>r :lua require'dap'.repl.open()<CR><c-w>ji
+nnoremap <silent> <c-i>y :lua require'dap'.run_last()<CR>
+nnoremap <silent> <c-i>h :lua require('dap.ui.widgets').hover()<CR>
+nnoremap <silent> <c-i>s :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.scopes).open()<CR>
+nnoremap <silent> <c-i>f :lua local widgets=require("dap.ui.widgets");widgets.centered_float(widgets.frames).open()<CR>
 
 lua << EOF
 local dap = require('dap')
