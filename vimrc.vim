@@ -36,7 +36,7 @@ Plug 'bling/vim-airline'
 Plug 'mhartington/oceanic-next'
 Plug 'ryanoasis/vim-devicons'
 " Plug 'TaDaa/vimade' "dim inactive windows
-Plug 'tmux-plugins/vim-tmux-focus-events' "dim when jumping to tmux
+Plug 'tmux-plugins/vim-tmux-focus-events'
 
 " tools
 Plug 'tpope/vim-surround'
@@ -46,7 +46,10 @@ Plug 'folke/which-key.nvim'
 Plug 'machakann/vim-swap' "exchange arguments with g< g> gs
 Plug 'mg979/vim-visual-multi'
 Plug 'mbbill/undotree'
-Plug 'karb94/neoscroll.nvim'
+Plug 'rcarriga/nvim-notify' "notifications
+
+" windows/buffers
+Plug 'paroxayte/vwm.vim'
 
 " configs
 " Plug 'editorconfig/editorconfig-vim'
@@ -63,6 +66,7 @@ Plug '~/Projects/far.vim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'phaazon/hop.nvim'
+Plug 'unblevable/quick-scope' " better f,F,t,T jumping
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'kyazdani42/nvim-web-devicons'
 
@@ -73,6 +77,7 @@ Plug 'airblade/vim-gitgutter'
 " dev
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mfussenegger/nvim-dap'
+Plug 'theHamsta/nvim-dap-virtual-text' " hightlight current debugging line (DAP)
 
 "performace and fixes
 Plug 'antoinemadec/FixCursorHold.nvim'
@@ -111,8 +116,7 @@ function! OnVimEnter()
 
     " open NVimTree and two empty splits by defauls (no args)
     if argc() == 0
-        exec 'vsplit'
-        exec 'NvimTreeOpen'
+        exec 'VwmToggle dev1'
     endif
 endfunction
 autocmd VimEnter * call OnVimEnter()
@@ -159,16 +163,19 @@ nnoremap V v$
 "highlight all line with vv
 nnoremap vv V
 "select pasted text
-nnoremap <expr> gvp '`[' . strpart(getregtype(), 0, 1) . '`]'
-"paste and select pasted text
-nnoremap vp pgvp
-nnoremap vP Pgvp
+nnoremap <expr> gv '`[' . strpart(getregtype(), 0, 1) . '`]'
 
 "vi mode moving in insert mode
 inoremap <c-h> <left>
 inoremap <c-k> <up>
 inoremap <c-j> <down>
 inoremap <c-l> <right>
+
+" open help on right
+augroup helpautogroup
+    autocmd!
+    autocmd FileType help wincmd L
+augroup END
 "}}}
 
 "abbreviations {{{
@@ -179,6 +186,49 @@ iabbrev KO Khalidov Oleg
 "help {{{
 nnoremap <F1>u :h usr_41.txt<cr>
 nnoremap <F1>f :h function-list<cr>
+"}}}
+
+"theme {{{
+syntax enable
+colorscheme OceanicNext
+" set background=dark
+
+if (has("termguicolors"))
+    set termguicolors
+    "hi LineNr guifg=#65737E guibg=#1E303B
+    "hi CursorLineNr guifg=#EC5f67 guibg=#1E303B gui=none
+    "hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
+    "hi SignColumn ctermfg=243 guifg=#65737E guibg=#1E303B "signcolumn same color as numbers
+
+    " fix jsx/tags coloring
+    if g:colors_name == 'OceanicNext'
+        hi Comment gui=italic
+        hi TSTagAttribute guifg=#c594c5 gui=italic
+        hi TSTag guifg=#fac863 "gui=bold
+        hi TSConstructor guifg=#
+        hi TSVariableBuiltin guifg=# gui=bold
+        hi TSKeyword gui=bold
+        " hi TSConditional gui=bold
+        hi TSInclude gui=bold
+    endif
+
+    "nvim tree
+    hi NvimTreeGitDirty guifg=#d9a243
+    hi NvimTreeGitIgnored guifg=#777777 gui=none
+endif
+
+" highlight line in insert mode
+" hi cursorline cterm=none ctermbg=238 ctermfg=none guibg=#1f3039
+" autocmd InsertEnter * set cul
+" autocmd InsertLeave * set nocul
+" set nocul
+
+"dim vim when jump to tmux
+" augroup tmuxdim
+"   autocmd!
+"   autocmd FocusGained * VimadeUnfadeActive
+"   autocmd FocusLost * VimadeFadeActive
+" augroup END
 "}}}
 
 "cmdline "{{{
@@ -193,17 +243,13 @@ cnoremap <m-f> <s-right>
 "}}}
 
 " tools {{{
-lua require('neoscroll').setup()
-
 " highlight yank
 augroup highlight_yank
     autocmd!
-    au TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=700}
+    au TextYankPost * silent! lua vim.highlight.on_yank{higroup="Visual", timeout=700}
 augroup END
 
 lua << EOF
---require('neoscroll').setup()
-
 require("which-key").setup {
     plugins = {
         marks = true,
@@ -233,6 +279,15 @@ let g:VM_maps["Add Cursor Down"] = '\\j'
 let g:VM_maps["Add Cursor Up"] = '\\k'
 let g:VM_maps["Add Cursor Up"] = '\\k'
 
+lua << EOF
+vim.notify = require("notify")
+vim.notify.setup({
+    timeout = 2000,
+    minimum_width = 30,
+    stages = "fade_in_slide_out",
+})
+EOF
+
 "}}}
 
 "session/source {{{
@@ -252,7 +307,7 @@ autocmd BufReadPost *
             \ endif
 
 autocmd FocusLost * wa|echom 'All buffers saved!'
- 
+
 function! SaveSession()
     let l:path = g:initial_dir.'/.vimsession'
     if confirm('save current session? '.l:path, "&yes\n&no", 1)==1
@@ -269,7 +324,7 @@ nnoremap <silent><c-s>r :source ~/Projects/dotfiles/vimrc.vim<cr>
 nnoremap <silent><c-s>t :source %<cr>
 "}}}
 
-"buffers/windows/tabs {{{
+"buffers/windows {{{
 "functions {{{
 " background buffer has no window (invisible)
 function! ClearBackBuffers()
@@ -331,7 +386,7 @@ function! SwapBuffers()
   let lastwin = winnr('$')
   while lastwin > 0
       if getbufvar(winbufnr(lastwin), '&filetype') != 'NVimTree'
-                  \ && lastwin != thiswin 
+                  \ && lastwin != thiswin
           break
       endif
       let lastwin -= 1
@@ -377,6 +432,65 @@ inoremap <F3> <Esc>:wa<cr>
 vnoremap <F3> <Esc>:wa<cr>
 "close current window
 nnoremap <F10> :q<cr>
+
+" vwm (layouts)
+let g:vwm#layouts = [{
+      \  'name': 'dev1',
+      \  'set_all': [],
+      \  'opnBfr': ['NvimTreeOpen'],
+      \  'clsBfr': ['NvimTreeClose']
+      \ }, {
+      \  'name': 'dev2',
+      \  'set_all': [],
+      \  'opnBfr': ['NvimTreeOpen'],
+      \  'clsBfr': ['NvimTreeClose'],
+      \  'right': {
+      \    'init' : [],
+      \    'focus' : 1
+      \  }
+      \ }, {
+      \  'name': 'dev3',
+      \  'set_all': [],
+      \  'opnBfr': ['NvimTreeOpen'],
+      \  'clsBfr': ['NvimTreeClose'],
+      \  'right': {
+      \    'init' : [],
+      \    'bot': {
+      \      'init' : [],
+      \      'focus' : 1
+      \    }
+      \  }
+      \ }, {
+      \  'name': 'debug',
+      \  'set_all': [],
+      \  'opnBfr': [
+      \     'lua dapwidgets = require("dap.ui.widgets")',
+      \     'lua dapscopes = dapwidgets.sidebar(dapwidgets.scopes, {width=60}); dapscopes.open()',
+      \     'nmap o <cr>',
+      \     'lua require"dap".repl.open({}, "bel 20split")',
+      \     'wincmd k',
+      \     'lua dapframes = dapwidgets.sidebar(dapwidgets.frames, {}, "rightb 50vsplit"); dapframes.open()',
+      \  ],
+      \  'clsBfr': [
+      \     'lua require"dap".repl.close()',
+      \     'lua dapscopes.close()',
+      \     'lua dapframes.close()',
+      \  ],
+      \  '_bot':
+      \  {
+      \    'v_sz': 20,
+      \    'init': [],
+      \    'focus': 1
+      \  }
+      \ }]
+
+nmap <silent> <c-w>o1 <c-w>c:VwmOpen dev1<cr>
+nmap <silent> <c-w>o2 <c-w>c:VwmOpen dev2<cr>
+nmap <silent> <c-w>o3 <c-w>c:VwmOpen dev3<cr>
+nmap <silent> <c-w>o5 <c-w>c:VwmOpen debug<cr>
+nnoremap <silent> <c-w>c :VwmCloseAll<cr>
+nnoremap <silent> <c-w>R :VwmRefresh<cr>
+
 "}}}
 
 "search/replace/subtitude "{{{
@@ -385,11 +499,11 @@ set ignorecase
 "set incsearch "search while typing, realy annoying
 
 xnoremap <c-t> y/<c-r>"<cr>N
-xnoremap <c-g> y0:g/<c-r>"/norm! 
+xnoremap <c-g> y0:g/<c-r>"/norm!
 xnoremap <c-s> y:%s/<c-r>"//ge<left><left><left>
 xnoremap <c-m> y/<c-r>"<cr>Nqq
 xnoremap <s-t> y/\<<c-r>"\><cr>N
-xnoremap <s-g> y0:g/\<<c-r>"\>/norm! 
+xnoremap <s-g> y0:g/\<<c-r>"\>/norm!
 xnoremap <s-s> y:%s/\<<c-r>"\>//ge<left><left><left>
 xnoremap <s-m> y/\<<c-r>"\><cr>Nqq
 
@@ -448,6 +562,7 @@ nnoremap <leader>lw :set wrap!<cr>
 "folds {{{
 set foldlevelstart=0 "do not fold new buffers
 set foldnestmax=2
+set nofoldenable
 
 augroup remember_folds
     autocmd!
@@ -545,6 +660,15 @@ lua << EOF
     require('hop').setup()
 EOF
 
+"quick-scope
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+
+augroup qs_colors
+  autocmd!
+  autocmd ColorScheme * highlight def link QuickScopePrimary HopNextKey
+  autocmd ColorScheme * highlight def link QuickScopeSecondary HopNextKey1
+augroup END
+
 nnoremap s <cmd> HopChar1<cr>
 
 " Telescope {{{
@@ -616,7 +740,7 @@ require('telescope').setup {
       preview_title = "",
       previewer = false,
       dir_icon = '',
-    }, 
+    },
     buffers = {
       layout_strategy = 'vertical',
       theme = 'dropdown',
@@ -658,8 +782,6 @@ nmap <c-p>x :!open %<cr><cr>
 "}}}
 
 "NvimTree {{{
-
-"TODO: autocmd on bufclose, check if only one window is visible then open the tree?
 let g:nvim_tree_icons = {
     \ 'default': '',
     \ 'symlink': '',
@@ -671,7 +793,7 @@ let g:nvim_tree_icons = {
     \   '-renamed': "➜",
     \   'untracked': "ﮦ",
     \   '-deleted': "",
-    \   '-ignored': ""
+    \   'ignored': ""
     \   },
     \ 'folder': {
     \   'arrow_open': "-",
@@ -721,7 +843,7 @@ require('nvim-tree').setup {
   },
   filters = {
     dotfiles = false,
-    custom = {}
+    custom = { ".git", ".vscode" }
   },
   git = {
     enable = true,
@@ -796,6 +918,7 @@ function! ToogleNvimTreeSmart()
 endfunction
 
 nnoremap <silent> <c-p>n :call ToogleNvimTreeSmart()<CR>
+nnoremap <silent> <c-w>n :call ToogleNvimTreeSmart()<CR>
 nnoremap <silent> <c-p><c-n> :NvimTreeToggle<CR>
 "}}}
 "}}}
@@ -831,48 +954,6 @@ function! s:ConfigGitGutter()
     endif
 endfunction
 autocmd VimEnter * call s:ConfigGitGutter()
-"}}}
-
-"theme {{{
-syntax enable
-colorscheme OceanicNext
-" set background=dark
-
-if (has("termguicolors"))
-    set termguicolors
-    "hi LineNr guifg=#65737E guibg=#1E303B
-    "hi CursorLineNr guifg=#EC5f67 guibg=#1E303B gui=none
-    "hi SignatureMarkText guifg=#FAC863 guibg=#1E303B
-    "hi SignColumn ctermfg=243 guifg=#65737E guibg=#1E303B "signcolumn same color as numbers
-
-    " fix jsx/tags coloring
-    if g:colors_name == 'OceanicNext'
-        hi Comment gui=italic
-        hi TSTagAttribute guifg=#c594c5 gui=italic
-        hi TSTag guifg=#fac863 "gui=bold
-        hi TSConstructor guifg=#
-        hi TSVariableBuiltin guifg=# gui=bold
-        hi TSKeyword gui=bold
-        hi TSConditional gui=bold
-        hi TSInclude gui=bold
-    endif
-
-    "nvim tree
-    hi NvimTreeGitDirty guifg=#d9a243
-endif
-
-" highlight line in insert mode
-hi cursorline cterm=none ctermbg=238 ctermfg=none guibg=#1f3039
-autocmd InsertEnter * set cul
-autocmd InsertLeave * set nocul
-set nocul
-
-"dim vim when jump to tmux
-" augroup tmuxdim
-"   autocmd!
-"   autocmd FocusGained * VimadeUnfadeActive
-"   autocmd FocusLost * VimadeFadeActive
-" augroup END
 "}}}
 
 "airline {{{
@@ -946,6 +1027,14 @@ function! InitDevMappings()
   nmap <silent> <c-k><c-k> <Plug>(coc-fix-current)
   nmap <silent> <c-k>k :CocFix<cr>
   nmap <silent> <c-k>l :CocList outline<cr>
+  nmap <silent><nowait> <c-k>p  :<C-u>CocList commands<cr>
+  nmap <silent> <c-k>c <Plug>(coc-codeaction)
+  xmap <silent> <c-k>c <Plug>(coc-codeaction-selected)
+  nmap <silent> <c-k>c <Plug>(coc-codeaction-selected)
+
+  " not working with TS
+  nmap <silent> <C-k>v <Plug>(coc-range-select)
+  xmap <silent> <C-s>v <Plug>(coc-range-select)
 
   "goto code navigation.
   nmap <silent> <c-]> <Plug>(coc-definition)
@@ -969,13 +1058,31 @@ function! InitDevMappings()
   " snippets
   nmap <c-k>s :CocCommand snippets.editSnippets<cr>
   nmap <c-k>S :CocCommand snippets.openSnippetFiles<cr>
+
+
+  " Show all diagnostics.
+  nnoremap <silent><nowait> <c-k>ta  :<C-u>CocList diagnostics<cr>
+  " Manage extensions.
+  nnoremap <silent><nowait> <c-k>te  :<C-u>CocList extensions<cr>
+  " Show commands.
+  nnoremap <silent><nowait> <c-k>tc  :<C-u>CocList commands<cr>
+  " Find symbol of current document.
+  nnoremap <silent><nowait> <c-k>to  :<C-u>CocList outline<cr>
+  " Search workspace symbols.
+  nnoremap <silent><nowait> <c-k>ts  :<C-u>CocList -I symbols<cr>
+  " Do default action for next item.
+  nnoremap <silent><nowait> <c-k>tj  :<C-u>CocNext<CR>
+  " Do default action for previous item.
+  nnoremap <silent><nowait> <c-k>tk  :<C-u>CocPrev<CR>
+  " Resume latest coc list.
+  nnoremap <silent><nowait> <c-k>tp  :<C-u>CocListResume<CR>
 endfunction
 
 function! OnCocStatusChanged()
     if !exists('g:dev_mappings') &&
           \ stridx(g:coc_status[1:3], 'TSC') >= 0
         call InitDevMappings()
-        echom 'Dev mappings enabled!'
+        lua require("notify")("Dev Mappings Applied")
         let g:dev_mappings = 1
     endif
 endfunction
@@ -987,7 +1094,11 @@ function! s:show_documentation()
     if (index(['vim','help'], &filetype) >= 0)
         execute 'h '.expand('<cword>')
     elseif (coc#rpc#ready())
-        call CocActionAsync('doHover')
+        if (coc#float#has_float())
+            call coc#float#jump()
+        else
+            call CocActionAsync('doHover')
+        endif
     else
         execute '!' . &keywordprg . " " . expand('<cword>')
     endif
@@ -1011,13 +1122,6 @@ augroup mygroup
     autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-"applying codeAction to the selected region.
-"Example: `,aap` for current paragraph
-xmap ,a <Plug>(coc-codeaction-selected)
-nmap ,a <Plug>(coc-codeaction-selected)
-
-"remap keys for applying codeAction to the current buffer.
-nmap ,ac <Plug>(coc-codeaction)
 
 "" Map function and class text objects
 "" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
@@ -1030,54 +1134,27 @@ nmap ,ac <Plug>(coc-codeaction)
 "xmap ac <Plug>(coc-classobj-a)
 "omap ac <Plug>(coc-classobj-a)
 
-"" Remap <C-f> and <C-b> for scroll float windows/popups.
-"if has('nvim-0.4.0') || has('patch-8.2.0750')
-"    nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-"    nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-"    inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-"    inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-"    vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-"    vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-"endif
-
-"" Use CTRL-S for selections ranges.
-"" Requires 'textDocument/selectionRange' support of language server.
-"nmap <silent> <C-s> <Plug>(coc-range-select)
-"xmap <silent> <C-s> <Plug>(coc-range-select)
-
-
 "" Add (Neo)Vim's native statusline support.
 "" NOTE: Please sez `:h coc-status` for integrations with external plugins that
 "" provide custom statusline: lightline.vim, vim-airline.
 "set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-"" Mappings for CoCList
-"" Show all diagnostics.
-"nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
-"" Manage extensions.
-"nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
-"" Show commands.
-"nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
-"" Find symbol of current document.
-"nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
-"" Search workspace symbols.
-"nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
-"" Do default action for next item.
-"nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
-"" Do default action for previous item.
-"nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
-"" Resume latest coc list.
-"nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 "}}}
 "}}}
 
-" debugger/inspector <c-j> {{{
+" DAP (debugger) <c-j> {{{
+function! ClearBreakpoints() 
+    exec "lua require'dap'.list_breakpoints()"
+    for item in getqflist()
+        exec "exe " . item.lnum . "|lua require'dap'.toggle_breakpoint()"
+    endfor
+endfunction
+
 nnoremap <silent> <c-j><c-j> :lua require'dap'.continue()<CR>
 nnoremap <silent> <c-j>h :lua require'dap'.run_to_cursor()<CR>
 nnoremap <silent> <c-j>j :lua require'dap'.step_over()<CR>
 nnoremap <silent> <c-j><c-]> :lua require'dap'.step_into()<CR>
 nnoremap <silent> <c-j><c-o> :lua require'dap'.step_out()<CR>
-nnoremap <silent> <c-j>B :lua require'dap'.list_breakpoints()<CR>
+nnoremap <silent> <c-j>B :call ClearBreakpoints()<CR>
 nnoremap <silent> <c-j>b :lua require'dap'.toggle_breakpoint()<CR>
 nnoremap <silent> <c-j>c :lua require'dap'.set_breakpoint(vim.fn.input('Condition: '))<CR>
 nnoremap <silent> <c-j>l :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point: '))<CR>
@@ -1108,12 +1185,34 @@ dap.configurations.typescript = {
     cwd= vim.fn.getcwd(),
   },
 }
+
+-- event listeners
+dap.listeners.after['event_initialized']['me'] = function()
+    vim.notify('Debugger attached', nil, { title="DAP" })
+    vim.cmd [[
+        sign define DapBreakpoint texthl=WarningMsg
+        sign define DapBreakpointCondition texthl=WarningMsg
+        sign define DapLogPoint texthl=WarningMsg
+    ]]
+end
+dap.listeners.after['event_terminated']['me'] = function()
+    vim.notify('Debugger terminated', 'warn', { title="DAP" })
+    dap.continue()
+    vim.cmd [[
+        sign define DapBreakpoint texthl=LineNr
+        sign define DapBreakpointCondition texthl=LineNr
+        sign define DapLogPoint texthl=LineNr
+    ]]
+end
+
+-- virtual-text
+require("nvim-dap-virtual-text").setup()
 EOF
 
-sign define DapBreakpoint text= texthl=WarningMsg
+sign define DapBreakpoint text= texthl=LineNr
 sign define DapBreakpointRejected text= texthl=LineNr
-sign define DapBreakpointCondition text= texthl=WarningMsg
-sign define DapLogPoint text= texthl=WarningMsg
+sign define DapBreakpointCondition text= texthl=LineNr
+sign define DapLogPoint text= texthl=LineNr
 sign define DapStopped text= texthl=WarningMsg
 "}}}
 
